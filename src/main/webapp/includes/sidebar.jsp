@@ -44,7 +44,7 @@
         </li>
 
         <li class="#">
-          <a href="account.php">
+          <a href="AccountServlet">
             <img src="assets/img/sidebar/icon-4.png" alt="icon"> <span> Tài khoản</span>
           </a>
         </li>

@@ -20,6 +20,12 @@ public class Account {
 		this.role = role;
 	}
 	
+	public Account(String username, String email, Role role) {
+		this.username = username;
+		this.email = email;
+		this.role = role;
+	}
+	
 	public Account(String username, String password) {
 		this.username = username;
 		this.password = password;

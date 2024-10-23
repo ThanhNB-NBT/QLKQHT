@@ -61,32 +61,55 @@
 						<a href="activities.html">View all Notifications</a>
 					</div>
 				</div></li>
-			<li class="nav-item dropdown d-none d-sm-block"><a
-				href="javascript:void(0);" id="open_msg_box"
-				class="hasnotifications nav-link"><img
-					src="assets/img/sidebar/icon-23.png" alt=""> </a></li>
-			<li class="nav-item dropdown has-arrow"><a href="#"
-				class=" nav-link user-link" data-toggle="dropdown"> <span
-					class="user-img"><img class="rounded-circle"
-						src="assets/img/user-06.jpg" width="30" alt="Admin"> <span
-						class="status online"></span></span> <span>Admin</span>
-			</a>
+			<li class="nav-item dropdown d-none d-sm-block">
+				<a href="javascript:void(0);" id="open_msg_box" class="hasnotifications nav-link">
+					<img src="assets/img/sidebar/icon-23.png" alt=""> 
+				</a>
+			</li>
+			<li class="nav-item dropdown has-arrow">
+				<a href="#" class=" nav-link user-link" data-toggle="dropdown"> 
+					<span class="user-img"><img class="rounded-circle" src="assets/img/user-06.jpg" width="30" alt="Admin">
+						 <span class="status online"></span>
+					</span> 
+					<span>Admin</span>
+				</a>
 				<div class="dropdown-menu">
-					<a class="dropdown-item" href="profile.html">My Profile</a> <a
-						class="dropdown-item" href="edit-profile.html">Edit Profile</a> <a
-						class="dropdown-item" href="settings.html">Settings</a> <a
-						class="dropdown-item" href="login.html">Logout</a>
-				</div></li>
+					<a class="dropdown-item" href="profile.html">My Profile</a>
+					<a class="dropdown-item" href="edit-profile.html">Edit Profile</a>
+					<a class="dropdown-item" href="settings.html">Settings</a>
+					<a class="dropdown-item" href="LogoutServlet">Logout</a>
+				</div>
+			</li>
 		</ul>
 		<div class="dropdown mobile-user-menu float-right">
-			<a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown"
-				aria-expanded="false"><i class="fas fa-ellipsis-v"></i></a>
+			<a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+				<i class="fas fa-ellipsis-v"></i>
+			</a>
 			<div class="dropdown-menu dropdown-menu-right">
-				<a class="dropdown-item" href="profile.html">My Profile</a> <a
-					class="dropdown-item" href="edit-profile.html">Edit Profile</a> <a
-					class="dropdown-item" href="settings.html">Settings</a> <a
-					class="dropdown-item" href="login.html">Logout</a>
+				<a class="dropdown-item" href="profile.html">My Profile</a>
+				<a class="dropdown-item" href="edit-profile.html">Edit Profile</a> 
+				<a class="dropdown-item" href="settings.html">Settings</a> 
+				<a class="dropdown-item" href="LogoutServlet">Logout</a>
 			</div>
 		</div>
 	</div>
 </div>
+
+<jsp:include page="sidebar.jsp"></jsp:include>
+
+<div class="page-wrapper">
+			<div class="content container-fluid">
+				<div class="page-header">
+					<div class="row">
+						<div class="col-md-6">
+							<h3 class="page-title mb-0">Dashboard</h3>
+						</div>
+						<div class="col-md-6">
+							<ul class="breadcrumb mb-0 p-0 float-right">
+								<li class="breadcrumb-item"><a href="index.html"><i class="fas fa-home"></i> Home</a>
+								</li>
+								<li class="breadcrumb-item"><span>Dashboard</span></li>
+							</ul>
+						</div>
+					</div>
+		

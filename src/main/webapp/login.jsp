@@ -19,8 +19,8 @@
 						</div>
 						<form action="LoginServlet" method="post">
 							<div class="form-group">
-								<label>Tên tài khoản</label>
-								<input type="text" class="form-control" name="username" require>
+								<label>Username / Email</label>
+								<input type="text" class="form-control" name="identifier" require>
 							</div>
 							<div class="form-group">
 								<label>Mật khẩu</label>
