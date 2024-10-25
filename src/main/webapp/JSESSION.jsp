@@ -18,6 +18,7 @@
                 <p>Account ID: <%= loggedInAccount.getAccountID() %></p>
                 <p>Username: <%= loggedInAccount.getUsername() %></p>
                 <p>Email: <%= loggedInAccount.getEmail() %></p>
+                <p>RoleID: <%= loggedInAccount.getRole().getRoleID() %></p>
                 <p>Role: <%= loggedInAccount.getRole() != null ? loggedInAccount.getRole().getRole() : "N/A" %></p>
     <%
             } else {

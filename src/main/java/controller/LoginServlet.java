@@ -33,7 +33,6 @@ public class LoginServlet extends HttpServlet {
 	        // Lưu thông tin vào session
 	        HttpSession session = request.getSession();
 	        session.setAttribute("loggedInUser", loggedInAccount); // Lưu toàn bộ đối tượng Account vào session
-
 	        request.getRequestDispatcher("index.jsp").forward(request, response);
 	    } else {
 	        request.setAttribute("error", "Invalid username/email or password.");

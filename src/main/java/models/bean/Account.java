@@ -20,8 +20,9 @@ public class Account {
 		this.role = role;
 	}
 	
-	public Account(String username, String email, Role role) {
+	public Account(String username,String password, String email, Role role) {
 		this.username = username;
+		this.password = password;
 		this.email = email;
 		this.role = role;
 	}

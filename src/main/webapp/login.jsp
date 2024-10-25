@@ -5,7 +5,24 @@
 <head>
 <meta charset="UTF-8">
 <title>Đăng nhập</title>
-<jsp:include page="includes/resources.jsp"></jsp:include>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
+
+	<link rel="shortcut icon" type="image/x-icon" href="assets/img/favicon.png">
+
+	<link href="../../../../css?family=Roboto:300,400,500,700,900" rel="stylesheet">
+
+	<link rel="stylesheet" href="assets/css/bootstrap.min.css">
+
+	<link rel="stylesheet" href="assets/plugins/fontawesome/css/all.min.css">
+	<link rel="stylesheet" href="assets/plugins/fontawesome/css/fontawesome.min.css">
+
+	<link rel="stylesheet" href="assets/css/fullcalendar.min.css">
+
+	<link rel="stylesheet" href="assets/css/dataTables.bootstrap4.min.css">
+
+	<link rel="stylesheet" href="assets/plugins/morris/morris.css">
+
+	<link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
 	<div class="main-wrapper">

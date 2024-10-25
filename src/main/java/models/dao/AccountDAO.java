@@ -16,14 +16,14 @@ public class AccountDAO {
 	        return null; // Trả về null nếu không có username hoặc password
 	    }
 
-	    String queryAccount = "SELECT a.accountID, a.username, a.password, a.email, r.roleID, r.role " +
+	    String sqlAccount = "SELECT a.accountID, a.username, a.password, a.email, r.roleID, r.role " +
 	                          "FROM Accounts a JOIN Roles r ON a.roleID = r.roleID " +
 	                          "WHERE (a.username = ? OR a.email = ?) AND a.password = ?";
 
 	    Account loggedInAccount = null; // Đối tượng Account để lưu thông tin tài khoản
 
 	    try {
-	        PreparedStatement stmt = ConnectDatabase.checkConnect().prepareStatement(queryAccount);
+	        PreparedStatement stmt = ConnectDatabase.checkConnect().prepareStatement(sqlAccount);
 	        String identifier = account.getUsername(); 
 	        stmt.setString(1, identifier);
 	        stmt.setString(2, identifier);
@@ -53,13 +53,13 @@ public class AccountDAO {
 
 	
 	public static List<Account> getAllAccounts() {
-	    String queryAllAccounts = "SELECT a.accountID, a.username, a.password, a.email, r.roleID, r.role " +
+	    String sqlAllAccount = "SELECT a.accountID, a.username, a.password, a.email, r.roleID, r.role " +
 	                              "FROM Accounts a " +
 	                              "JOIN Roles r ON a.roleID = r.roleID";
 	    List<Account> accounts = new ArrayList<>();
 
 	    try {
-	        PreparedStatement stmt = ConnectDatabase.checkConnect().prepareStatement(queryAllAccounts);
+	        PreparedStatement stmt = ConnectDatabase.checkConnect().prepareStatement(sqlAllAccount);
 	        ResultSet rs = stmt.executeQuery();
 	        
 	        while (rs.next()) {
@@ -86,6 +86,36 @@ public class AccountDAO {
 	    
 	    return accounts; 
 	}
+	
+	public static boolean createAccount(Account account) {
+        String sqlInsert = "INSERT INTO Accounts (Username, Password, Email, RoleID) VALUES (?, ?, ?, ?)";
+        try (PreparedStatement stmt = ConnectDatabase.checkConnect().prepareStatement(sqlInsert)) {
 
+            stmt.setString(1, account.getUsername());
+            stmt.setString(2, account.getPassword());
+            stmt.setString(3, account.getEmail());
+            stmt.setInt(4, account.getRole().getRoleID());
 
+            int rowsAffected = stmt.executeUpdate();
+
+            return rowsAffected > 0;
+        } catch(SQLException e) {
+        	e.printStackTrace();
+        	return false;
+        }
+	}
+	
+	public void deleteAccount(int accountID) {
+		String sqlDelete = "DELETE FROM Accounts WHERE AccountID = ?";
+		try (PreparedStatement stmt = ConnectDatabase.checkConnect().prepareStatement(sqlDelete)){
+			stmt.setInt(1, accountID);
+			stmt.executeUpdate();
+		} catch(SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	public void updateAccount(int accountID) {
+		String sqlUpdate = "UPDATE Accounts SET Username = ?, Password = ?, Email = ?, RoleID = ? WHERE AccountID = ?";
+		
+	}
 }
