@@ -1,8 +1,22 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@page import="models.bean.Account"%>
-<%@page import="java.util.ArrayList"%>
+<%@page import="java.util.List"%>
 <%@page import="jakarta.servlet.http.HttpSession"%>
+<%@page import="common.SessionUtils"%>
+
+<%
+// Kiểm tra người dùng đã đăng nhập hay chưa
+HttpSession session1 = request.getSession(false); // Lấy session hiện tại
+if (!SessionUtils.isLoggedIn(session1)) {
+	// Nếu chưa đăng nhập, chuyển hướng về trang đăng nhập
+	response.sendRedirect("login.jsp");
+	return; // Dừng việc xử lý tiếp
+} else {
+	// Nếu đã đăng nhập, lấy tài khoản và hiển thị thông tin người dùng
+	Account loggedInUser = SessionUtils.getLoggedInAccount(session1);
+}
+%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -15,6 +29,14 @@
 		<jsp:include page="../includes/header.jsp"></jsp:include>
 		<div class="page-wrapper">
 			<div class="content container-fluid">
+				<c:if test="${not empty sessionScope.message}">
+					<div class="alert alert-success" id="successMessage">${sessionScope.message}</div>
+					<c:remove var="message" scope="session" />
+				</c:if>
+				<c:if test="${not empty sessionScope.error}">
+					<div class="alert alert-danger" id="errorMessage">${sessionScope.error}</div>
+					<c:remove var="error" scope="session" />
+				</c:if>
 				<div class="page-header">
 					<div class="row">
 						<div class="col-md-6">
@@ -29,19 +51,15 @@
 						</div>
 					</div>
 				</div>
-
 				<div class="row">
 					<div class="col-sm-4 col-4"></div>
 					<div class="col-sm-8 col-8 text-right add-btn-col">
-
-						<a href="#" class="btn btn-primary btn-rounded"
+						<a href="javascript:void(0);" class="btn btn-primary btn-rounded"
 							data-toggle="modal" data-target="#add_account"> <i
 							class="fas fa-plus"></i> Thêm tài khoản
 						</a>
-
 					</div>
 				</div>
-
 				<div class="content-page">
 					<div class="row filter-row">
 						<div class="col-sm-8 col-md-3">
@@ -64,7 +82,6 @@
 							</form>
 						</div>
 					</div>
-
 					<div class="row">
 						<div class="col-md-12 mb-3">
 							<div class="table-responsive">
@@ -81,15 +98,15 @@
 									<tbody>
 										<%
 										int i = 1;
-										ArrayList<Account> accounts = (ArrayList<Account>) request.getAttribute("accounts");
+										List<Account> accounts = (List<Account>) request.getAttribute("accounts");
 										if (accounts != null && !accounts.isEmpty()) {
 											for (Account account : accounts) {
 										%>
 										<tr>
 											<td><%=i++%></td>
-											<td><a href="profile.html" class="avatar">D</a>
+											<td><a href="profile.html" class="avatar"><%=account.getUsername().substring(0, 1).toUpperCase()%></a>
 												<h2>
-													<a href="profile.html"> <%=account.getUsername()%>
+													<a class="badge" href="profile.html"> <%=account.getUsername()%>
 													</a>
 												</h2></td>
 											<td><a href="/cdn-cgi/l/email-protection"
@@ -129,12 +146,10 @@
 														class="fas fa-ellipsis-v"></i></a>
 													<div class="dropdown-menu dropdown-menu-right">
 														<a class="dropdown-item edit-account"
-															data-id="<%=account.getAccountID()%>" data-toggle="modal"
-															data-target="#edit_account"> <i
+															data-id="<%=account.getAccountID()%>"> <i
 															class="fas fa-pencil-alt m-r-5"></i> Sửa
 														</a> <a class="dropdown-item delete-account"
-															data-id="<%=account.getAccountID()%>" data-toggle="modal"
-															data-target="#delete_account"> <i
+															data-id="<%=account.getAccountID()%>"> <i
 															class="fas fa-trash-alt m-r-5"></i> Xóa
 														</a>
 													</div>
@@ -171,7 +186,6 @@
 								<button type="button" class="close" data-dismiss="modal">&times;</button>
 							</div>
 							<div class="modal-body">
-								<!-- Form gửi tới AccountServlet -->
 								<form action="AccountServlet" method="post" class="m-b-30">
 									<div class="row justify-content-center">
 										<div class="col-sm-8">
@@ -213,8 +227,8 @@
 												</select> <label class="focus-label">Quyền</label>
 											</div>
 											<div class="m-t-20 text-center">
-												<button class="btn btn-primary btn-lg" name="submit">Tạo
-													tài khoản</button>
+												<button class="btn btn-primary btn-lg" name="action"
+													value="create">Tạo tài khoản</button>
 											</div>
 										</div>
 									</div>
@@ -223,10 +237,91 @@
 						</div>
 					</div>
 				</div>
+				<div id="delete_account" class="modal" role="dialog">
+					<div class="modal-dialog modal-dialog-centered">
+						<div class="modal-content modal-md">
+							<div class="modal-header">
+								<h4 class="modal-title">Xóa tài khoản</h4>
+								<button type="button" class="close" data-dismiss="modal">&times;</button>
+							</div>
+							<form id="deleteForm" method="post" action="AccountServlet">
+								<div class="modal-body">
+									<p>Bạn có chắc chắn muốn xóa không?</p>
+									<input type="hidden" id="deleteAccountId" name="accountID">
+									<input type="hidden" name="action" value="delete">
+									<!-- Truyền action delete -->
+									<a href="#" class="btn btn-white" data-dismiss="modal">Đóng</a>
+									<button type="submit" class="btn btn-danger">Xóa</button>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+				<jsp:include page="edit_account_modal.jsp"></jsp:include>
+
 			</div>
 		</div>
 	</div>
-
 	<jsp:include page="../includes/footer.jsp"></jsp:include>
+	<script>
+		$(document).on('click', '.edit-account', function() {
+			var accountId = $(this).data('id');
+			console.log("Account ID đang lấy:", accountId);
+			$('#editAccountID').val(accountId);
+			$('#edit_account').modal('show');
+		});
+
+		$(document).ready(function() {
+			// Khi người dùng nhấn nút "Cập nhật" trong modal sửa tài khoản
+			$('#editAccountForm').on('submit', function(event) {
+				event.preventDefault(); // Ngăn chặn hành vi mặc định của form
+
+				$.ajax({
+					url : 'AccountServlet',
+					type : 'POST',
+					data : $(this).serialize(), // Lấy tất cả dữ liệu từ form
+					success : function(response) {
+						// Xử lý kết quả trả về từ servlet
+						if (response.success) {
+							location.reload(); // Tải lại trang để cập nhật dữ liệu
+						} else {
+							alert(response.message); // Hiển thị thông báo lỗi
+						}
+					},
+					error : function(xhr) {
+						alert('Có lỗi xảy ra khi cập nhật tài khoản.');
+					}
+				});
+			});
+		});
+
+		$(document).on('click', '.delete-account', function() {
+			var accountId = $(this).data('id');
+			$('#deleteAccountId').val(accountId);
+			$('#delete_account').modal('show');
+		});
+
+		$('#deleteForm').on('submit', function(event) {
+			event.preventDefault();
+
+			var accountId = $('#deleteAccountId').val();
+			$.ajax({
+				url : 'AccountServlet',
+				type : 'POST',
+				data : {
+					accountID : accountId,
+					action : 'delete'
+				},
+				success : function(response) {
+					$('tr[data-account-id="' + accountId + '"]').remove(); // Xóa dòng tương ứng trong bảng
+					$('#delete_account').modal('hide'); // Đóng modal
+					location.reload(); // Reload lại trang
+				},
+				error : function(xhr) {
+					alert('Có lỗi xảy ra khi xóa tài khoản.');
+				}
+			});
+		});
+	</script>
 </body>
 </html>

@@ -7,6 +7,11 @@ public class Role {
 	public Role(){
 		super();
 	}
+	
+	public Role(int roleID, String role) {
+        this.roleID = roleID;
+        this.role = role;
+    }
 
 	public int getRoleID() {
 		return roleID;

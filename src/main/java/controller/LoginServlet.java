@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import models.bean.Account;
 import models.dao.AccountDAO;
@@ -23,26 +24,25 @@ public class LoginServlet extends HttpServlet {
     }
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String identifier = request.getParameter("identifier");
 	    String password = request.getParameter("password");
 	    Account account = new Account(identifier, password);
-	    
-	    Account loggedInAccount = AccountDAO.checkAccount(account);
+	    AccountDAO accountDAO = new AccountDAO();
+	    Optional<Account> loggedInAccount = accountDAO.checkAccount(account);
 
-	    if (loggedInAccount != null) {
+	    if (loggedInAccount.isPresent()) {
 	        // Lưu thông tin vào session
 	        HttpSession session = request.getSession();
-	        session.setAttribute("loggedInUser", loggedInAccount); // Lưu toàn bộ đối tượng Account vào session
+	        session.setAttribute("loggedInUser", loggedInAccount.get()); // Lưu toàn bộ đối tượng Account vào session
 	        request.getRequestDispatcher("index.jsp").forward(request, response);
 	    } else {
 	        request.setAttribute("error", "Invalid username/email or password.");
 	        request.getRequestDispatcher("login.jsp").include(request, response);
 	    }
-	}
-
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		doGet(request, response);
 	}
 
 }

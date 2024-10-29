@@ -9,8 +9,6 @@
 
 	<link rel="shortcut icon" type="image/x-icon" href="assets/img/favicon.png">
 
-	<link href="../../../../css?family=Roboto:300,400,500,700,900" rel="stylesheet">
-
 	<link rel="stylesheet" href="assets/css/bootstrap.min.css">
 
 	<link rel="stylesheet" href="assets/plugins/fontawesome/css/all.min.css">
@@ -46,9 +44,7 @@
 							<div class="form-group text-center custom-mt-form-group">
 								<button class="btn btn-primary btn-block account-btn" type="submit" value="login">Đăng nhập</button>
 							</div>
-							<div class="text-center">
-								<a href="forgot-password.html">Forgot your password?</a>
-							</div>
+							
 						</form>
 					</div>
 				</div>

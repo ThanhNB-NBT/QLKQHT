@@ -13,7 +13,7 @@
 
 	<link rel="stylesheet" href="assets/css/fullcalendar.min.css">
 
-	<link rel="stylesheet" href="assets/css/dataTables.bootstrap4.min.css">
+	
 
 	<link rel="stylesheet" href="assets/plugins/morris/morris.css">
 

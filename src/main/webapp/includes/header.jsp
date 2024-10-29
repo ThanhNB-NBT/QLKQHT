@@ -87,7 +87,7 @@
 				class=" nav-link user-link" data-toggle="dropdown"> <span
 					class="user-img"><img class="rounded-circle"
 						src="assets/img/user-06.jpg" width="30" > <span
-						class="status online"></span> </span> <span>Admin</span>
+						class="status online"></span> </span> <span><%= loggedInUser.getUsername() %></span>
 			</a>
 				<div class="dropdown-menu">
 					<a class="dropdown-item" href="profile.html">My Profile</a> <a

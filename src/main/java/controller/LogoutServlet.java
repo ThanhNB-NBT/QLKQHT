@@ -20,7 +20,7 @@ public class LogoutServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		 // Đăng xuất người dùng
         SessionUtils.logout(request.getSession(false));
-        response.sendRedirect("LoginServlet");
+        response.sendRedirect("login.jsp");
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

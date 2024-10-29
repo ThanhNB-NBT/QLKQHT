@@ -27,7 +27,7 @@
     <%
             }
         } else {
-    %>
+    %>		<a href="login.jsp">Đăng nhập</a>
             <p>No session exists.</p>
     <%
         }
