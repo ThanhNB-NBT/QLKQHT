@@ -6,12 +6,11 @@ import common.ConnectDatabase;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
 
 public class AccountDAO {
-    private static final Logger logger = Logger.getLogger(AccountDAO.class.getName());
+	private static final Logger logger = Logger.getLogger(AccountDAO.class.getName());
 
     private static final String SQL_CHECK_ACCOUNT = "SELECT a.accountID, a.username, a.password, a.email, r.roleID, r.role FROM Accounts a JOIN Roles r ON a.roleID = r.roleID WHERE (a.username = ? OR a.email = ?) AND a.password = ?";
     private static final String SQL_SELECT_ALL_ACCOUNTS = "SELECT a.accountID, a.username, a.password, a.email, r.roleID, r.role FROM Accounts a JOIN Roles r ON a.roleID = r.roleID";
@@ -20,7 +19,18 @@ public class AccountDAO {
     private static final String SQL_UPDATE_ACCOUNT = "UPDATE Accounts SET Username = ?, Password = ?, Email = ?, RoleID = ? WHERE AccountID = ?";
     private static final String SQL_SELECT_ACCOUNT = "SELECT a.accountID, a.username, a.password, a.email, a.roleID, r.role FROM Accounts a JOIN Roles r ON r.roleID = a.roleID WHERE AccountID = ?";
 
-    // Kiểm tra tài khoản khi đăng nhập
+    // Tạo đối tượng Account từ ResultSet
+    private static Account mapAccount(ResultSet rs) throws SQLException {
+        Role role = new Role(rs.getInt("roleID"), rs.getString("role"));
+        return new Account(
+                rs.getInt("accountID"),
+                rs.getString("username"),
+                rs.getString("password"),
+                rs.getString("email"),
+                role
+        );
+    }
+
     public Optional<Account> checkAccount(Account account) {
         if (account.getUsername() == null || account.getPassword() == null) {
             return Optional.empty();
@@ -33,17 +43,10 @@ public class AccountDAO {
             stmt.setString(2, identifier);
             stmt.setString(3, account.getPassword());
 
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                Role role = new Role(rs.getInt("roleID"), rs.getString("role"));
-                Account loggedInAccount = new Account(
-                        rs.getInt("accountID"),
-                        rs.getString("username"),
-                        rs.getString("password"),
-                        rs.getString("email"),
-                        role
-                );
-                return Optional.of(loggedInAccount);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return Optional.of(mapAccount(rs));
+                }
             }
         } catch (SQLException e) {
             logger.severe("Error checking account: " + e.getMessage());
@@ -51,23 +54,14 @@ public class AccountDAO {
         return Optional.empty();
     }
 
-    // Lấy tất cả tài khoản
-    public static List<Account> getAllAccounts() {
-        List<Account> accounts = new ArrayList<>();
+    public static ArrayList<Account> getAllAccounts() {
+        ArrayList<Account> accounts = new ArrayList<>();
         try (Connection conn = ConnectDatabase.checkConnect();
              PreparedStatement stmt = conn.prepareStatement(SQL_SELECT_ALL_ACCOUNTS);
              ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
-                Role role = new Role(rs.getInt("roleID"), rs.getString("role"));
-                Account account = new Account(
-                        rs.getInt("accountID"),
-                        rs.getString("username"),
-                        rs.getString("password"),
-                        rs.getString("email"),
-                        role
-                );
-                accounts.add(account);
+                accounts.add(mapAccount(rs));
             }
         } catch (SQLException e) {
             logger.severe("Error retrieving all accounts: " + e.getMessage());
@@ -75,13 +69,12 @@ public class AccountDAO {
         return accounts;
     }
 
-    // Tạo tài khoản mới
     public static boolean createAccount(Account account) {
         try (Connection conn = ConnectDatabase.checkConnect();
              PreparedStatement stmt = conn.prepareStatement(SQL_INSERT_ACCOUNT)) {
             stmt.setString(1, account.getUsername());
             stmt.setString(2, account.getPassword());
-            stmt.setString(3, account.getEmail()); // Mật khẩu đã được băm
+            stmt.setString(3, account.getEmail());
             stmt.setInt(4, account.getRole().getRoleID());
 
             return stmt.executeUpdate() > 0;
@@ -91,12 +84,11 @@ public class AccountDAO {
         return false;
     }
 
-    // Cập nhật tài khoản
     public static boolean updateAccount(Account account) {
         try (Connection conn = ConnectDatabase.checkConnect();
              PreparedStatement stmt = conn.prepareStatement(SQL_UPDATE_ACCOUNT)) {
             stmt.setString(1, account.getUsername());
-            stmt.setString(2, account.getPassword()); // Mật khẩu đã được băm
+            stmt.setString(2, account.getPassword());
             stmt.setString(3, account.getEmail());
             stmt.setInt(4, account.getRole().getRoleID());
             stmt.setInt(5, account.getAccountID());
@@ -108,7 +100,6 @@ public class AccountDAO {
         return false;
     }
 
-    // Xóa tài khoản
     public static boolean deleteAccount(int accountID) {
         try (Connection conn = ConnectDatabase.checkConnect();
              PreparedStatement stmt = conn.prepareStatement(SQL_DELETE_ACCOUNT)) {
@@ -120,58 +111,52 @@ public class AccountDAO {
         return false;
     }
     
- // Lấy tài khoản theo ID
     public static Account getAccountById(int accountID) {
-        Account account = null;
         try (Connection conn = ConnectDatabase.checkConnect();
              PreparedStatement stmt = conn.prepareStatement(SQL_SELECT_ACCOUNT)) {
             stmt.setInt(1, accountID);
-            
+
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    Role role = new Role(rs.getInt("roleID"), rs.getString("role"));
-                    account = new Account(
-                            rs.getInt("accountID"),
-                            rs.getString("username"),
-                            rs.getString("password"),
-                            rs.getString("email"),
-                            role
-                    );
+                    return mapAccount(rs);
                 }
             }
         } catch (SQLException e) {
             logger.severe("Error retrieving account by ID: " + e.getMessage());
         }
-        return account;
+        return null;
     }
-    
+
     public static boolean checkUsername(String username) {
         String sql = "SELECT COUNT(*) FROM accounts WHERE username = ?";
         try (Connection conn = ConnectDatabase.checkConnect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, username);
-            ResultSet rs = pstmt.executeQuery();
-            if (rs.next()) {
-                return rs.getInt(1) == 0; // Nếu số lượng là 0 thì username là duy nhất
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) == 0;
+                }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.severe("Error checking username: " + e.getMessage());
         }
-        return false; // Mặc định là không duy nhất nếu có lỗi
+        return false;
     }
+
     public static boolean checkEmail(String email) {
         String sql = "SELECT COUNT(*) FROM accounts WHERE email = ?";
         try (Connection conn = ConnectDatabase.checkConnect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, email);
-            ResultSet rs = pstmt.executeQuery();
-            if (rs.next()) {
-                return rs.getInt(1) == 0; // Nếu số lượng là 0 thì email là duy nhất
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) == 0;
+                }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.severe("Error checking email: " + e.getMessage());
         }
-        return false; // Mặc định là không duy nhất nếu có lỗi
+        return false;
     }
 
 }

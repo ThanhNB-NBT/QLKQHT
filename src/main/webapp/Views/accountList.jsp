@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@page import="models.bean.Account"%>
-<%@page import="java.util.List"%>
+<%@page import="java.util.ArrayList"%>
 <%@page import="jakarta.servlet.http.HttpSession"%>
 <%@page import="common.SessionUtils"%>
 
@@ -29,14 +29,10 @@ if (!SessionUtils.isLoggedIn(session1)) {
 		<jsp:include page="../includes/header.jsp"></jsp:include>
 		<div class="page-wrapper">
 			<div class="content container-fluid">
-				<c:if test="${not empty sessionScope.message}">
-					<div class="alert alert-success" id="successMessage">${sessionScope.message}</div>
-					<c:remove var="message" scope="session" />
-				</c:if>
-				<c:if test="${not empty sessionScope.error}">
-					<div class="alert alert-danger" id="errorMessage">${sessionScope.error}</div>
-					<c:remove var="error" scope="session" />
-				</c:if>
+			
+				<div class="alert alert-success" style="display: none;" id="successMessage">${sessionScope.message}</div>
+				<div class="alert alert-danger" style="display: none;" id="errorMessage">${sessionScope.error}</div>
+				
 				<div class="page-header">
 					<div class="row">
 						<div class="col-md-6">
@@ -61,27 +57,27 @@ if (!SessionUtils.isLoggedIn(session1)) {
 					</div>
 				</div>
 				<div class="content-page">
-					<div class="row filter-row">
-						<div class="col-sm-8 col-md-3">
-							<div class="form-group form-focus">
-								<form action="#" method="GET">
+					<form action="#" method="GET">
+						<div class="row filter-row">
+							<div class="col-sm-8 col-md-3">
+								<div class="form-group form-focus">
 									<input type="text" name="search" class="form-control floating">
 									<label class="focus-label">Tên tài khoản</label>
+								</div>
+							</div>
+							<div class="col-sm-6 col-md-3">
+								<div class="form-group form-focus"></div>
+							</div>
+							<div class="col-sm-6 col-md-3">
+								<div class="form-group form-focus"></div>
+							</div>
+							<div class="col-sm-6 col-md-3">
+								<button type="submit"
+									class="btn btn-search rounded btn-block mb-3">Tìm kiếm
+								</button>
 							</div>
 						</div>
-						<div class="col-sm-6 col-md-3">
-							<div class="form-group form-focus"></div>
-						</div>
-						<div class="col-sm-6 col-md-3">
-							<div class="form-group form-focus"></div>
-						</div>
-						<div class="col-sm-6 col-md-3">
-							<button type="submit"
-								class="btn btn-search rounded btn-block mb-3">Tìm kiếm
-							</button>
-							</form>
-						</div>
-					</div>
+					</form>
 					<div class="row">
 						<div class="col-md-12 mb-3">
 							<div class="table-responsive">
@@ -98,7 +94,7 @@ if (!SessionUtils.isLoggedIn(session1)) {
 									<tbody>
 										<%
 										int i = 1;
-										List<Account> accounts = (List<Account>) request.getAttribute("accounts");
+										ArrayList<Account> accounts = (ArrayList<Account>) request.getAttribute("accounts");
 										if (accounts != null && !accounts.isEmpty()) {
 											for (Account account : accounts) {
 										%>
@@ -186,6 +182,7 @@ if (!SessionUtils.isLoggedIn(session1)) {
 								<button type="button" class="close" data-dismiss="modal">&times;</button>
 							</div>
 							<div class="modal-body">
+									<div class="alert alert-success" style="display: none;">${message}</div>
 								<form action="AccountServlet" method="post" class="m-b-30">
 									<div class="row justify-content-center">
 										<div class="col-sm-8">
@@ -204,7 +201,7 @@ if (!SessionUtils.isLoggedIn(session1)) {
 										</div>
 										<div class="col-sm-8">
 											<div class="form-group form-focus">
-												<input name="pass" type="password"
+												<input name="password" type="password"
 													class="form-control floating" required> <label
 													class="focus-label">Mật khẩu <span
 													class="text-danger">*</span></label>
@@ -257,7 +254,59 @@ if (!SessionUtils.isLoggedIn(session1)) {
 						</div>
 					</div>
 				</div>
-				<jsp:include page="edit_account_modal.jsp"></jsp:include>
+
+				<div class="modal" id="edit_account" role="dialog">
+					<div class="modal-dialog modal-dialog-centered" role="document">
+						<div class="modal-content modal-lg">
+							<div class="modal-header">
+								<h4 class="modal-title" id="editAccountLabel">Sửa tài khoản</h4>
+								<button type="button" class="close" data-dismiss="modal"
+									aria-label="Close">
+									<span aria-hidden="true">&times;</span>
+								</button>
+							</div>
+							<form id="editAccountForm" action="AccountServlet" method="post">
+								<div class="modal-body">
+										<div class="alert alert-success" style="display: none;">${message}</div>
+									<input type="hidden" id="editAccountID" name="accountID">
+
+									<div class="form-group">
+										<label for="editName">Tên đăng nhập</label> <input type="text"
+											id="editName" name="name" class="form-control" required>
+									</div>
+									<div class="form-group">
+										<label for="editEmail">Email</label> <input type="email"
+											id="editEmail" name="email" class="form-control" required>
+									</div>
+									<div class="form-group">
+										<label for="editRole">Vai trò</label> <select id="editRole"
+											name="role" class="form-control" required>
+											<option value="1">Quản trị viên</option>
+											<option value="2">Giảng viên</option>
+											<option value="3">Sinh viên</option>
+										</select>
+									</div>
+									<div class="form-group">
+										<label for="editPassword">Đổi mật khẩu</label> <input
+											type="password" id="editPassword" name="password"
+											class="form-control" placeholder="Nhập mật khẩu mới">
+									</div>
+									<div class="form-group">
+										<label for="editConfirmPassword">Xác nhận mật khẩu mới</label>
+										<input type="password" id="editConfirmPassword" name="cpass"
+											class="form-control" placeholder="Nhập lại mật khẩu mới">
+									</div>
+								</div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-secondary"
+										data-dismiss="modal">Đóng</button>
+									<button type="submit" class="btn btn-primary" name="action"
+										value="update">Cập nhật</button>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
 
 			</div>
 		</div>
@@ -271,32 +320,38 @@ if (!SessionUtils.isLoggedIn(session1)) {
 			$('#edit_account').modal('show');
 		});
 
-		$(document).ready(function() {
-			// Khi người dùng nhấn nút "Cập nhật" trong modal sửa tài khoản
-			$('#editAccountForm').on('submit', function(event) {
-				event.preventDefault(); // Ngăn chặn hành vi mặc định của form
+		$(document).on('click', '.edit-account', function() {
+			var accountId = $(this).data('id');
 
-				$.ajax({
-					url : 'AccountServlet',
-					type : 'POST',
-					data : $(this).serialize(), // Lấy tất cả dữ liệu từ form
-					success : function(response) {
-						// Xử lý kết quả trả về từ servlet
-						if (response.success) {
-							location.reload(); // Tải lại trang để cập nhật dữ liệu
-						} else {
-							alert(response.message); // Hiển thị thông báo lỗi
-						}
-					},
-					error : function(xhr) {
-						alert('Có lỗi xảy ra khi cập nhật tài khoản.');
+			$.ajax({
+				url : 'AccountServlet',
+				type : 'GET',
+				data : {
+					accountID : accountId
+				},
+				dataType : 'json',
+				success : function(account) {
+					if (account) {
+						$('#editAccountID').val(account.accountID);
+						$('#editName').val(account.username);
+						$('#editEmail').val(account.email);
+						$('#editRole').val(account.role.roleID);
+
+						// Mở modal sau khi dữ liệu được load xong
+						$('#edit_account').modal('show');
+					} else {
+						alert("Tài khoản không tồn tại.");
 					}
-				});
+				},
+				error : function(xhr) {
+					alert('Có lỗi xảy ra khi tải thông tin tài khoản.');
+				}
 			});
 		});
 
 		$(document).on('click', '.delete-account', function() {
 			var accountId = $(this).data('id');
+			console.log("Account ID đang lấy:", accountId);
 			$('#deleteAccountId').val(accountId);
 			$('#delete_account').modal('show');
 		});
