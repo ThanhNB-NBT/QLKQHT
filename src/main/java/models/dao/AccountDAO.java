@@ -18,7 +18,8 @@ public class AccountDAO {
     private static final String SQL_DELETE_ACCOUNT = "DELETE FROM Accounts WHERE AccountID = ?";
     private static final String SQL_UPDATE_ACCOUNT = "UPDATE Accounts SET Username = ?, Password = ?, Email = ?, RoleID = ? WHERE AccountID = ?";
     private static final String SQL_SELECT_ACCOUNT = "SELECT a.accountID, a.username, a.password, a.email, a.roleID, r.role FROM Accounts a JOIN Roles r ON r.roleID = a.roleID WHERE AccountID = ?";
-
+    private static final String SQL_SEARCH_ACCOUNT = "SELECT a.accountID, a.username, a.password, a.email, a.roleID, r.role FROM Accounts a JOIN Roles r ON r.roleID = a.roleID WHERE a.Username LIKE ? ";
+    
     // Tạo đối tượng Account từ ResultSet
     private static Account mapAccount(ResultSet rs) throws SQLException {
         Role role = new Role(rs.getInt("roleID"), rs.getString("role"));
@@ -67,6 +68,23 @@ public class AccountDAO {
             logger.severe("Error retrieving all accounts: " + e.getMessage());
         }
         return accounts;
+    }
+    
+    public static ArrayList<Account> searchAccountByUsername(String username) {
+    	ArrayList<Account> accounts = new ArrayList<>();
+    	
+    	try(Connection conn = ConnectDatabase.checkConnect();
+    		PreparedStatement stmt = conn.prepareStatement(SQL_SEARCH_ACCOUNT)) {
+    			stmt.setString(1,"%" + username + "%");
+    			try(ResultSet rs = stmt.executeQuery()){
+    				while (rs.next()) {
+    					accounts.add(mapAccount(rs));
+    				}
+    			} 
+			}catch (SQLException e) {
+				logger.severe("Error: " + e.getMessage());
+		}
+    	return accounts;
     }
 
     public static boolean createAccount(Account account) {

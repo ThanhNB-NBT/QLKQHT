@@ -50,11 +50,16 @@ public class AccountServlet extends HttpServlet {
 	            return;
 	        }
 		}
-
+		
+		String searchAccount = request.getParameter("search");
+		ArrayList<Account> accounts;
+		if (searchAccount != null && !searchAccount.trim().isEmpty()) {
+			accounts = AccountDAO.searchAccountByUsername(searchAccount);
+		} else {
+			accounts = AccountDAO.getAllAccounts();
+		}
 		Account loggedInUser = SessionUtils.getLoggedInAccount(session);
 		request.setAttribute("username", loggedInUser.getUsername());
-
-		ArrayList<Account> accounts = AccountDAO.getAllAccounts();
 		request.setAttribute("accounts", accounts);
 		request.getRequestDispatcher("Views/accountList.jsp").forward(request, response);
 	}
@@ -86,8 +91,9 @@ public class AccountServlet extends HttpServlet {
 		String cpass = request.getParameter("cpass");
 		String email = request.getParameter("email");
 
-		if (validateAccountInput(request, response, username, password, cpass, email))
+		if (checkAccountInput(request, response, username, password, cpass, email)) {
 			return;
+		}
 
 		int roleID = Integer.parseInt(request.getParameter("role"));
 		Role role = new Role();
@@ -129,9 +135,9 @@ public class AccountServlet extends HttpServlet {
 		String cpass = request.getParameter("cpass");
 		String email = request.getParameter("email");
 
-		if (validateAccountInput(request, response, username, password, cpass, email))
+		if (checkAccountInput(request, response, username, password, cpass, email)) {
 			return;
-
+		}
 		int roleID = Integer.parseInt(request.getParameter("role"));
 		Role role = new Role();
 		role.setRoleID(roleID);
@@ -143,38 +149,42 @@ public class AccountServlet extends HttpServlet {
 		response.sendRedirect("AccountServlet");
 	}
 
-	private boolean validateAccountInput(HttpServletRequest request, HttpServletResponse response, String username,
+	private boolean checkAccountInput(HttpServletRequest request, HttpServletResponse response, String username,
 			String password, String cpass, String email) throws ServletException, IOException {
+		HttpSession session = request.getSession();
 		if (username == null || username.trim().isEmpty()) {
-			request.setAttribute("error", "Tên tài khoản không được để trống.");
-			forwardToAccountList(request, response);
+			setSessionError(session, "Tên tài khoản không được để trống.");
+
 			return true;
 		}
 
 		if (email == null || email.trim().isEmpty()) {
-			request.setAttribute("error", "Email không được để trống.");
-			forwardToAccountList(request, response);
+			setSessionError(session, "Email không được để trống.");
+
 			return true;
 		}
 
 		if (!password.equals(cpass)) {
-			request.setAttribute("error", "Mật khẩu và xác nhận mật khẩu không trùng khớp.");
-			forwardToAccountList(request, response);
+			setSessionError(session, "Mật khẩu và xác nhận mật khẩu không trùng khớp.");
+
 			return true;
 		}
 
 		if (!AccountDAO.checkUsername(username)) {
-			request.setAttribute("error", "Tên tài khoản đã tồn tại.");
-			forwardToAccountList(request, response);
+			setSessionError(session, "Tên tài khoản đã tồn tại.");
+
 			return true;
 		}
 
 		if (!AccountDAO.checkEmail(email)) {
-			request.setAttribute("error", "Email đã tồn tại.");
-			forwardToAccountList(request, response);
+			setSessionError(session, "Email đã tồn tại.");
+//			forwardToAccountList(request, response);
 			return true;
 		}
 		return false;
+	}
+	private void setSessionError(HttpSession session, String errorMessage) {
+	    session.setAttribute("errorModal", errorMessage);
 	}
 
 	private void forwardToAccountList(HttpServletRequest request, HttpServletResponse response)

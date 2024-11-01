@@ -16,6 +16,10 @@ if (!SessionUtils.isLoggedIn(session1)) {
 	// Nếu đã đăng nhập, lấy tài khoản và hiển thị thông tin người dùng
 	Account loggedInUser = SessionUtils.getLoggedInAccount(session1);
 }
+
+String message = (String) session.getAttribute("message");
+String error = (String) session.getAttribute("error");
+String errorModal = (String) session.getAttribute("errorModal");
 %>
 <!DOCTYPE html>
 <html>
@@ -29,10 +33,32 @@ if (!SessionUtils.isLoggedIn(session1)) {
 		<jsp:include page="../includes/header.jsp"></jsp:include>
 		<div class="page-wrapper">
 			<div class="content container-fluid">
-			
-				<div class="alert alert-success" style="display: none;" id="successMessage">${sessionScope.message}</div>
-				<div class="alert alert-danger" style="display: none;" id="errorMessage">${sessionScope.error}</div>
-				
+				<%
+				if (message != null && !message.isEmpty()) {
+				%>
+				<div id="successAlert" class="alert alert-success">
+					<%=message%>
+				</div>
+				<%
+				session.removeAttribute("message");
+				%>
+				<%
+				}
+				%>
+
+				<%
+				if (error != null && !error.isEmpty()) {
+				%>
+				<div id="errorAlert" class="alert alert-danger">
+					<%=error%>
+				</div>
+				<%
+				session.removeAttribute("error");
+				%>
+				<%
+				}
+				%>
+
 				<div class="page-header">
 					<div class="row">
 						<div class="col-md-6">
@@ -57,7 +83,7 @@ if (!SessionUtils.isLoggedIn(session1)) {
 					</div>
 				</div>
 				<div class="content-page">
-					<form action="#" method="GET">
+					<form action="AccountServlet" method="GET">
 						<div class="row filter-row">
 							<div class="col-sm-8 col-md-3">
 								<div class="form-group form-focus">
@@ -182,37 +208,56 @@ if (!SessionUtils.isLoggedIn(session1)) {
 								<button type="button" class="close" data-dismiss="modal">&times;</button>
 							</div>
 							<div class="modal-body">
-									<div class="alert alert-success" style="display: none;">${message}</div>
-								<form action="AccountServlet" method="post" class="m-b-30">
+								<%
+								if (errorModal != null && !errorModal.isEmpty()) {
+								%>
+								<div id="errorAlert" class="alert alert-danger">
+									<%=errorModal%>
+								</div>
+								<%
+								session.removeAttribute("errorModal");
+								%>
+								<%
+								}
+								%>
+								<form id="addAccountForm" action="AccountServlet" method="post"
+									class="m-b-30">
 									<div class="row justify-content-center">
 										<div class="col-sm-8">
 											<div class="form-group form-focus">
 												<input name="name" type="text" class="form-control floating"
-													required> <label class="focus-label">Tên <span
-													class="text-danger">*</span></label>
+													required pattern=".{3,}"
+													title="Tài khoản phải có ít nhất 3 ký tự"> <label
+													class="focus-label">Tên <span class="text-danger">*</span></label>
 											</div>
 										</div>
 										<div class="col-sm-8">
 											<div class="form-group form-focus">
 												<input name="email" type="email"
-													class="form-control floating" required> <label
+													class="form-control floating" required
+													
+													title="Email không hợp lệ!"> <label
 													class="focus-label">Email <span class="text-danger">*</span></label>
 											</div>
 										</div>
 										<div class="col-sm-8">
 											<div class="form-group form-focus">
-												<input name="password" type="password"
-													class="form-control floating" required> <label
+												<input id="password" name="password" type="password"
+													class="form-control floating" required pattern=".{6,}"
+													title="Mật khẩu phải có ít nhất 6 ký tự"> <label
 													class="focus-label">Mật khẩu <span
 													class="text-danger">*</span></label>
 											</div>
 										</div>
 										<div class="col-sm-8">
 											<div class="form-group form-focus">
-												<input name="cpass" type="password"
-													class="form-control floating" required> <label
+												<input id="confirmPassword" name="cpass" type="password"
+													class="form-control floating" required
+													title="Xác nhận mật khẩu không được để trống"> <label
 													class="focus-label">Nhập lại mật khẩu <span
-													class="text-danger">*</span></label>
+													class="text-danger">*</span></label> <small
+													id="passwordMismatchWarning" class="text-danger"
+													style="display: none;">Mật khẩu không khớp</small>
 											</div>
 										</div>
 										<div class="col-sm-8">
@@ -224,7 +269,7 @@ if (!SessionUtils.isLoggedIn(session1)) {
 												</select> <label class="focus-label">Quyền</label>
 											</div>
 											<div class="m-t-20 text-center">
-												<button class="btn btn-primary btn-lg" name="action"
+												<button type="submit" class="btn btn-primary btn-lg" name="action"
 													value="create">Tạo tài khoản</button>
 											</div>
 										</div>
@@ -265,18 +310,31 @@ if (!SessionUtils.isLoggedIn(session1)) {
 									<span aria-hidden="true">&times;</span>
 								</button>
 							</div>
-							<form id="editAccountForm" action="AccountServlet" method="post">
+							<%
+							if (errorModal != null && !errorModal.isEmpty()) {
+							%>
+							<div id="errorAlert" class="alert alert-danger">
+								<%=errorModal%>
+							</div>
+							<%
+							session.removeAttribute("errorModal");
+							%>
+							<%
+							}
+							%>
+							<form id="editAccountForm" action="AccountServlet" method="post" class="m-b-30">
 								<div class="modal-body">
-										<div class="alert alert-success" style="display: none;">${message}</div>
 									<input type="hidden" id="editAccountID" name="accountID">
-
 									<div class="form-group">
 										<label for="editName">Tên đăng nhập</label> <input type="text"
-											id="editName" name="name" class="form-control" required>
+											id="editName" name="name" class="form-control" required
+											pattern=".{3,}" title="Tài khoản phải có ít nhất 3 ký tự">
 									</div>
 									<div class="form-group">
 										<label for="editEmail">Email</label> <input type="email"
-											id="editEmail" name="email" class="form-control" required>
+											id="editEmail" name="email" class="form-control" required
+											
+											title="Email không hợp lệ!">
 									</div>
 									<div class="form-group">
 										<label for="editRole">Vai trò</label> <select id="editRole"
@@ -289,12 +347,15 @@ if (!SessionUtils.isLoggedIn(session1)) {
 									<div class="form-group">
 										<label for="editPassword">Đổi mật khẩu</label> <input
 											type="password" id="editPassword" name="password"
-											class="form-control" placeholder="Nhập mật khẩu mới">
+											class="form-control" placeholder="Nhập mật khẩu mới"
+											pattern=".{6,}" title="Mật khẩu phải có ít nhất 6 ký tự">
 									</div>
 									<div class="form-group">
 										<label for="editConfirmPassword">Xác nhận mật khẩu mới</label>
 										<input type="password" id="editConfirmPassword" name="cpass"
 											class="form-control" placeholder="Nhập lại mật khẩu mới">
+										<small id="editPasswordMismatchWarning" class="text-danger"
+											style="display: none;">Mật khẩu không khớp</small>
 									</div>
 								</div>
 								<div class="modal-footer">
@@ -377,6 +438,38 @@ if (!SessionUtils.isLoggedIn(session1)) {
 				}
 			});
 		});
+		
+		function checkPasswordMatch(passwordFieldId, confirmPasswordFieldId, warningTextId, event = null) {
+		    const password = document.getElementById(passwordFieldId).value;
+		    const confirmPassword = document.getElementById(confirmPasswordFieldId).value;
+		    const warningText = document.getElementById(warningTextId);
+
+		    // Chỉ kiểm tra khi có ít nhất một trường được điền
+		    if (password.length > 0 || confirmPassword.length > 0) {
+		        if (password !== confirmPassword) {
+		            warningText.style.display = "block";
+		            document.getElementById(confirmPasswordFieldId).value = ""; // Xóa nội dung ô nhập xác nhận mật khẩu
+		            if (event) event.preventDefault();
+		        } else {
+		            warningText.style.display = "none";
+		        }
+		    } else {
+		        // Nếu cả hai trường đều trống thì ẩn cảnh báo và cho phép submit
+		        warningText.style.display = "none";
+		    }
+		}
+
+		// Tạo tài khoản - Gắn kiểm tra mật khẩu khi submit
+		document.getElementById("addAccountForm").addEventListener("submit", function(event) {
+		    checkPasswordMatch("password", "confirmPassword", "passwordMismatchWarning", event);
+		});
+
+		// Cập nhật tài khoản - Gắn kiểm tra mật khẩu khi submit
+		document.getElementById("editAccountForm").addEventListener("submit", function(event) {
+		    checkPasswordMatch("editPassword", "editConfirmPassword", "editPasswordMismatchWarning", event);
+		});
+
+
 	</script>
 </body>
 </html>
