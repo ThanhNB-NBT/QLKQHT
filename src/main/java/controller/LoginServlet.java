@@ -42,7 +42,7 @@ public class LoginServlet extends HttpServlet {
 //	        session.setMaxInactiveInterval(5);
 	        
 	        session.setAttribute("loggedInUser", loggedInAccount.get()); // Lưu toàn bộ đối tượng Account vào session
-	        request.getRequestDispatcher("index.jsp").forward(request, response);
+	        response.sendRedirect("index.jsp");
 	    } else {
 	        request.setAttribute("error", "Invalid username/email or password.");
 	        request.getRequestDispatcher("login.jsp").include(request, response);

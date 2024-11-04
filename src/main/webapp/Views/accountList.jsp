@@ -7,7 +7,7 @@
 
 <%
 // Kiểm tra người dùng đã đăng nhập hay chưa
-HttpSession session1 = request.getSession(false); // Lấy session hiện tại
+HttpSession session1 = request.getSession(false);
 if (!SessionUtils.isLoggedIn(session1)) {
 	// Nếu chưa đăng nhập, chuyển hướng về trang đăng nhập
 	response.sendRedirect("../login.jsp");
@@ -16,7 +16,9 @@ if (!SessionUtils.isLoggedIn(session1)) {
 	// Nếu đã đăng nhập, lấy tài khoản và hiển thị thông tin người dùng
 	Account loggedInUser = SessionUtils.getLoggedInAccount(session1);
 }
-
+response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+response.setHeader("Pragma", "no-cache");
+response.setDateHeader("Expires", 0);
 String message = (String) session.getAttribute("message");
 String error = (String) session.getAttribute("error");
 %>
