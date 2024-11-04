@@ -18,7 +18,7 @@ public class Account {
     public Account(int accountID, String username, String password, String email, Role role) {
         this.accountID = accountID;
         this.username = username;
-        setPassword(password); // Băm mật khẩu trước khi lưu
+        setPassword(password);
         this.email = email;
         this.role = role;
     }

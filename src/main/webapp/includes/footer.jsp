@@ -17,6 +17,7 @@
 <script src="assets/plugins/datetimepicker/js/tempusdominus-bootstrap-4.min.js"></script>
 
 <script src="assets/js/app.js"></script>
+
 <script>
     $(document).ready(function () {
         setTimeout(function () {

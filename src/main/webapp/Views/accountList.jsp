@@ -10,7 +10,7 @@
 HttpSession session1 = request.getSession(false); // Lấy session hiện tại
 if (!SessionUtils.isLoggedIn(session1)) {
 	// Nếu chưa đăng nhập, chuyển hướng về trang đăng nhập
-	response.sendRedirect("login.jsp");
+	response.sendRedirect("../login.jsp");
 	return; // Dừng việc xử lý tiếp
 } else {
 	// Nếu đã đăng nhập, lấy tài khoản và hiển thị thông tin người dùng
@@ -19,7 +19,6 @@ if (!SessionUtils.isLoggedIn(session1)) {
 
 String message = (String) session.getAttribute("message");
 String error = (String) session.getAttribute("error");
-String errorModal = (String) session.getAttribute("errorModal");
 %>
 <!DOCTYPE html>
 <html>
@@ -208,18 +207,6 @@ String errorModal = (String) session.getAttribute("errorModal");
 								<button type="button" class="close" data-dismiss="modal">&times;</button>
 							</div>
 							<div class="modal-body">
-								<%
-								if (errorModal != null && !errorModal.isEmpty()) {
-								%>
-								<div id="errorAlert" class="alert alert-danger">
-									<%=errorModal%>
-								</div>
-								<%
-								session.removeAttribute("errorModal");
-								%>
-								<%
-								}
-								%>
 								<form id="addAccountForm" action="AccountServlet" method="post"
 									class="m-b-30">
 									<div class="row justify-content-center">
@@ -310,18 +297,6 @@ String errorModal = (String) session.getAttribute("errorModal");
 									<span aria-hidden="true">&times;</span>
 								</button>
 							</div>
-							<%
-							if (errorModal != null && !errorModal.isEmpty()) {
-							%>
-							<div id="errorAlert" class="alert alert-danger">
-								<%=errorModal%>
-							</div>
-							<%
-							session.removeAttribute("errorModal");
-							%>
-							<%
-							}
-							%>
 							<form id="editAccountForm" action="AccountServlet" method="post" class="m-b-30">
 								<div class="modal-body">
 									<input type="hidden" id="editAccountID" name="accountID">

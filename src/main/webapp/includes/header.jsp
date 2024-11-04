@@ -9,7 +9,7 @@
     HttpSession session1 = request.getSession(false);  // Lấy session hiện tại
     if (!SessionUtils.isLoggedIn(session1)) {
         // Nếu chưa đăng nhập, chuyển hướng về trang đăng nhập
-        response.sendRedirect("login.jsp");
+        response.sendRedirect("../login.jsp");
         return;  // Dừng việc xử lý tiếp
     } else {
         // Nếu đã đăng nhập, lấy tài khoản và hiển thị thông tin người dùng

@@ -37,6 +37,10 @@ public class LoginServlet extends HttpServlet {
 	    if (loggedInAccount.isPresent()) {
 	        // Lưu thông tin vào session
 	        HttpSession session = request.getSession();
+	        
+	        //Tạo thời gian xóa session
+//	        session.setMaxInactiveInterval(5);
+	        
 	        session.setAttribute("loggedInUser", loggedInAccount.get()); // Lưu toàn bộ đối tượng Account vào session
 	        request.getRequestDispatcher("index.jsp").forward(request, response);
 	    } else {

@@ -187,12 +187,12 @@ public class AccountServlet extends HttpServlet {
 	    session.setAttribute("errorModal", errorMessage);
 	}
 
-	private void forwardToAccountList(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		List<Account> accounts = AccountDAO.getAllAccounts();
-		request.setAttribute("accounts", accounts);
-		request.getRequestDispatcher("Views/accountList.jsp").forward(request, response);
-	}
+//	private void forwardToAccountList(HttpServletRequest request, HttpServletResponse response)
+//			throws ServletException, IOException {
+//		List<Account> accounts = AccountDAO.getAllAccounts();
+//		request.setAttribute("accounts", accounts);
+//		request.getRequestDispatcher("Views/accountList.jsp").forward(request, response);
+//	}
 
 	private void setSessionMessage(HttpServletRequest request, boolean success, String successMessage,
 			String errorMessage) {
