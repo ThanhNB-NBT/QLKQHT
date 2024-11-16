@@ -37,7 +37,7 @@
         </li>
 
         <li class="#">
-          <a href="#">
+          <a href="DepartmentServlet">
             <img src="assets/img/sidebar/icon-4.png" alt="icon"> <span> Khoa/Viện</span> 
           </a>
           

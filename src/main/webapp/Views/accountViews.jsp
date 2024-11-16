@@ -12,13 +12,7 @@ if (!SessionUtils.isLoggedIn(session1)) {
 	// Nếu chưa đăng nhập, chuyển hướng về trang đăng nhập
 	response.sendRedirect("../login.jsp");
 	return; // Dừng việc xử lý tiếp
-} else {
-	// Nếu đã đăng nhập, lấy tài khoản và hiển thị thông tin người dùng
-	Account loggedInUser = SessionUtils.getLoggedInAccount(session1);
-}
-
-String message = (String) session.getAttribute("message");
-String error = (String) session.getAttribute("error");
+} 
 %>
 <!DOCTYPE html>
 <html>
@@ -32,32 +26,6 @@ String error = (String) session.getAttribute("error");
 		<jsp:include page="../includes/header.jsp"></jsp:include>
 		<div class="page-wrapper">
 			<div class="content container-fluid">
-				<%
-				if (message != null && !message.isEmpty()) {
-				%>
-				<div id="successAlert" class="alert alert-success">
-					<%=message%>
-				</div>
-				<%
-				session.removeAttribute("message");
-				%>
-				<%
-				}
-				%>
-
-				<%
-				if (error != null && !error.isEmpty()) {
-				%>
-				<div id="errorAlert" class="alert alert-danger">
-					<%=error%>
-				</div>
-				<%
-				session.removeAttribute("error");
-				%>
-				<%
-				}
-				%>
-
 				<div class="page-header">
 					<div class="row">
 						<div class="col-md-6">

@@ -8,12 +8,16 @@ public class Department {
     
 	public Department() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 	
 	public Department(int departmentID, String departmentName, String email, String phone) {
 		super();
 		this.departmentID = departmentID;
+		this.departmentName = departmentName;
+		this.email = email;
+		this.phone = phone;
+	}
+	public Department(String departmentName, String email, String phone) {
 		this.departmentName = departmentName;
 		this.email = email;
 		this.phone = phone;

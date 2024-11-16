@@ -1,5 +1,6 @@
 package controller;
 
+import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -17,10 +18,11 @@ import java.util.ArrayList;
 @WebServlet("/AccountServlet")
 public class AccountServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	private static final String ACCOUNTID = "accountID";
+	private static final String ACCOUNT_SERVLET = "AccountServlet";
 
 	public AccountServlet() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -31,7 +33,7 @@ public class AccountServlet extends HttpServlet {
 			return;
 		}
 
-		String accountIDStr = request.getParameter("accountID");
+		String accountIDStr = request.getParameter(ACCOUNTID);
 		if (accountIDStr != null) {
 	        try {
 	            int accountID = Integer.parseInt(accountIDStr);
@@ -61,7 +63,7 @@ public class AccountServlet extends HttpServlet {
 		Account loggedInUser = SessionUtils.getLoggedInAccount(session);
 		request.setAttribute("username", loggedInUser.getUsername());
 		request.setAttribute("accounts", accounts);
-		request.getRequestDispatcher("Views/accountList.jsp").forward(request, response);
+		request.getRequestDispatcher("Views/accountViews.jsp").forward(request, response);
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -103,12 +105,12 @@ public class AccountServlet extends HttpServlet {
 		boolean success = AccountDAO.createAccount(account);
 		setSessionMessage(request, success, "Tạo tài khoản thành công!", "Đã có lỗi xảy ra khi tạo tài khoản.");
 
-		response.sendRedirect("AccountServlet");
+		response.sendRedirect(ACCOUNT_SERVLET);
 	}
 
 	private void deleteAccount(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		String accountIDStr = request.getParameter("accountID");
+			throws IOException, ServletException {
+		String accountIDStr = request.getParameter(ACCOUNTID);
 
 		if (accountIDStr == null || accountIDStr.isEmpty()) {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Account ID không hợp lệ.");
@@ -121,7 +123,7 @@ public class AccountServlet extends HttpServlet {
 			setSessionMessage(request, success, "Tài khoản đã được xóa thành công.",
 					"Có lỗi xảy ra khi xóa tài khoản.");
 
-			response.sendRedirect("AccountServlet");
+			response.sendRedirect(ACCOUNT_SERVLET);
 		} catch (NumberFormatException e) {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Account ID không hợp lệ.");
 		}
@@ -129,7 +131,7 @@ public class AccountServlet extends HttpServlet {
 
 	private void updateAccount(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		int accountID = Integer.parseInt(request.getParameter("accountID"));
+		int accountID = Integer.parseInt(request.getParameter(ACCOUNTID));
 		String username = request.getParameter("name");
 		String password = request.getParameter("password");
 		String cpass = request.getParameter("cpass");
@@ -146,7 +148,7 @@ public class AccountServlet extends HttpServlet {
 		boolean success = AccountDAO.updateAccount(account);
 		setSessionMessage(request, success, "Cập nhật tài khoản thành công!", "Có lỗi xảy ra khi cập nhật tài khoản.");
 
-		response.sendRedirect("AccountServlet");
+		response.sendRedirect(ACCOUNT_SERVLET);
 	}
 
 	private boolean checkAccountInput(HttpServletRequest request, HttpServletResponse response, String username,
@@ -154,31 +156,26 @@ public class AccountServlet extends HttpServlet {
 		HttpSession session = request.getSession();
 		if (username == null || username.trim().isEmpty()) {
 			setSessionError(session, "Tên tài khoản không được để trống.");
-
 			return true;
 		}
 
 		if (email == null || email.trim().isEmpty()) {
 			setSessionError(session, "Email không được để trống.");
-
 			return true;
 		}
 
 		if (!password.equals(cpass)) {
 			setSessionError(session, "Mật khẩu và xác nhận mật khẩu không trùng khớp.");
-
 			return true;
 		}
 
 		if (!AccountDAO.checkUsername(username)) {
 			setSessionError(session, "Tên tài khoản đã tồn tại.");
-
 			return true;
 		}
 
 		if (!AccountDAO.checkEmail(email)) {
 			setSessionError(session, "Email đã tồn tại.");
-//			forwardToAccountList(request, response);
 			return true;
 		}
 		return false;
@@ -187,16 +184,14 @@ public class AccountServlet extends HttpServlet {
 	    session.setAttribute("errorModal", errorMessage);
 	}
 
-//	private void forwardToAccountList(HttpServletRequest request, HttpServletResponse response)
-//			throws ServletException, IOException {
-//		List<Account> accounts = AccountDAO.getAllAccounts();
-//		request.setAttribute("accounts", accounts);
-//		request.getRequestDispatcher("Views/accountList.jsp").forward(request, response);
-//	}
-
 	private void setSessionMessage(HttpServletRequest request, boolean success, String successMessage,
 			String errorMessage) {
-		request.getSession().setAttribute(success ? "message" : "error", success ? successMessage : errorMessage);
+		HttpSession session = request.getSession();
+        if (success) {
+            session.setAttribute("message", successMessage);
+        } else {
+            session.setAttribute("error", errorMessage);
+        }
 	}
 	// Hàm chuyển đổi Account thành JSON
 	private String convertAccountToJson(Account account) {
