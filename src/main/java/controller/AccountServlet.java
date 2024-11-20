@@ -91,10 +91,11 @@ public class AccountServlet extends HttpServlet {
 		String cpass = request.getParameter("cpass");
 		String email = request.getParameter("email");
 
-		if (checkAccountInput(request, response, username, password, cpass, email)) {
+		if (checkAccountInput(request, response, username, password, cpass, email, true)) {
+			response.sendRedirect(ACCOUNT_SERVLET);
 			return;
 		}
-
+		
 		int roleID = Integer.parseInt(request.getParameter("role"));
 		Role role = new Role();
 		role.setRoleID(roleID);
@@ -104,6 +105,8 @@ public class AccountServlet extends HttpServlet {
 		setSessionMessage(request, success, "Tạo tài khoản thành công!", "Đã có lỗi xảy ra khi tạo tài khoản.");
 
 		response.sendRedirect(ACCOUNT_SERVLET);
+		
+		
 	}
 
 	private void deleteAccount(HttpServletRequest request, HttpServletResponse response)
@@ -135,14 +138,21 @@ public class AccountServlet extends HttpServlet {
 		String cpass = request.getParameter("cpass");
 		String email = request.getParameter("email");
 
-		if (checkAccountInput(request, response, username, password, cpass, email)) {
+		if (checkAccountInput(request, response, username, password, cpass, email, false)) {
 			return;
 		}
 		int roleID = Integer.parseInt(request.getParameter("role"));
 		Role role = new Role();
 		role.setRoleID(roleID);
-		Account account = new Account(accountID, username, password, email, role);
-
+		Account account = new Account(accountID, username, email, role);
+		 // Nếu người dùng nhập mật khẩu mới, cập nhật mật khẩu vào đối tượng Account
+	    if (password != null && !password.trim().isEmpty()) {
+	        if (!password.equals(cpass)) {
+	            setSessionError(request.getSession(), "Mật khẩu và xác nhận mật khẩu không trùng khớp.");
+	            return;
+	        }
+	        account.setPassword(password); // Cập nhật mật khẩu mới
+	    }
 		boolean success = AccountDAO.updateAccount(account);
 		setSessionMessage(request, success, "Cập nhật tài khoản thành công!", "Có lỗi xảy ra khi cập nhật tài khoản.");
 
@@ -150,7 +160,7 @@ public class AccountServlet extends HttpServlet {
 	}
 
 	private boolean checkAccountInput(HttpServletRequest request, HttpServletResponse response, String username,
-			String password, String cpass, String email) throws ServletException, IOException {
+			String password, String cpass, String email, boolean isCreateAction) throws ServletException, IOException {
 		HttpSession session = request.getSession();
 		if (username == null || username.trim().isEmpty()) {
 			setSessionError(session, "Tên tài khoản không được để trống.");
@@ -161,18 +171,35 @@ public class AccountServlet extends HttpServlet {
 			setSessionError(session, "Email không được để trống.");
 			return true;
 		}
+		
+		if (!isValidEmailFormat(email)) {
+	        setSessionError(session, "Định dạng email không hợp lệ.");
+	        return true;
+	    }
+		
+		if (isCreateAction) { 
+	        if (password == null || password.isEmpty()) {
+	            setSessionError(session, "Mật khẩu không được để trống.");
+	            return true;
+	        }
 
-		if (!password.equals(cpass)) {
-			setSessionError(session, "Mật khẩu và xác nhận mật khẩu không trùng khớp.");
-			return true;
-		}
+	        if (!password.equals(cpass)) {
+	            setSessionError(session, "Mật khẩu và xác nhận mật khẩu không trùng khớp.");
+	            return true;
+	        }
+	    }
 
-		if (!AccountDAO.checkUsername(username)) {
+		// Kiểm tra nếu username hoặc email có thay đổi thì kiểm tra sự tồn tại trong DB
+		Account accountToEdit = (Account) session.getAttribute("accountToEdit"); // Tải đối tượng account đang chỉnh sửa (nếu có)
+		
+		// Kiểm tra username
+		if (accountToEdit != null && !accountToEdit.getUsername().equals(username) && AccountDAO.checkUsername(username)) {
 			setSessionError(session, "Tên tài khoản đã tồn tại.");
 			return true;
 		}
 
-		if (!AccountDAO.checkEmail(email)) {
+		// Kiểm tra email
+		if (accountToEdit != null && !accountToEdit.getEmail().equals(email) && AccountDAO.checkEmail(email)) {
 			setSessionError(session, "Email đã tồn tại.");
 			return true;
 		}
@@ -198,6 +225,11 @@ public class AccountServlet extends HttpServlet {
 	           ", \"email\": \"" + account.getEmail() + "\"" +
 	           ", \"role\": { \"roleID\": " + account.getRole().getRoleID() + 
 	           ", \"role\": \"" + account.getRole().getRole() + "\" } }";
+	}
+	
+	private boolean isValidEmailFormat(String email) {
+	    String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+	    return email.matches(emailRegex);
 	}
 
 }

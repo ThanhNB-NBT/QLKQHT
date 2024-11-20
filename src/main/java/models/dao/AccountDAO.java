@@ -19,8 +19,8 @@ public class AccountDAO {
     private static final String SQL_UPDATE_ACCOUNT = "UPDATE Accounts SET Username = ?, Password = ?, Email = ?, RoleID = ? WHERE AccountID = ?";
     private static final String SQL_SELECT_ACCOUNT = "SELECT a.accountID, a.username, a.password, a.email, a.roleID, r.role FROM Accounts a JOIN Roles r ON r.roleID = a.roleID WHERE AccountID = ?";
     private static final String SQL_SEARCH_ACCOUNT = "SELECT a.accountID, a.username, a.password, a.email, a.roleID, r.role FROM Accounts a JOIN Roles r ON r.roleID = a.roleID WHERE a.Username LIKE ? ";
-    
-    // Tạo đối tượng Account từ ResultSet
+    private static final String SQL_CHECK_USERNAME = "SELECT COUNT(*) FROM accounts WHERE username = ?";
+    private static final String SQL_CHECK_EMAIL = "SELECT COUNT(*) FROM accounts WHERE email = ?";
     private static Account mapAccount(ResultSet rs) throws SQLException {
         Role role = new Role(rs.getInt("roleID"), rs.getString("role"));
         return new Account(
@@ -146,13 +146,12 @@ public class AccountDAO {
     }
 
     public static boolean checkUsername(String username) {
-        String sql = "SELECT COUNT(*) FROM accounts WHERE username = ?";
         try (Connection conn = ConnectDatabase.checkConnect();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+             PreparedStatement pstmt = conn.prepareStatement(SQL_CHECK_USERNAME)) {
             pstmt.setString(1, username);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
-                    return rs.getInt(1) == 0;
+                    return rs.getInt(1) > 0;
                 }
             }
         } catch (SQLException e) {
@@ -162,13 +161,12 @@ public class AccountDAO {
     }
 
     public static boolean checkEmail(String email) {
-        String sql = "SELECT COUNT(*) FROM accounts WHERE email = ?";
         try (Connection conn = ConnectDatabase.checkConnect();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+             PreparedStatement pstmt = conn.prepareStatement(SQL_CHECK_EMAIL)) {
             pstmt.setString(1, email);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
-                    return rs.getInt(1) == 0;
+                    return rs.getInt(1) > 0;
                 }
             }
         } catch (SQLException e) {

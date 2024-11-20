@@ -2,6 +2,7 @@
 	pageEncoding="UTF-8"%>
 
 <%@page import="models.bean.Department"%>
+<%@page import="models.dao.DepartmentDAO"%>
 <%@page import="models.bean.Account"%>
 <%@page import="java.util.List"%>
 <%@page import="jakarta.servlet.http.HttpSession"%>
@@ -14,6 +15,9 @@ if (!SessionUtils.isLoggedIn(session)) {
 	response.sendRedirect("../login.jsp");
 	return; // Dừng việc xử lý tiếp
 }
+response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+response.setHeader("Pragma", "no-cache");
+response.setDateHeader("Expires", 0);
 %>
 <!DOCTYPE html>
 <html>

@@ -34,18 +34,17 @@ public class LoginServlet extends HttpServlet {
 	    Optional<Account> loggedInAccount = accountDAO.checkAccount(account);
 
 	    if (loggedInAccount.isPresent()) {
-	        // Lưu thông tin vào session
-	        HttpSession session = request.getSession();
-	        
-	        //Tạo thời gian xóa session
-//	        session.setMaxInactiveInterval(5);
-	        
-	        session.setAttribute("loggedInUser", loggedInAccount.get()); // Lưu toàn bộ đối tượng Account vào session
-	        response.sendRedirect("index.jsp");
-	    } else {
-	        request.setAttribute("error", "Invalid username/email or password.");
-	        request.getRequestDispatcher("login.jsp").include(request, response);
-	    }
+            // Tạo session hoặc lấy session hiện tại nếu đã tồn tại
+            HttpSession session = request.getSession(false); 
+
+            session.setAttribute("loggedInUser", loggedInAccount.get()); 
+
+            response.sendRedirect(request.getContextPath() + "/index.jsp");
+        } else {
+            // Đăng nhập thất bại, hiển thị thông báo lỗi
+            request.setAttribute("error", "Tài khoản hoặc mật khẩu không chính xác");
+            request.getRequestDispatcher("login.jsp").forward(request, response);
+        }
 	}
 
 }

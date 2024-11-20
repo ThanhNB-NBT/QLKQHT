@@ -138,6 +138,9 @@ public class DepartmentServlet extends HttpServlet {
 	private boolean checkDepartmentInput(HttpServletRequest request, HttpServletResponse response, String departmentName,
 			String email, String phone) {
 		HttpSession session = request.getSession();
+		
+		Department departmentToEdit = (Department) session.getAttribute("departmentToEdit");
+		
 		if (departmentName == null || departmentName.trim().isEmpty()) {
 			setSessionError(session, "Tên khoa/viện không được để trống.");
 			return true;
@@ -153,7 +156,11 @@ public class DepartmentServlet extends HttpServlet {
 			return true;
 		}
 
-		if (!DepartmentDAO.checkDepartmentName(departmentName)) {
+		if (departmentToEdit != null && !departmentToEdit.getDepartmentName().equals(departmentName) &&  DepartmentDAO.checkDepartmentName(departmentName)) {
+			setSessionError(session, "Tên khoa/viện đã tồn tại.");
+			return true;
+		}
+		if (departmentToEdit != null && !departmentToEdit.getEmail().equals(email) &&  DepartmentDAO.checkDepartmentName(departmentName)) {
 			setSessionError(session, "Tên khoa/viện đã tồn tại.");
 			return true;
 		}

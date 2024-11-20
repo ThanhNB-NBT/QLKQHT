@@ -14,7 +14,7 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 
-@WebFilter("/LoginFilter")
+@WebFilter("/*")
 public class LoginFilter extends HttpFilter implements Filter {
        
     public LoginFilter() {
@@ -30,11 +30,17 @@ public class LoginFilter extends HttpFilter implements Filter {
 		HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res = (HttpServletResponse) response;
 
+        String path = req.getRequestURI();
+        if (path.endsWith("/login.jsp") || path.endsWith("/LoginServlet") || 
+    	    path.endsWith(".css") || path.endsWith(".js") || path.endsWith(".png") 
+    	    || path.endsWith(".jpg") || path.endsWith(".jpeg") || path.endsWith(".gif")) { 
+    	    chain.doFilter(request, response); 
+    	    return; 
+    	}
+        
         HttpSession session = req.getSession(false);
-
-
         if (session == null || session.getAttribute("loggedInUser") == null) {
-            res.sendRedirect(req.getContextPath() + "/login.jsp");
+        	res.sendRedirect(req.getContextPath() + "/login.jsp"); 
         } else {
             chain.doFilter(request, response);
         }

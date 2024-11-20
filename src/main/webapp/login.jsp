@@ -5,22 +5,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Đăng nhập</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
-
-	<link rel="shortcut icon" type="image/x-icon" href="assets/img/favicon.png">
-
-	<link rel="stylesheet" href="assets/css/bootstrap.min.css">
-
-	<link rel="stylesheet" href="assets/plugins/fontawesome/css/all.min.css">
-	<link rel="stylesheet" href="assets/plugins/fontawesome/css/fontawesome.min.css">
-
-	<link rel="stylesheet" href="assets/css/fullcalendar.min.css">
-
-	<link rel="stylesheet" href="assets/css/dataTables.bootstrap4.min.css">
-
-	<link rel="stylesheet" href="assets/plugins/morris/morris.css">
-
-	<link rel="stylesheet" href="assets/css/style.css">
+	<jsp:include page="includes/resources.jsp"></jsp:include>
 </head>
 <body>
 	<div class="main-wrapper">
@@ -34,12 +19,14 @@
 						</div>
 						<form action="LoginServlet" method="post">
 							<div class="form-group">
-								<label>Username / Email</label>
-								<input type="text" class="form-control" name="identifier" require>
+								<label>Tài khoản / Email</label>
+								<input type="text" class="form-control" name="identifier" required pattern=".{3,}"
+													title="Tài khoản phải có ít nhất 3 ký tự">
 							</div>
 							<div class="form-group">
 								<label>Mật khẩu</label>
-								<input type="password" class="form-control" name="password" require>
+								<input type="password" class="form-control" name="password" required pattern=".{3,}"
+													title="Mật khẩu phải có ít nhất 6 ký tự">
 							</div>
 							<div class="form-group text-center custom-mt-form-group">
 								<button class="btn btn-primary btn-block account-btn" type="submit" value="login">Đăng nhập</button>
@@ -52,12 +39,6 @@
 		</div>
 	</div>
 
-	<script src="assets/js/jquery-3.6.0.min.js"></script>
-
-	<script src="assets/js/bootstrap.bundle.min.js"></script>
-
-	<script src="assets/js/jquery.slimscroll.js"></script>
-
-	<script src="assets/js/app.js"></script>
+	<jsp:include page="includes/footer.jsp"></jsp:include>
 </body>
 </html>

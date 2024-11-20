@@ -43,8 +43,6 @@ session.removeAttribute("error");
 }
 %>
 
-
-<%-- Kiểm tra và hiển thị thông báo lỗi modal --%>
 <%
 String errorModal = (String) session.getAttribute("errorModal");
 if (errorModal != null) {

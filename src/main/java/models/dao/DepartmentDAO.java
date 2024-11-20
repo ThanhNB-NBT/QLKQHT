@@ -119,7 +119,7 @@ public class DepartmentDAO {
 				stmt.setString(1, departmentName);
 				try(ResultSet rs = stmt.executeQuery()){
 					if(rs.next()) {
-						return rs.getInt(1) == 0;
+						return rs.getInt(1) > 0;
 					}
 				}
 		} catch(SQLException e) {
