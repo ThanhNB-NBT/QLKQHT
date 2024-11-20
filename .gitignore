@@ -1,1 +1,28 @@
+# Ignore các file và thư mục được tạo tự động bởi Eclipse
+/.settings/
+/bin/
 /build/
+/target/
+/out/
+
+# Giữ lại các file cần thiết cho Eclipse (dùng để import dự án đúng cách)
+!.project
+!.classpath
+
+# File log và tạm thời
+*.log
+*.tmp
+*.bak
+*.swp
+
+# Hệ điều hành-specific files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# File biên dịch Java
+*.class
+
+# File WAR/EAR
+*.war
+*.ear

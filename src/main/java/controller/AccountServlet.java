@@ -1,6 +1,5 @@
 package controller;
 
-import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -12,7 +11,6 @@ import models.bean.Role;
 import models.dao.AccountDAO;
 import common.SessionUtils;
 import java.io.IOException;
-import java.util.List;
 import java.util.ArrayList;
 
 @WebServlet("/AccountServlet")
