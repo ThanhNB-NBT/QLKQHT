@@ -6,6 +6,7 @@ import common.ConnectDatabase;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
 
@@ -55,8 +56,8 @@ public class AccountDAO {
         return Optional.empty();
     }
 
-    public static ArrayList<Account> getAllAccounts() {
-        ArrayList<Account> accounts = new ArrayList<>();
+    public static List<Account> getAllAccounts() {
+        List<Account> accounts = new ArrayList<>();
         try (Connection conn = ConnectDatabase.checkConnect();
              PreparedStatement stmt = conn.prepareStatement(SQL_SELECT_ALL_ACCOUNTS);
              ResultSet rs = stmt.executeQuery()) {

@@ -1,19 +1,44 @@
 package models.bean;
 
 public class Course {
-	private String courseID;
+	private int courseID;
     private String courseName;
     private int credits;
     private int departmentID;
-    private String status;        
     private String courseCode;    
     private String courseType;  
+    private String status; 
+    private String departmentName;
     
 	public Course() {
 		super();
 	}
 
-	public Course(String courseID, String courseName, int credits, int departmentID,
+	public Course(int courseID, String courseName, int credits, int departmentID,
+			String status, String courseCode, String courseType, String departmentName) {
+		super();
+		this.courseID = courseID;
+		this.courseName = courseName;
+		this.credits = credits;
+		this.departmentID = departmentID;
+		this.status = status;
+		this.courseCode = courseCode;
+		this.courseType = courseType;
+		this.departmentName = departmentName;
+	}
+	
+	public Course( String courseName, int credits, int departmentID,
+			String status, String courseCode, String courseType) {
+		super();
+		this.courseName = courseName;
+		this.credits = credits;
+		this.departmentID = departmentID;
+		this.status = status;
+		this.courseCode = courseCode;
+		this.courseType = courseType;
+	}
+	
+	public Course(int courseID, String courseName, int credits, int departmentID,
 			String status, String courseCode, String courseType) {
 		super();
 		this.courseID = courseID;
@@ -23,9 +48,10 @@ public class Course {
 		this.status = status;
 		this.courseCode = courseCode;
 		this.courseType = courseType;
+
 	}
 
-	public String getCourseID() {
+	public int getCourseID() {
 		return courseID;
 	}
 
@@ -52,8 +78,11 @@ public class Course {
 	public String getCourseType() {
 		return courseType;
 	}
+	public String getDepartmentName() {
+		return departmentName;
+	}
 
-	public void setCourseID(String courseID) {
+	public void setCourseID(int courseID) {
 		this.courseID = courseID;
 	}
 
@@ -79,6 +108,10 @@ public class Course {
 
 	public void setCourseType(String courseType) {
 		this.courseType = courseType;
+	}
+	
+	public void setDepartmentName(String departmentName) {
+		this.departmentName = departmentName;
 	}
 	
 	

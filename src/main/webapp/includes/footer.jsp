@@ -13,43 +13,37 @@
 	src="https://cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/alertify.min.js"></script>
 <script src="assets/js/app.js"></script>
 <script>
-	alertify.set('notifier', 'position', 'top-right');
-	
-	<%-- Kiểm tra và hiển thị thông báo thành công --%>
-	<%
-	    String message = (String) session.getAttribute("message");
-	    if (message != null) {
-	%>
-	    alertify.success('<%= message %>');
-	    <%
-	        session.removeAttribute("message");
-	    }
-	%>
-	
-	<%-- Kiểm tra và hiển thị thông báo lỗi --%>
-<%
-    String error = (String) session.getAttribute("error");
-    if (error != null) {
-%>
-    <script>
-        // Sử dụng setTimeout để thêm delay cho việc hiển thị thông báo
-        setTimeout(function() {
-            alertify.error('<%= error %>
-	');
-	}, 2000); // Delay 1000ms (1 giây)
-</script>
-<%
-session.removeAttribute("error");
-}
-%>
+	$(document).ready(function() {
+		alertify.set('notifier', 'position', 'top-right');
+		
+		<%
+			String message = (String) session.getAttribute("message");
+			if (message != null) {
+		%>
+			alertify.success('<%= message %>');
+			<%
+				session.removeAttribute("message");
+			}
+		%>
 
-<%
-String errorModal = (String) session.getAttribute("errorModal");
-if (errorModal != null) {
-%>
-alertify.error('<%=errorModal%>');
-<%
-session.removeAttribute("errorModal");
-}
-%>
+		<%
+		String error = (String) session.getAttribute("error");
+		if (error != null) {
+		%>
+		alertify.error('<%= error %>');
+		<%
+		session.removeAttribute("error");
+		}
+		%>
+
+		<%
+		String errorModal = (String) session.getAttribute("errorModal");
+		if (errorModal != null) {
+		%>
+		alertify.error('<%=errorModal%>');
+		<%
+		session.removeAttribute("errorModal");
+		}
+		%>
+	});
 </script>

@@ -41,9 +41,10 @@ public class DepartmentServlet extends HttpServlet {
 	            Department departmentToEdit = DepartmentDAO.getDepartmentById(departmentID);
 
 	            if (departmentToEdit != null) {
-	                response.setContentType("application/json");
-	                response.setCharacterEncoding("UTF-8");
-	                response.getWriter().write(convertDepartmentToJson(departmentToEdit));
+
+	                request.setAttribute("departmentToEdit", departmentToEdit);
+
+	                request.getRequestDispatcher("/Views/DepartmentView/editDepartmentModal.jsp").forward(request, response);
 	            } else {
 	                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Tài khoản không tồn tại.");
 	            }
@@ -62,7 +63,7 @@ public class DepartmentServlet extends HttpServlet {
 			departments = DepartmentDAO.getAllDepartment();
 		}
 		request.setAttribute("departments", departments );
-		request.getRequestDispatcher("Views/departmentViews.jsp").forward(request, response);
+		request.getRequestDispatcher("Views/DepartmentView/departmentViews.jsp").forward(request, response);
 	}
 @Override
 	

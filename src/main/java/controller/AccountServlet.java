@@ -11,7 +11,7 @@ import models.bean.Role;
 import models.dao.AccountDAO;
 import common.SessionUtils;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
 
 @WebServlet("/AccountServlet")
 public class AccountServlet extends HttpServlet {
@@ -39,9 +39,11 @@ public class AccountServlet extends HttpServlet {
 	            Account accountToEdit = AccountDAO.getAccountById(accountID);
 
 	            if (accountToEdit != null) {
-	                response.setContentType("application/json");
-	                response.setCharacterEncoding("UTF-8");
-	                response.getWriter().write(convertAccountToJson(accountToEdit));
+//	                response.setContentType("application/json");
+//	                response.setCharacterEncoding("UTF-8");
+//	                response.getWriter().write(convertAccountToJson(accountToEdit));
+	            	request.setAttribute("accountToEdit", accountToEdit);
+	            	request.getRequestDispatcher("/Views/AccountView/editAccountModal.jsp").forward(request, response);
 	            } else {
 	                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Tài khoản không tồn tại.");
 	            }
@@ -53,7 +55,7 @@ public class AccountServlet extends HttpServlet {
 		}
 		
 		String searchAccount = request.getParameter("search");
-		ArrayList<Account> accounts;
+		List<Account> accounts;
 		if (searchAccount != null && !searchAccount.trim().isEmpty()) {
 			accounts = AccountDAO.searchAccountByUsername(searchAccount);
 		} else {
@@ -62,7 +64,7 @@ public class AccountServlet extends HttpServlet {
 		Account loggedInUser = SessionUtils.getLoggedInAccount(session);
 		request.setAttribute("username", loggedInUser.getUsername());
 		request.setAttribute("accounts", accounts);
-		request.getRequestDispatcher("Views/accountViews.jsp").forward(request, response);
+		request.getRequestDispatcher("Views/AccountView/accountViews.jsp").forward(request, response);
 	}
 @Override
 	

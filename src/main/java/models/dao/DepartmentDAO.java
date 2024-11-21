@@ -19,11 +19,12 @@ public class DepartmentDAO {
 	private static final String SQL_CHECHK_DEPARTMENTNAME = "SELECT COUNT(*) FROM Departments WHERE DepartmentName = ?";
 	
 	private static Department mapDepartment(ResultSet rs) throws SQLException{
-		return new Department(rs.getInt("DepartmentID"),
-				rs.getString("DepartmentName"),
-				rs.getString("Email"),
-				rs.getString("Phone")
-				);
+		Department department = new Department();
+		department.setDepartmentID(rs.getInt("DepartmentID"));
+		department.setDepartmentName(rs.getString("DepartmentName"));
+		department.setEmail(rs.getString("Email"));
+		department.setPhone(rs.getString("Phone"));
+		return department;
 	}
 	
 	public static List<Department> getAllDepartment(){
