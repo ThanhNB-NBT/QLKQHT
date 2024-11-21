@@ -11,43 +11,30 @@ import models.dao.AccountDAO;
 
 import java.io.IOException;
 
-/**
- * Servlet implementation class RegisterServlet
- */
 @WebServlet("/RegisterServlet")
 public class RegisterServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
+
     public RegisterServlet() {
         super();
-        // TODO Auto-generated constructor stub
     }
 
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
+
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		response.getWriter().append("Served at: ").append(request.getContextPath());
+
 	}
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
+
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String username = request.getParameter("username");
         String email = request.getParameter("email");
         String password = request.getParameter("password");
         int roleID = Integer.parseInt(request.getParameter("roleID"));
         
-        Role role = new Role(roleID, ""); // Thay đổi theo cách lấy thông tin vai trò nếu cần
+        Role role = new Role(roleID, ""); 
         Account newAccount = new Account(username, password, email, role);
         
-        AccountDAO accountDAO = new AccountDAO();
-        boolean isCreated = accountDAO.createAccount(newAccount);
+        boolean isCreated = AccountDAO.createAccount(newAccount);
 
         if (isCreated) {
             response.sendRedirect("login.jsp?success=true");

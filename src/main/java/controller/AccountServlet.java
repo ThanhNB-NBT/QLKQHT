@@ -23,6 +23,7 @@ public class AccountServlet extends HttpServlet {
 		super();
 	}
 
+	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		HttpSession session = request.getSession(false);
@@ -63,7 +64,8 @@ public class AccountServlet extends HttpServlet {
 		request.setAttribute("accounts", accounts);
 		request.getRequestDispatcher("Views/accountViews.jsp").forward(request, response);
 	}
-
+@Override
+	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		String action = request.getParameter("action");
@@ -146,12 +148,16 @@ public class AccountServlet extends HttpServlet {
 		role.setRoleID(roleID);
 		Account account = new Account(accountID, username, email, role);
 		 // Nếu người dùng nhập mật khẩu mới, cập nhật mật khẩu vào đối tượng Account
-	    if (password != null && !password.trim().isEmpty()) {
+		if (password != null && !password.trim().isEmpty()) {
 	        if (!password.equals(cpass)) {
 	            setSessionError(request.getSession(), "Mật khẩu và xác nhận mật khẩu không trùng khớp.");
 	            return;
 	        }
 	        account.setPassword(password); // Cập nhật mật khẩu mới
+	    } else {
+	        // Nếu không thay đổi mật khẩu, giữ mật khẩu cũ
+	        Account oldAccount = AccountDAO.getAccountById(accountID); // Giả sử bạn có phương thức này
+	        account.setPassword(oldAccount.getPassword()); // Giữ mật khẩu cũ
 	    }
 		boolean success = AccountDAO.updateAccount(account);
 		setSessionMessage(request, success, "Cập nhật tài khoản thành công!", "Có lỗi xảy ra khi cập nhật tài khoản.");
@@ -201,7 +207,7 @@ public class AccountServlet extends HttpServlet {
 		// Kiểm tra email
 		if (accountToEdit != null && !accountToEdit.getEmail().equals(email) && AccountDAO.checkEmail(email)) {
 			setSessionError(session, "Email đã tồn tại.");
-			return true;
+			return true;	
 		}
 		return false;
 	}

@@ -26,6 +26,7 @@ public class DepartmentServlet extends HttpServlet {
     }
 
 
+	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		HttpSession session = request.getSession(false);
 		if (!SessionUtils.isLoggedIn(session)) {
@@ -63,7 +64,8 @@ public class DepartmentServlet extends HttpServlet {
 		request.setAttribute("departments", departments );
 		request.getRequestDispatcher("Views/departmentViews.jsp").forward(request, response);
 	}
-
+@Override
+	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String action = request.getParameter("action");
 

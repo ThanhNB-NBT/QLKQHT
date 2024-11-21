@@ -64,7 +64,11 @@ public class Account {
     }
 
     public void setPassword(String password) {
-        this.password = hashPassword(password); // Băm mật khẩu tự động
+    	if (password == null || password.trim().isEmpty()) {
+            this.password = null; // Hoặc giữ mật khẩu cũ nếu không thay đổi
+        } else {
+            this.password = hashPassword(password); // Băm mật khẩu tự động nếu có mật khẩu mới
+        } 
     }
 
     public String getEmail() {
