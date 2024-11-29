@@ -23,7 +23,7 @@
 						<div class="col-sm-8">
 							<div class="form-group form-focus">
 								<input name="email" type="email" class="form-control floating"
-									required title="Email không hợp lệ!"> <label
+									required> <label
 									class="focus-label">Email <span class="text-danger">*</span></label>
 							</div>
 						</div>

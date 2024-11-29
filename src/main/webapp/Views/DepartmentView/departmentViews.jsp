@@ -68,7 +68,7 @@ boolean isAdmin = (userRole != null && userRole == 1);
 							<div class="col-sm-8 col-md-3">
 								<div class="form-group form-focus">
 									<input type="text" name="search" class="form-control floating">
-									<label class="focus-label">Tên khoan/viện</label>
+									<label class="focus-label">Tên khoa/viện</label>
 								</div>
 							</div>
 							<div class="col-sm-6 col-md-3">

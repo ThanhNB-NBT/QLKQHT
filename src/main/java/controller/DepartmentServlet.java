@@ -183,11 +183,4 @@ public class DepartmentServlet extends HttpServlet {
             session.setAttribute("error", errorMessage);
         }
 	}
-	
-	private String convertDepartmentToJson(Department department) {
-	    return "{ \"departmentID\": " + department.getDepartmentID() +
-	           ", \"departmentName\": \"" + department.getDepartmentName() + "\"" +
-	           ", \"email\": \"" + department.getEmail() + "\"" +
-	           ", \"phone\": \"" + department.getPhone() + "\" }";
-	}
 }

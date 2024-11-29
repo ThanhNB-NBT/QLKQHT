@@ -5,14 +5,14 @@ document.body.addEventListener('click', function(event) {
 		const username = event.target.getAttribute('data-username');
 		const email = event.target.getAttribute('data-email');
 		const role = event.target.getAttribute('data-role');
-//		const roleId = event.target.getAttribute('data-role-id');
+		//		const roleId = event.target.getAttribute('data-role-id');
 
 		// Đưa các giá trị vào modal chỉnh sửa
 		document.getElementById('editAccountID').value = accountId;
 		document.getElementById('editName').value = username;
 		document.getElementById('editEmail').value = email;
 		document.getElementById('editRole').value = role;
-//		document.getElementById('editRoleID').value = roleId;
+		//		document.getElementById('editRoleID').value = roleId;
 
 		// Hiển thị modal chỉnh sửa
 		$('#edit_account').modal('show');
@@ -20,31 +20,15 @@ document.body.addEventListener('click', function(event) {
 });
 
 $(document).on('click', '.delete-account', function() {
+	// Lấy ID tài khoản từ thuộc tính data-id của nút Xóa
 	var accountId = $(this).data('id');
 	console.log("Account ID đang lấy:", accountId);
+
+	// Gán giá trị accountId vào input hidden trong form của modal
 	$('#deleteAccountId').val(accountId);
+
+	// Hiển thị modal
 	$('#delete_account').modal('show');
-});
-
-$('#deleteForm').on('submit', function(event) {
-	event.preventDefault();
-
-	var accountId = $('#deleteAccountId').val();
-	$.ajax({
-		url: 'AccountServlet',
-		type: 'POST',
-		data: {
-			accountID: accountId,
-			action: 'delete'
-		},
-		success: function(response) {
-			$('tr[data-account-id="' + accountId + '"]').remove(); // Xóa dòng tương ứng trong bảng
-			$('#delete_account').modal('hide'); // Đóng modal
-		},
-		error: function(xhr) {
-			alert('Có lỗi xảy ra khi xóa tài khoản.');
-		}
-	});
 });
 
 function checkPasswordMatch(passwordFieldId, confirmPasswordFieldId, warningTextId, event = null) {

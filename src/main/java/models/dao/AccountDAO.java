@@ -71,8 +71,8 @@ public class AccountDAO {
         return accounts;
     }
     
-    public static ArrayList<Account> searchAccountByUsername(String username) {
-    	ArrayList<Account> accounts = new ArrayList<>();
+    public static List<Account> searchAccountByUsername(String username) {
+    	List<Account> accounts = new ArrayList<>();
     	
     	try(Connection conn = ConnectDatabase.checkConnect();
     		PreparedStatement stmt = conn.prepareStatement(SQL_SEARCH_ACCOUNT)) {

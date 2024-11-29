@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
+	
 <div id="add_account" class="modal" role="dialog">
 	<div class="modal-dialog modal-dialog-centered justify-content-center">
 		<div class="modal-content modal-lg">
