@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="jakarta.servlet.http.HttpSession" %>
-<%@ page import="common.ErrorManager" %>
+<%@ page import="common.AlertManager" %>
 <%
     String successMessages = (String) request.getSession().getAttribute("successMessages");
     String errorMessages = (String) request.getSession().getAttribute("errorMessages");

@@ -22,9 +22,12 @@
 						</div>
 						<div class="col-sm-8">
 							<div class="form-group form-focus">
-								<input name="email" type="email" class="form-control floating"
-									required> <label
-									class="focus-label">Email <span class="text-danger">*</span></label>
+								<input id="email" name="email" type="email" class="form-control floating"
+									required> <label class="focus-label">Email <span
+									class="text-danger">*</span></label>
+								<!-- Thông báo lỗi nếu email không hợp lệ -->
+								<small id="email-error" class="form-text text-danger"
+									style="display: none;">Email không hợp lệ.</small>
 							</div>
 						</div>
 						<div class="col-sm-8">

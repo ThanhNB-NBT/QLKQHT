@@ -103,27 +103,29 @@ response.setDateHeader("Expires", 0);
 																	<span>${account.role.role}</span>
 																</c:otherwise>
 															</c:choose></td>
-														<td class="text-right">
-															<div class="dropdown dropdown-action">
-																<a href="#" class="action-icon dropdown-toggle"
-																	data-toggle="dropdown"> <i
-																	class="fas fa-ellipsis-v"></i>
-																</a>
-																<div class="dropdown-menu dropdown-menu-right">
-																	<a class="dropdown-item edit-account"
-																		data-id="${account.accountID}"
-																		data-username="${account.username}"
-																		data-email="${account.email}"
-																		data-role="${account.role.role}"
-																		data-role-id="${account.role.roleID}">
-																		<i class="fas fa-pencil-alt m-r-5"></i> Sửa
-																	</a> <a class="dropdown-item delete-account"
-																		data-id="${account.accountID}">
-																		<i class="fas fa-trash-alt m-r-5"></i> Xóa
+														<c:if test="${isAdmin}">
+															<td class="text-right">
+																<div class="dropdown dropdown-action">
+																	<a href="#" class="action-icon dropdown-toggle"
+																		data-toggle="dropdown"> <i
+																		class="fas fa-ellipsis-v"></i>
 																	</a>
+																	<div class="dropdown-menu dropdown-menu-right">
+																		<a class="dropdown-item edit-account"
+																			data-id="${account.accountID}"
+																			data-username="${account.username}"
+																			data-email="${account.email}"
+																			data-role="${account.role.role}"
+																			data-role-id="${account.role.roleID}"> <i
+																			class="fas fa-pencil-alt m-r-5"></i> Sửa
+																		</a> <a class="dropdown-item delete-account"
+																			data-id="${account.accountID}"> <i
+																			class="fas fa-trash-alt m-r-5"></i> Xóa
+																		</a>
+																	</div>
 																</div>
-															</div>
-														</td>
+															</td>
+														</c:if>
 													</tr>
 												</c:forEach>
 											</c:when>
@@ -148,7 +150,8 @@ response.setDateHeader("Expires", 0);
 		</div>
 	</div>
 	<jsp:include page="../../includes/footer.jsp" />
-	<script src="${pageContext.request.contextPath}/Views/AccountView/AccountJS.js?v=<%= System.currentTimeMillis() %>"></script>
+	<script
+		src="${pageContext.request.contextPath}/Views/AccountView/AccountJS.js?v=<%= System.currentTimeMillis() %>"></script>
 
 
 </body>

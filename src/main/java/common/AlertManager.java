@@ -3,7 +3,7 @@ package common;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
-public class ErrorManager {
+public class AlertManager {
     private static final String SUCCESS_MESSAGES = "successMessages";
     private static final String ERROR_MESSAGES = "errorMessages";
 

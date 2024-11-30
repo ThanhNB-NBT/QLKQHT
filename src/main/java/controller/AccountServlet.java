@@ -9,8 +9,9 @@ import jakarta.servlet.http.HttpSession;
 import models.bean.Account;
 import models.bean.Role;
 import models.dao.AccountDAO;
-import common.ErrorManager;
+import common.AlertManager;
 import common.SessionUtils;
+import common.RoleUtils;
 import java.io.IOException;
 import java.util.List;
 
@@ -32,6 +33,9 @@ public class AccountServlet extends HttpServlet {
 			response.sendRedirect("login.jsp");
 			return;
 		}
+		
+		boolean isAdmin = RoleUtils.isAdmin(session);
+		request.setAttribute("isAdmin", isAdmin);
 
 		String accountIDStr = request.getParameter(ACCOUNTID);
 		if (accountIDStr != null) {
@@ -53,16 +57,13 @@ public class AccountServlet extends HttpServlet {
 		}
 
 		String searchAccount = request.getParameter("search");
-		List<Account> accounts;
-		if (searchAccount != null && !searchAccount.trim().isEmpty()) {
-			accounts = AccountDAO.searchAccountByUsername(searchAccount);
-		} else {
-			accounts = AccountDAO.getAllAccounts();
-		}
+		 List<Account> accounts = (searchAccount != null && !searchAccount.trim().isEmpty()) 
+		            ? AccountDAO.searchAccountByUsername(searchAccount)
+		            : AccountDAO.getAllAccounts();
 		Account loggedInUser = SessionUtils.getLoggedInAccount(session);
 		request.setAttribute("username", loggedInUser.getUsername());
 		request.setAttribute("accounts", accounts);
-		request.getRequestDispatcher("Views/AccountView/accountViews.jsp").forward(request, response);
+		request.getRequestDispatcher("/Views/AccountView/accountViews.jsp").forward(request, response);
 	}
 
 	@Override
@@ -104,7 +105,7 @@ public class AccountServlet extends HttpServlet {
 
 		boolean success = AccountDAO.createAccount(account);
 		String message = success ? "Tạo tài khoản thành công!" : "Đã có lỗi xảy ra khi tạo tài khoản.";
-		ErrorManager.addMessage(request, message, success); // success là boolean
+		AlertManager.addMessage(request, message, success); // success là boolean
 
 		response.sendRedirect(ACCOUNT_SERVLET);
 	}
@@ -122,7 +123,7 @@ public class AccountServlet extends HttpServlet {
 			boolean success = AccountDAO.deleteAccount(accountID);
 
 			String message = success ? "Tài khoản đã được xóa thành công." : "Có lỗi xảy ra khi xóa tài khoản.";
-			ErrorManager.addMessage(request, message, success);
+			AlertManager.addMessage(request, message, success);
 			response.sendRedirect(ACCOUNT_SERVLET);
 		} catch (NumberFormatException e) {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Account ID không hợp lệ.");
@@ -148,7 +149,7 @@ public class AccountServlet extends HttpServlet {
 
 		if (password != null && !password.trim().isEmpty()) {
 			if (!password.equals(cpass)) {
-				ErrorManager.addMessage(request, "Mật khẩu không trùng khớp.", false); // false = Lỗi
+				AlertManager.addMessage(request, "Mật khẩu không trùng khớp.", false); // false = Lỗi
 				return;
 			}
 
@@ -160,7 +161,7 @@ public class AccountServlet extends HttpServlet {
 
 		boolean success = AccountDAO.updateAccount(account);
 		String message = success ? "Cập nhật tài khoản thành công!" : "Có lỗi xảy ra khi cập nhật tài khoản.";
-		ErrorManager.addMessage(request, message, success);
+		AlertManager.addMessage(request, message, success);
 
 		response.sendRedirect(ACCOUNT_SERVLET);
 	}
@@ -172,32 +173,32 @@ public class AccountServlet extends HttpServlet {
 
 		// Kiểm tra tên tài khoản
 		if (username == null || username.trim().isEmpty()) {
-			ErrorManager.addMessage(request, "Tên tài khoản không được để trống.", false);
+			AlertManager.addMessage(request, "Tên tài khoản không được để trống.", false);
 			hasErrors = true;
 		}
 
 		// Kiểm tra email
 		if (email == null || email.trim().isEmpty()) {
-			ErrorManager.addMessage(request, "Email không được để trống.", false);
+			AlertManager.addMessage(request, "Email không được để trống.", false);
 			hasErrors = true;
 		} else if (!isValidEmailFormat(email)) {
-			ErrorManager.addMessage(request, "Định dạng email không hợp lệ.", false);
+			AlertManager.addMessage(request, "Định dạng email không hợp lệ.", false);
 			hasErrors = true;
 		}
 
 		// Kiểm tra mật khẩu khi tạo tài khoản
 		if (isCreateAction) {
 			if (password == null || password.isEmpty()) {
-				ErrorManager.addMessage(request, "Mật khẩu không được để trống.", false);
+				AlertManager.addMessage(request, "Mật khẩu không được để trống.", false);
 				hasErrors = true;
 			} else if (!password.equals(cpass)) {
-				ErrorManager.addMessage(request, "Mật khẩu và xác nhận mật khẩu không trùng khớp.", false);
+				AlertManager.addMessage(request, "Mật khẩu và xác nhận mật khẩu không trùng khớp.", false);
 				hasErrors = true;
 			}
 		} else {
 			// Kiểm tra mật khẩu khi cập nhật tài khoản
 			if (password != null && !password.trim().isEmpty() && !password.equals(cpass)) {
-				ErrorManager.addMessage(request, "Mật khẩu và xác nhận mật khẩu không trùng khớp.", false);
+				AlertManager.addMessage(request, "Mật khẩu và xác nhận mật khẩu không trùng khớp.", false);
 				hasErrors = true;
 			}
 		}

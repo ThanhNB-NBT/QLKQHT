@@ -5,14 +5,11 @@ document.body.addEventListener('click', function(event) {
 		const username = event.target.getAttribute('data-username');
 		const email = event.target.getAttribute('data-email');
 		const role = event.target.getAttribute('data-role');
-		//		const roleId = event.target.getAttribute('data-role-id');
 
-		// Đưa các giá trị vào modal chỉnh sửa
 		document.getElementById('editAccountID').value = accountId;
 		document.getElementById('editName').value = username;
 		document.getElementById('editEmail').value = email;
 		document.getElementById('editRole').value = role;
-		//		document.getElementById('editRoleID').value = roleId;
 
 		// Hiển thị modal chỉnh sửa
 		$('#edit_account').modal('show');

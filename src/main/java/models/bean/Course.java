@@ -1,5 +1,9 @@
 package models.bean;
 
+import java.util.Random;
+
+import models.dao.CourseDAO;
+
 public class Course {
 	private int courseID;
     private String courseName;
@@ -8,47 +12,46 @@ public class Course {
     private String courseCode;    
     private String courseType;  
     private String status; 
-    private String departmentName;
+    private Department department;
     
 	public Course() {
 		super();
 	}
 
 	public Course(int courseID, String courseName, int credits, int departmentID,
-			String status, String courseCode, String courseType, String departmentName) {
+			 String courseCode, String courseType, String status, Department department) {
 		super();
 		this.courseID = courseID;
 		this.courseName = courseName;
 		this.credits = credits;
 		this.departmentID = departmentID;
-		this.status = status;
 		this.courseCode = courseCode;
 		this.courseType = courseType;
-		this.departmentName = departmentName;
+		this.status = status;
+		this.department = department;
 	}
 	
 	public Course( String courseName, int credits, int departmentID,
-			String status, String courseCode, String courseType) {
+			 String courseCode, String courseType,String status) {
 		super();
 		this.courseName = courseName;
 		this.credits = credits;
 		this.departmentID = departmentID;
-		this.status = status;
 		this.courseCode = courseCode;
 		this.courseType = courseType;
+		this.status = status;
 	}
 	
 	public Course(int courseID, String courseName, int credits, int departmentID,
-			String status, String courseCode, String courseType) {
+			 String courseCode, String courseType, String status) {
 		super();
 		this.courseID = courseID;
 		this.courseName = courseName;
 		this.credits = credits;
 		this.departmentID = departmentID;
-		this.status = status;
 		this.courseCode = courseCode;
 		this.courseType = courseType;
-
+		this.status = status;
 	}
 
 	public int getCourseID() {
@@ -78,8 +81,8 @@ public class Course {
 	public String getCourseType() {
 		return courseType;
 	}
-	public String getDepartmentName() {
-		return departmentName;
+	public Department getDepartment() {
+	    return department;
 	}
 
 	public void setCourseID(int courseID) {
@@ -110,9 +113,57 @@ public class Course {
 		this.courseType = courseType;
 	}
 	
-	public void setDepartmentName(String departmentName) {
-		this.departmentName = departmentName;
+	public void setDepartment(Department department) {
+	    this.department = department;
 	}
 	
-	
+	public String generateCourseCode(int departmentID, Integer excludeCourseID) {
+	    // Kiểm tra courseName trước
+	    if (this.courseName == null || this.courseName.trim().isEmpty()) {
+	        throw new IllegalArgumentException("Tên học phần không được để trống.");
+	    }
+
+	    // Tạo 3 ký tự đầu tiên từ tên khóa học
+	    String[] words = this.courseName.split(" ");
+	    StringBuilder initials = new StringBuilder();
+
+	    for (String word : words) {
+	        if (!word.isEmpty()) {
+	            initials.append(Character.toUpperCase(word.charAt(0)));
+	        }
+	    }
+
+	    // Giới hạn tối đa 3 ký tự
+	    if (initials.length() > 4) {
+	        initials.setLength(4);
+	    }
+
+	    // Thêm departmentID và số ngẫu nhiên để đủ 8 ký tự
+	    Random random = new Random();
+	    String courseCode;
+	    int maxAttempts = 5; // Giới hạn số lần thử
+	    int attempts = 0;
+
+	    do {
+	        if (attempts >= maxAttempts) {
+	            throw new RuntimeException("Không thể tạo mã khóa học duy nhất sau nhiều lần thử.");
+	        }
+
+	        StringBuilder codeBuilder = new StringBuilder(initials);
+
+	        codeBuilder.append(String.format("%02d", departmentID % 100)); 
+
+	        // Thêm số ngẫu nhiên để đạt 10 ký tự
+	        while (codeBuilder.length() < 10) {
+	            codeBuilder.append(random.nextInt(10));
+	        }
+
+	        courseCode = codeBuilder.toString();
+	        attempts++;
+	    } while (excludeCourseID == null
+	             ? CourseDAO.checkCourseCode(courseCode) 
+	             : CourseDAO.checkCourseCode(courseCode, excludeCourseID)); 
+
+	    return courseCode;
+	}
 }

@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 
 import common.ConnectDatabase;
 import models.bean.Course;
+import models.bean.Department;
 
 public class CourseDAO {
 	private static final Logger logger = Logger.getLogger(CourseDAO.class.getName());
@@ -40,8 +41,11 @@ public class CourseDAO {
 	private static final String SQL_INSERT_COURSE = 
 	    "INSERT INTO Courses (CourseName, Credits, DepartmentID, CourseCode, CourseType, Status) VALUES (?, ?, ?, ?, ?, ?)";
 
+	private static final String SQL_CHECK_COURSECODE_UPDATE = 
+		"SELECT COUNT(*) FROM Course WHERE courseCode = ? AND courseID != ?";
+	
 	private static final String SQL_CHECK_COURSECODE = 
-	    "SELECT COUNT(*) FROM Courses WHERE CourseCode = ?";
+			"SELECT COUNT(*) FROM Course WHERE courseCode = ?";
 
 	private static Course mapCourse(ResultSet rs) throws SQLException{
 		Course course = new Course();
@@ -49,10 +53,15 @@ public class CourseDAO {
         course.setCourseName(rs.getString("CourseName"));
         course.setCredits(rs.getInt("Credits"));
         course.setDepartmentID(rs.getInt("DepartmentID"));
-        course.setDepartmentName(rs.getString("DepartmentName"));
         course.setCourseCode(rs.getString("CourseCode"));
         course.setCourseType(rs.getString("CourseType"));
         course.setStatus(rs.getString("Status"));
+        
+        Department department = new Department();
+        department.setDepartmentID(rs.getInt("DepartmentID"));
+        department.setDepartmentName(rs.getString("DepartmentName"));
+
+        course.setDepartment(department);
         return course;
 	}
 	
@@ -92,7 +101,6 @@ public class CourseDAO {
 	public static boolean deleteCourse(int courseID) {
         try (Connection conn = ConnectDatabase.checkConnect();
              PreparedStatement stmt = conn.prepareStatement(SQL_DELETE_COURSE)) {
-            
             stmt.setInt(1, courseID);
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -153,11 +161,30 @@ public class CourseDAO {
         return courses;
     }
 	
+	public static boolean checkCourseCode(String courseCode, int excludeCourseID) {
+        try (Connection conn = ConnectDatabase.checkConnect();
+             PreparedStatement stmt = conn.prepareStatement(SQL_CHECK_COURSECODE_UPDATE)) {
+            
+            stmt.setString(1, courseCode);
+            stmt.setInt(2, excludeCourseID);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            logger.severe("Error while checking course code: " + e.getMessage());
+        }
+        return false;
+    }
+	
 	public static boolean checkCourseCode(String courseCode) {
         try (Connection conn = ConnectDatabase.checkConnect();
              PreparedStatement stmt = conn.prepareStatement(SQL_CHECK_COURSECODE)) {
             
             stmt.setString(1, courseCode);
+            
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     return rs.getInt(1) > 0;

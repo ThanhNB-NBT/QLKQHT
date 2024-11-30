@@ -31,7 +31,7 @@
         </li>
 
         <li class="#">
-          <a href="#">
+          <a href="CourseServlet">
             <img src="assets/img/sidebar/icon-4.png" alt="icon"> <span> Học phần </span> 
           </a>
         </li>
