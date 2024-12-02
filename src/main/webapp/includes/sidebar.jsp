@@ -19,7 +19,7 @@
         </li>
 
         <li class=" #">
-          <a href="#">
+          <a href="TeacherServlet">
             <img src="assets/img/sidebar/icon-2.png" alt="icon"> <span> Giảng viên</span>
           </a>
         </li>

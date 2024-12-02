@@ -6,9 +6,6 @@ response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
 response.setHeader("Pragma", "no-cache");
 response.setDateHeader("Expires", 0);
 %>
-<%
-
-%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -138,6 +135,6 @@ response.setDateHeader("Expires", 0);
 	</div>
 	
 	<jsp:include page="../../includes/footer.jsp"></jsp:include>
-	<script src="${pageContext.request.contextPath}/Views/CourseView/CourseJS.js?v=<%= System.currentTimeMillis() %>"></script>
+	<script src="${pageContext.request.contextPath}/Views/CourseView/courseJS.js?v=<%= System.currentTimeMillis() %>"></script>
 </body>
 </html>

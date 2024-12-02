@@ -13,14 +13,14 @@ public class Teacher {
     private Date hireDate;
     private int accountID;
     private String avatar;
+    private Department department;
     
 	public Teacher() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 	
 	public Teacher(int teacherID, String firstName, String lastName, String email, String phone, int departmentID,
-			String office, Date hireDate, int accountID, String avatar) {
+			String office, Date hireDate, int accountID, String avatar, Department department) {
 		super();
 		this.teacherID = teacherID;
 		this.firstName = firstName;
@@ -31,6 +31,33 @@ public class Teacher {
 		this.office = office;
 		this.hireDate = hireDate;
 		this.accountID = accountID;
+		this.avatar = avatar;
+		this.department = department;
+	}
+	public Teacher( String firstName, String lastName, String email, String phone, int departmentID,
+			String office, Date hireDate, int accountID, String avatar, Department department) {
+		super();
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.email = email;
+		this.phone = phone;
+		this.departmentID = departmentID;
+		this.office = office;
+		this.hireDate = hireDate;
+		this.accountID = accountID;
+		this.avatar = avatar;
+		this.department = department;
+	}
+	public Teacher( String firstName, String lastName, String email, String phone, int departmentID,
+			String office, Date hireDate, String avatar) {
+		super();
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.email = email;
+		this.phone = phone;
+		this.departmentID = departmentID;
+		this.office = office;
+		this.hireDate = hireDate;
 		this.avatar = avatar;
 	}
 	
@@ -64,6 +91,13 @@ public class Teacher {
 	public String getAvatar() {
 		return avatar;
 	}
+	public Department getDepartment() {
+		return department;
+	}
+
+	public void setDepartment(Department department) {
+		this.department = department;
+	}
 	public void setTeacherID(int teacherID) {
 		this.teacherID = teacherID;
 	}
@@ -93,7 +127,5 @@ public class Teacher {
 	}
 	public void setAvatar(String avatar) {
 		this.avatar = avatar;
-	}
-    
-    
+	} 
 }

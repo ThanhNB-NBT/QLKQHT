@@ -130,6 +130,6 @@ response.setDateHeader("Expires", 0);
 	</div>
 	
 	<jsp:include page="../../includes/footer.jsp"></jsp:include>
-	<script src="${pageContext.request.contextPath}/Views/DepartmentView/DepartmentJS.js?v=<%= System.currentTimeMillis() %>"></script>
+	<script src="${pageContext.request.contextPath}/Views/DepartmentView/departmentJS.js?v=<%= System.currentTimeMillis() %>"></script>
 </body>
 </html>

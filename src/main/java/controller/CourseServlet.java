@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import models.bean.Account;
 import models.bean.Course;
 import models.dao.CourseDAO;
 import models.dao.DepartmentDAO;
@@ -63,6 +64,8 @@ public class CourseServlet extends HttpServlet {
             ? CourseDAO.searchCoursesByName(searchCourse) :  CourseDAO.getAllCourse();
         request.setAttribute("courses", courses);
         request.setAttribute("departments", DepartmentDAO.getAllDepartment());
+        Account loggedInUser = SessionUtils.getLoggedInAccount(session);
+		request.setAttribute("username", loggedInUser.getUsername());
         request.getRequestDispatcher("/Views/CourseView/courseViews.jsp").forward(request, response);
 	}
 

@@ -12,6 +12,7 @@ import java.util.List;
 import common.AlertManager;
 import common.SessionUtils;
 import common.RoleUtils;
+import models.bean.Account;
 import models.bean.Department;
 import models.dao.DepartmentDAO;
 
@@ -64,6 +65,8 @@ public class DepartmentServlet extends HttpServlet {
 				? DepartmentDAO.searchByDepartmentName(searchDepartment)
 				: DepartmentDAO.getAllDepartment();
 		request.setAttribute("departments", departments);
+		Account loggedInUser = SessionUtils.getLoggedInAccount(session);
+		request.setAttribute("username", loggedInUser.getUsername());
 		request.getRequestDispatcher("Views/DepartmentView/departmentViews.jsp").forward(request, response);
 	}
 

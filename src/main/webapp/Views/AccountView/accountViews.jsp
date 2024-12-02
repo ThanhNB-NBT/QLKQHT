@@ -151,7 +151,7 @@ response.setDateHeader("Expires", 0);
 	</div>
 	<jsp:include page="../../includes/footer.jsp" />
 	<script
-		src="${pageContext.request.contextPath}/Views/AccountView/AccountJS.js?v=<%= System.currentTimeMillis() %>"></script>
+		src="${pageContext.request.contextPath}/Views/AccountView/accountJS.js?v=<%= System.currentTimeMillis() %>"></script>
 
 
 </body>
