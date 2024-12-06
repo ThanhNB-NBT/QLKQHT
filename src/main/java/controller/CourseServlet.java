@@ -10,6 +10,7 @@ import models.bean.Account;
 import models.bean.Course;
 import models.dao.CourseDAO;
 import models.dao.DepartmentDAO;
+import valid.CourseValidator;
 import common.AlertManager;
 import common.RoleUtils;
 
@@ -17,6 +18,7 @@ import java.io.IOException;
 import java.util.List;
 
 import common.SessionUtils;
+import input.CourseInput;
 
 
 @WebServlet("/CourseServlet")
@@ -36,7 +38,7 @@ public class CourseServlet extends HttpServlet {
             response.sendRedirect("login.jsp");
             return;
         }
-        
+
         boolean isAdmin = RoleUtils.isAdmin(session);
         request.setAttribute("isAdmin", isAdmin);
 
@@ -90,29 +92,23 @@ public class CourseServlet extends HttpServlet {
                 break;
         }
 	}
-	
-	private void createCourse(HttpServletRequest request, HttpServletResponse response)
-	        throws IOException {
-	    String courseName = request.getParameter("courseName");
-	    String creditsStr = request.getParameter("credits");
-	    String departmentIDStr = request.getParameter("departmentID");
-	    String courseCode = request.getParameter("courseCode");
-	    String courseType = request.getParameter("courseType");
-	    String status = request.getParameter("status");
 
-	    if (checkCourseInput(request, courseName, courseCode, creditsStr, departmentIDStr, courseType, status)) {
+	private void createCourse(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	    CourseInput input = CourseInput.fromRequest(request, false);
+
+	    if (CourseValidator.validateInput(input, request, false)) {
+	        response.sendRedirect(COURSE_SERVLET);
 	        return;
 	    }
 
-
-	    int credits = Integer.parseInt(creditsStr);
-	    int departmentID = Integer.parseInt(departmentIDStr);
-
+	    // Nếu không có courseCode, tự động tạo
+	    String courseCode = input.getCourseCode();
 	    if (courseCode == null || courseCode.trim().isEmpty()) {
-	        Course tempCourse = new Course(courseName, credits, departmentID, "", courseType, status);
+	        Course tempCourse = new Course(input.getCourseName(), input.getCredits(),
+	                input.getDepartmentID(), "", input.getCourseType(), input.getStatus());
+	        courseCode = tempCourse.generateCourseCode(input.getDepartmentID(), null);
 
-	        courseCode = tempCourse.generateCourseCode(departmentID,null); 
-
+	        // Kiểm tra mã tự động sinh có bị trùng không
 	        if (CourseDAO.checkCourseCode(courseCode)) {
 	            AlertManager.addMessage(request, "Không thể tạo mã tự động vì mã bị trùng. Vui lòng nhập mã khác.", false);
 	            response.sendRedirect(COURSE_SERVLET);
@@ -120,14 +116,15 @@ public class CourseServlet extends HttpServlet {
 	        }
 	    }
 
-	    Course course = new Course(courseName, credits, departmentID, courseCode, courseType, status);
+	    // Tạo đối tượng Course từ input
+	    Course course = new Course(input.getCourseName(), input.getCredits(),
+	            input.getDepartmentID(), courseCode, input.getCourseType(), input.getStatus());
 
 	    boolean success = CourseDAO.createCourse(course);
-	    String message = success ? "Thêm học phần thành công!" : "Đã có lỗi xảy ra khi thêm học phần";
-	    AlertManager.addMessage(request, message, success);
-
+	    AlertManager.addMessage(request, success ? "Thêm học phần thành công!" : "Có lỗi khi thêm học phần", success);
 	    response.sendRedirect(COURSE_SERVLET);
 	}
+
 
 
     private void deleteCourse(HttpServletRequest request, HttpServletResponse response)
@@ -147,79 +144,40 @@ public class CourseServlet extends HttpServlet {
         response.sendRedirect(COURSE_SERVLET);
     }
 
-    private void updateCourse(HttpServletRequest request, HttpServletResponse response)
-            throws IOException {
-        int courseID = Integer.parseInt(request.getParameter(COURSEID));
-        String courseName = request.getParameter("courseName");
-        String courseCode = request.getParameter("courseCode");
-        String creditsStr = request.getParameter("credits");
-        String departmentIDStr = request.getParameter("departmentID");
-        String courseType = request.getParameter("courseType");
-        String status = request.getParameter("status");
+    private void updateCourse(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        CourseInput input = CourseInput.fromRequest(request, true);
 
-        if (checkCourseInput(request, courseName, courseCode, creditsStr, departmentIDStr, courseType, status)) {
-            return;
-        }
-
-        int credits = Integer.parseInt(creditsStr);
-        int departmentID = Integer.parseInt(departmentIDStr);
-
-        Course oldCourse = CourseDAO.getCourseById(courseID);
-        if (oldCourse == null) {
-            AlertManager.addMessage(request, "Không tìm thấy học phần", false);
+        if (CourseValidator.validateInput(input, request, true)) {
             response.sendRedirect(COURSE_SERVLET);
             return;
         }
 
-        if (!oldCourse.getCourseName().equals(courseName) || oldCourse.getDepartmentID() != departmentID) {
-            Course tempCourse = new Course();
-            tempCourse.setCourseName(courseName);
-            tempCourse.setDepartmentID(departmentID);
-            courseCode = tempCourse.generateCourseCode(departmentID,courseID); 
+        Course oldCourse = CourseDAO.getCourseById(input.getCourseID());
+        if (oldCourse == null) {
+            AlertManager.addMessage(request, "Học phần không tồn tại.", false);
+            response.sendRedirect(COURSE_SERVLET);
+            return;
         }
 
-        Course course = new Course(courseID, courseName, credits, departmentID, courseCode, courseType, status);
+        String courseCode = input.getCourseCode();
+        if (!oldCourse.getCourseName().equals(input.getCourseName()) ||
+                oldCourse.getDepartmentID() != input.getDepartmentID()) {
+            Course tempCourse = new Course(input.getCourseName(), input.getCredits(),
+                    input.getDepartmentID(), "", input.getCourseType(), input.getStatus());
+            courseCode = tempCourse.generateCourseCode(input.getDepartmentID(), input.getCourseID());
 
-        boolean success = CourseDAO.updateCourse(course);
-        String message = success ? "Cập nhật học phần thành công!" : "Có lỗi xảy ra khi cập nhật học phần";
-        AlertManager.addMessage(request, message, success);
+            if (CourseDAO.checkCourseCode(courseCode)) {
+                AlertManager.addMessage(request, "Không thể tạo mã mới vì mã bị trùng. Vui lòng nhập mã khác.", false);
+                response.sendRedirect(COURSE_SERVLET);
+                return;
+            }
+        }
+
+        Course updatedCourse = new Course(input.getCourseID(), input.getCourseName(), input.getCredits(),
+                input.getDepartmentID(), courseCode, input.getCourseType(), input.getStatus());
+
+        boolean success = CourseDAO.updateCourse(updatedCourse);
+        AlertManager.addMessage(request, success ? "Cập nhật học phần thành công!" : "Có lỗi khi cập nhật học phần", success);
         response.sendRedirect(COURSE_SERVLET);
-    }
-
-
-    private boolean checkCourseInput(HttpServletRequest request, String courseName,
-                                     String courseCode, String creditsStr, String departmentIDStr,
-                                     String courseType, String status) {
-    	boolean hasError = false;
-
-        if (courseName == null || courseName.trim().isEmpty()) {
-            AlertManager.addMessage(request, "Tên học phần không được để trống", false);
-            hasError = true;
-        }
-
-        try {
-            Integer.parseInt(creditsStr);
-            Integer.parseInt(departmentIDStr);
-        } catch (NumberFormatException e) {
-        	AlertManager.addMessage(request, "Số tín chỉ hoặc khoa không hợp lệ", false);
-            hasError = true;
-        }
-
-        if (courseType == null || courseType.trim().isEmpty()) {
-        	AlertManager.addMessage(request, "Loại học phần không được để trống", false);
-            hasError = true;
-        }
-
-        if (status == null || status.trim().isEmpty()) {
-        	AlertManager.addMessage(request, "Trạng thái không được để trống", false);
-            hasError = true;
-        }
-
-        if (CourseDAO.checkCourseCode(courseCode)) {
-            AlertManager.addMessage(request, "Mã học phần đã tồn tại", false);
-            hasError = true;
-        }
-
-        return hasError;
     }
 }

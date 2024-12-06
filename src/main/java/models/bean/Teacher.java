@@ -8,18 +8,18 @@ public class Teacher {
     private String lastName;
     private String email;
     private String phone;
-    private int departmentID;
+    private Integer departmentID;
     private String office;
     private Date hireDate;
     private int accountID;
     private String avatar;
     private Department department;
-    
+
 	public Teacher() {
 		super();
 	}
-	
-	public Teacher(int teacherID, String firstName, String lastName, String email, String phone, int departmentID,
+
+	public Teacher(int teacherID, String firstName, String lastName, String email, String phone, Integer departmentID,
 			String office, Date hireDate, int accountID, String avatar, Department department) {
 		super();
 		this.teacherID = teacherID;
@@ -34,7 +34,7 @@ public class Teacher {
 		this.avatar = avatar;
 		this.department = department;
 	}
-	public Teacher( String firstName, String lastName, String email, String phone, int departmentID,
+	public Teacher( String firstName, String lastName, String email, String phone, Integer departmentID,
 			String office, Date hireDate, int accountID, String avatar, Department department) {
 		super();
 		this.firstName = firstName;
@@ -48,7 +48,7 @@ public class Teacher {
 		this.avatar = avatar;
 		this.department = department;
 	}
-	public Teacher( String firstName, String lastName, String email, String phone, int departmentID,
+	public Teacher( String firstName, String lastName, String email, String phone, Integer departmentID,
 			String office, Date hireDate, String avatar) {
 		super();
 		this.firstName = firstName;
@@ -60,7 +60,7 @@ public class Teacher {
 		this.hireDate = hireDate;
 		this.avatar = avatar;
 	}
-	
+
 	public int getTeacherID() {
 		return teacherID;
 	}
@@ -76,7 +76,7 @@ public class Teacher {
 	public String getPhone() {
 		return phone;
 	}
-	public int getDepartmentID() {
+	public Integer getDepartmentID() {
 		return departmentID;
 	}
 	public String getOffice() {
@@ -113,7 +113,7 @@ public class Teacher {
 	public void setPhone(String phone) {
 		this.phone = phone;
 	}
-	public void setDepartmentID(int departmentID) {
+	public void setDepartmentID(Integer departmentID) {
 		this.departmentID = departmentID;
 	}
 	public void setOffice(String office) {
@@ -127,5 +127,5 @@ public class Teacher {
 	}
 	public void setAvatar(String avatar) {
 		this.avatar = avatar;
-	} 
+	}
 }

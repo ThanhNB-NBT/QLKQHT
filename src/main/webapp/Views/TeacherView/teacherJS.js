@@ -4,13 +4,13 @@ document.body.addEventListener('click', function (event) {
 		const teacherId = event.target.getAttribute('data-id');
 
 		// Lấy thông tin từ thuộc tính data- và điền vào các trường input của modal
-		const firstName = event.target.getAttribute('data-firstname');
-		const lastName = event.target.getAttribute('data-lastname');
+		const firstName = event.target.getAttribute('data-first-name');
+		const lastName = event.target.getAttribute('data-last-name');
 		const email = event.target.getAttribute('data-email');
 		const phone = event.target.getAttribute('data-phone');
-		const departmentId = event.target.getAttribute('data-departmentid');
+		const departmentId = event.target.getAttribute('data-department-id');
 		const office = event.target.getAttribute('data-office');
-		const hireDate = event.target.getAttribute('data-hiredate');
+		const hireDate = event.target.getAttribute('data-hire-date');
 
 		// Điền thông tin vào form chỉnh sửa
 		document.getElementById('editTeacherID').value = teacherId;

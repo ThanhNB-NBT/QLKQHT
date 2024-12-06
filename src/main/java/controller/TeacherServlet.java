@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
 
-import Valid.TeacherValidator;
+import valid.TeacherValidator;
 
 @WebServlet("/TeacherServlet")
 @MultipartConfig
@@ -110,19 +110,8 @@ public class TeacherServlet extends HttpServlet {
                 return;
             }
 
-            String avatar;
-            try {
-
-                String uploadDir = "D:/eclipse-workspace/QLKQHT/src/main/webapp/assets/img/profile";
-
-                Part avatarPart = request.getPart("avatar");
-
-                avatar = ImageUtils.processAvatar(avatarPart, uploadDir, true, 150, 150);
-
-            } catch (Exception e) {
-                // Nếu có lỗi, sử dụng avatar mặc định
-                avatar = "assets/img/user.jpg";
-            }
+            // Xử lý ảnh đại diện
+            String avatar = processAvatar(request);
 
 
             // Tạo đối tượng Teacher
@@ -174,21 +163,7 @@ public class TeacherServlet extends HttpServlet {
                 return;
             }
 
-            String avatar;
-            try {
-            	String uploadDir = "D:/eclipse-workspace/QLKQHT/src/main/webapp/assets/img/profile";
-                Part avatarPart = request.getPart("avatar");
-
-                if (avatarPart != null && avatarPart.getSize() > 0) {
-
-                    avatar = ImageUtils.processAvatar(avatarPart, uploadDir, true, 150, 150);
-                } else {
-
-                    avatar = request.getParameter("currentAvatar");
-                }
-            } catch (Exception e) {
-                avatar = request.getParameter("currentAvatar");
-            }
+            String avatar = processAvatar(request, request.getParameter("currentAvatar"));
 
             // Cập nhật thông tin giảng viên
             Teacher teacher = new Teacher();
@@ -214,4 +189,21 @@ public class TeacherServlet extends HttpServlet {
         }
     }
 
+    private String processAvatar(HttpServletRequest request) throws IOException, ServletException {
+        return processAvatar(request, "assets/img/user.jpg");
+    }
+
+    private String processAvatar(HttpServletRequest request, String defaultAvatar) throws IOException, ServletException {
+        try {
+        	String uploadDir = "D:/eclipse-workspace/QLKQHT/src/main/webapp/assets/img/profile";
+            Part avatarPart = request.getPart("avatar");
+
+            if (avatarPart != null && avatarPart.getSize() > 0) {
+                return ImageUtils.processAvatar(avatarPart, uploadDir, true, 150, 150);
+            }
+        } catch (Exception e) {
+            // Log lỗi nếu cần
+        }
+        return defaultAvatar;
+    }
 }

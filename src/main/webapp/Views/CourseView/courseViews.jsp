@@ -26,7 +26,7 @@ response.setDateHeader("Expires", 0);
 						<div class="col-md-6">
 							<ul class="breadcrumb mb-0 p-0 float-right">
 								<li class="breadcrumb-item"><a href="index.jsp"><i class="fas fa-home"></i> Trang chủ</a></li>
-								<li class="breadcrumb-item"><span>Học phần</span></li>
+								<li class="breadcrumb-item active"><span>Học phần</span></li>
 							</ul>
 						</div>
 					</div>
@@ -94,10 +94,10 @@ response.setDateHeader("Expires", 0);
 																		<i class="fas fa-ellipsis-v"></i>
 																	</a>
 																	<div class="dropdown-menu dropdown-menu-right">
-																		<a class="dropdown-item edit-course" 
-																			data-id="${course.courseID}" 
-																			data-name="${course.courseName}" 
-																			data-credits="${course.credits}" 
+																		<a class="dropdown-item edit-course"
+																			data-id="${course.courseID}"
+																			data-name="${course.courseName}"
+																			data-credits="${course.credits}"
 																			data-type="${course.courseType}"
 																			data-department="${course.department.departmentName}"
 																			data-departmentid="${course.departmentID}"
@@ -126,14 +126,14 @@ response.setDateHeader("Expires", 0);
 						</div>
 					</div>
 				</div>
-				
+
 				<jsp:include page="addCourseModal.jsp"></jsp:include>
 				<jsp:include page="deleteCourseModal.jsp"></jsp:include>
 				<jsp:include page="editCourseModal.jsp"></jsp:include>
 			</div>
 		</div>
 	</div>
-	
+
 	<jsp:include page="../../includes/footer.jsp"></jsp:include>
 	<script src="${pageContext.request.contextPath}/Views/CourseView/courseJS.js?v=<%= System.currentTimeMillis() %>"></script>
 </body>

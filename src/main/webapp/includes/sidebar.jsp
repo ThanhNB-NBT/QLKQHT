@@ -25,22 +25,22 @@
         </li>
 
         <li class="#">
-          <a href="#">
+          <a href="StudentServlet">
             <img src="assets/img/sidebar/icon-3.png" alt="icon"> <span> Sinh viên</span>
           </a>
         </li>
 
         <li class="#">
           <a href="CourseServlet">
-            <img src="assets/img/sidebar/icon-4.png" alt="icon"> <span> Học phần </span> 
+            <img src="assets/img/sidebar/icon-4.png" alt="icon"> <span> Học phần </span>
           </a>
         </li>
 
         <li class="#">
           <a href="DepartmentServlet">
-            <img src="assets/img/sidebar/icon-4.png" alt="icon"> <span> Khoa/Viện</span> 
+            <img src="assets/img/sidebar/icon-4.png" alt="icon"> <span> Khoa/Viện</span>
           </a>
-          
+
         </li>
 
         <li class="#">

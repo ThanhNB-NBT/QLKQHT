@@ -11,10 +11,12 @@ import java.io.IOException;
 import java.util.List;
 import common.AlertManager;
 import common.SessionUtils;
+import input.DepartmentInput;
 import common.RoleUtils;
 import models.bean.Account;
 import models.bean.Department;
 import models.dao.DepartmentDAO;
+import valid.DepartmentValidator;
 
 @WebServlet("/DepartmentServlet")
 public class DepartmentServlet extends HttpServlet {
@@ -34,10 +36,10 @@ public class DepartmentServlet extends HttpServlet {
 			response.sendRedirect("login.jsp");
 			return;
 		}
-		
+
 		boolean isAdmin = RoleUtils.isAdmin(session);
 		request.setAttribute("isAdmin", isAdmin);
-		
+
 		String departmentIDStr = request.getParameter(DEPARTMENTID);
 		if (departmentIDStr != null) {
 			try {
@@ -92,16 +94,18 @@ public class DepartmentServlet extends HttpServlet {
 	}
 
 	private void createDepartment(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		String departmentName = request.getParameter("departmentName");
-		String email = request.getParameter("email");
-		String phone = request.getParameter("phone");
+			throws IOException {
+		DepartmentInput input = DepartmentInput.fromRequest(request);
 
-		if (checkDepartmentInput(request, departmentName, email, phone)) {
-			return;
-		}
 
-		Department department = new Department(departmentName, email, phone);
+		 boolean hasErrors = DepartmentValidator.validateInput(input, request);
+         if (hasErrors) {
+             // Thêm thông báo lỗi nếu có và chuyển hướng về trang quản lý sinh viên
+             AlertManager.addMessage(request, "Dữ liệu nhập vào không hợp lệ, vui lòng kiểm tra lại.", false);
+             response.sendRedirect(DEPARTMENT_SERVLET);
+             return;
+         }
+		Department department = new Department(input.getDepartmentName(), input.getEmail(), input.getPhone());
 
 		boolean success = DepartmentDAO.createDepartment(department);
 		String message = success ? "Thêm khoa/viện thành công!" : "Đã có lỗi xảy ra khi thêm khoa/viện.";
@@ -126,16 +130,17 @@ public class DepartmentServlet extends HttpServlet {
 	}
 
 	private void updateDepartment(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		int departmentID = Integer.parseInt(request.getParameter(DEPARTMENTID));
-		String departmentName = request.getParameter("departmentName");
-		String email = request.getParameter("email");
-		String phone = request.getParameter("phone");
+		DepartmentInput input = DepartmentInput.fromRequest(request);
 
-		if (checkDepartmentInput(request, departmentName, email, phone)) {
-			return;
-		}
 
-		Department department = new Department(departmentID, departmentName, email, phone);
+		 boolean hasErrors = DepartmentValidator.validateInput(input, request);
+        if (hasErrors) {
+            // Thêm thông báo lỗi nếu có và chuyển hướng về trang quản lý sinh viên
+            AlertManager.addMessage(request, "Dữ liệu nhập vào không hợp lệ, vui lòng kiểm tra lại.", false);
+            response.sendRedirect(DEPARTMENT_SERVLET);
+            return;
+        }
+		Department department = new Department(input.getDepartmentID(), input.getDepartmentName(), input.getEmail(), input.getPhone());
 
 		boolean success = DepartmentDAO.updateDepartment(department);
 		String message = success ? "Cập nhật khoa/viện thành công!" : "Có lỗi xảy ra khi cập nhật khoa/viện.";
@@ -143,47 +148,4 @@ public class DepartmentServlet extends HttpServlet {
 		response.sendRedirect(DEPARTMENT_SERVLET);
 	}
 
-	private boolean checkDepartmentInput(HttpServletRequest request, String departmentName, String email,
-			String phone) {
-		boolean hasError = false;
-
-		Department departmentToEdit = (Department) request.getAttribute("departmentToEdit");
-
-		if (departmentName == null || departmentName.trim().isEmpty()) {
-			AlertManager.addMessage(request, "Tên khoa không được để trống", false);
-			hasError = true;
-		}
-
-		// Kiểm tra email
-		if (email == null || email.trim().isEmpty()) {
-			AlertManager.addMessage(request, "Email không được để trống.", false);
-			hasError = true;
-		} else if (!isValidEmailFormat(email)) {
-			AlertManager.addMessage(request, "Định dạng email không hợp lệ.", false);
-			hasError = true;
-		}
-
-		if (phone == null || phone.trim().isEmpty()) {
-			AlertManager.addMessage(request, "Số điện thoại không được để trống!", false);
-			hasError = true;
-		}
-
-		if (departmentToEdit != null && !departmentToEdit.getDepartmentName().equals(departmentName)
-				&& DepartmentDAO.checkDepartmentName(departmentName)) {
-			AlertManager.addMessage(request, "Tên khoa đã tồn tại", false);
-			hasError = true;
-		}
-		if (departmentToEdit != null && !departmentToEdit.getEmail().equals(email)
-				&& DepartmentDAO.checkDepartmentName(departmentName)) {
-			AlertManager.addMessage(request, "Email của khoa đẫ tồn tại", false);
-			hasError = true;
-		}
-		return hasError;
-	}
-
-	private boolean isValidEmailFormat(String email) {
-		String emailRegex = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$";
-		return email.matches(emailRegex);
-	}
-	
 }

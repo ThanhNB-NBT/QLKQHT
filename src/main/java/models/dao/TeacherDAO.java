@@ -69,10 +69,10 @@ public class TeacherDAO {
         teacher.setAccountID(rs.getInt("AccountID"));
         teacher.setAvatar(rs.getString("Avatar"));
 
+        // Ánh xạ Department
         Department department = new Department();
         department.setDepartmentID(rs.getInt("DepartmentID"));
         department.setDepartmentName(rs.getString("DepartmentName"));
-
         teacher.setDepartment(department);
         return teacher;
     }
@@ -326,9 +326,11 @@ public class TeacherDAO {
              PreparedStatement stmt = conn.prepareStatement(SQL_CHECK_EMAIL_EXISTS)) {
 
             stmt.setString(1, email);
+
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    return rs.getInt(1) == 0;
+                    int count = rs.getInt(1);
+                    return count == 0;
                 }
             }
         } catch (SQLException e) {
@@ -336,6 +338,7 @@ public class TeacherDAO {
         }
         return false;
     }
+
 
     private static boolean isUsernameUnique(String username) {
         try (Connection conn = ConnectDatabase.checkConnect();

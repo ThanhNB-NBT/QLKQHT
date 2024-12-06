@@ -10,7 +10,7 @@ response.setDateHeader("Expires", 0);
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Quản lý giáo viên</title>
+<title>Quản lý sinh viên</title>
 <jsp:include page="../../includes/resources.jsp"></jsp:include>
 </head>
 <body>
@@ -21,12 +21,12 @@ response.setDateHeader("Expires", 0);
 				<div class="page-header">
 					<div class="row">
 						<div class="col-md-6">
-							<h3 class="page-title mb-0">Quản lý giáo viên</h3>
+							<h3 class="page-title mb-0">Quản lý sinh viên</h3>
 						</div>
 						<div class="col-md-6">
 							<ul class="breadcrumb mb-0 p-0 float-right">
 								<li class="breadcrumb-item"><a href="index.jsp"><i class="fas fa-home"></i> Trang chủ</a></li>
-								<li class="breadcrumb-item active"><span>Giáo viên</span></li>
+								<li class="breadcrumb-item active">Sinh viên</li>
 							</ul>
 						</div>
 					</div>
@@ -34,25 +34,31 @@ response.setDateHeader("Expires", 0);
 				<div class="row">
 					<div class="col-sm-4 col-4"></div>
 					<div class="col-sm-8 col-8 text-right add-btn-col">
-						<a href="javascript:void(0);" class="btn btn-primary btn-rounded" data-toggle="modal" data-target="#add_teacher">
-							<i class="fas fa-plus"></i> Thêm giáo viên
+						<a href="javascript:void(0);" class="btn btn-primary btn-rounded" data-toggle="modal" data-target="#add_student">
+							<i class="fas fa-plus"></i> Thêm sinh viên
 						</a>
 					</div>
 				</div>
 				<div class="content-page">
-					<form action="TeacherServlet" method="GET">
+					<form action="StudentServlet" method="GET">
 						<div class="row filter-row">
 							<div class="col-sm-8 col-md-3">
 								<div class="form-group form-focus">
 									<input type="text" name="search" class="form-control floating">
-									<label class="focus-label">Tên giáo viên</label>
+									<label class="focus-label">Tên sinh viên</label>
 								</div>
 							</div>
 							<div class="col-sm-6 col-md-3">
-								<div class="form-group form-focus"></div>
+								<div class="form-group form-focus">
+									<input type="text" name="major" class="form-control floating">
+									<label class="focus-label">Ngành học</label>
+								</div>
 							</div>
 							<div class="col-sm-6 col-md-3">
-								<div class="form-group form-focus"></div>
+								<div class="form-group form-focus">
+									<input type="text" name="address" class="form-control floating">
+									<label class="focus-label">Địa chỉ</label>
+								</div>
 							</div>
 							<div class="col-sm-6 col-md-3">
 								<button type="submit" class="btn btn-search rounded btn-block mb-3">Tìm kiếm</button>
@@ -66,48 +72,55 @@ response.setDateHeader("Expires", 0);
 									<thead class="thead-light">
 										<tr>
 											<th>STT</th>
+											<th>MSSV</th>
 											<th>Avatar</th>
 											<th>Họ và tên</th>
-											<th>Email</th>
-											<th>Khoa/Viện</th>
-											<th>Ngày làm việc</th>
+											<th>Ngày sinh</th>
+											<th>Ngành học</th>
+											<th>Địa chỉ</th>
+
 											<th class="text-right">Chức năng</th>
 										</tr>
 									</thead>
 									<tbody>
 										<c:choose>
-											<c:when test="${not empty teachers}">
-												<c:forEach var="teacher" items="${teachers}" varStatus="status">
-													<tr data-teacher-id="${teacher.teacherID}">
+											<c:when test="${not empty students}">
+												<c:forEach var="student" items="${students}" varStatus="status">
+													<tr data-student-id="${student.studentID}">
 														<td>${status.index + 1}</td>
+														<td>${student.studentCode}</td>
 														<td>
-															<img src="${pageContext.request.contextPath}/${teacher.avatar}" alt="Avatar" class="img-thumbnail" width="40" height="40">
+															<img src="${pageContext.request.contextPath}/${student.avatar}" alt="Avatar" class="img-thumbnail" width="40" height="40">
 														</td>
-														<td>${teacher.firstName} ${teacher.lastName}</td>
-														<td>${teacher.email}</td>
-														<td>${teacher.department != null ? teacher.department.departmentName : "Chưa có khoa/viện"}</td>
+														<td>${student.firstName} ${student.lastName}</td>
 														<td>
-															<fmt:formatDate value="${teacher.hireDate}" pattern="dd/MM/yyyy"/>
+															<fmt:formatDate value="${student.dateOfBirth}" pattern="dd/MM/yyyy"/>
 														</td>
+														<td>${student.majorName}</td>
+														<td>${student.address}</td>
+
 														<td class="text-right">
 															<div class="dropdown dropdown-action">
 																<a href="#" class="action-icon dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
 																	<i class="fas fa-ellipsis-v"></i>
 																</a>
 																<div class="dropdown-menu dropdown-menu-right">
-																	<a class="dropdown-item edit-teacher"
-																		data-id="${teacher.teacherID}"
-																		data-first-name="${teacher.firstName}"
-																		data-last-name="${teacher.lastName}"
-																		data-email="${teacher.email}"
-																		data-phone="${teacher.phone}"
-																		data-department-id="${teacher.departmentID}"
-																		data-office="${teacher.office}"
-																		data-hire-date="${teacher.hireDate}"
-																		data-avatar="${pageContext.request.contextPath}/${teacher.avatar}">
+																	<a class="dropdown-item edit-student"
+																		data-id="${student.studentID}"
+																		data-first-name="${student.firstName}"
+																		data-last-name="${student.lastName}"
+																		data-dob="${student.dateOfBirth}"
+																		data-email="${student.email}"
+																		data-phone="${student.phone}"
+																		data-department-id="${student.departmentID}"
+																		data-major-name="${student.majorName}"
+																		data-address="${student.address}"
+																		data-enrollment-year="${student.enrollmentYear}"
+																		data-student-code="${student.studentCode}"
+																		data-avatar="${pageContext.request.contextPath}/${student.avatar}">
 																		<i class="fas fa-pencil-alt m-r-5"></i> Sửa
 																	</a>
-																	<a class="dropdown-item delete-teacher" data-id="${teacher.teacherID}">
+																	<a class="dropdown-item delete-student" data-id="${student.studentID}">
 																		<i class="fas fa-trash-alt m-r-5"></i> Xóa
 																	</a>
 																</div>
@@ -129,14 +142,14 @@ response.setDateHeader("Expires", 0);
 					</div>
 				</div>
 
-				<jsp:include page="addTeacherModal.jsp"></jsp:include>
-				<jsp:include page="deleteTeacherModal.jsp"></jsp:include>
-				<jsp:include page="editTeacherModal.jsp"></jsp:include>
+				<jsp:include page="addStudentModal.jsp"></jsp:include>
+				<jsp:include page="deleteStudentModal.jsp"></jsp:include>
+				<jsp:include page="editStudentModal.jsp"></jsp:include>
 			</div>
 		</div>
 	</div>
 
 	<jsp:include page="../../includes/footer.jsp"></jsp:include>
-	<script src="${pageContext.request.contextPath}/Views/TeacherView/teacherJS.js?v=<%= System.currentTimeMillis() %>"></script>
+	<script src="${pageContext.request.contextPath}/Views/StudentView/StudentJS.js?v=<%= System.currentTimeMillis() %>"></script>
 </body>
 </html>
