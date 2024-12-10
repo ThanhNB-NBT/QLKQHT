@@ -12,6 +12,7 @@ $(document).on('click', '.edit-student', function () {
 	const studentCode = $(this).data('student-code');
 	const avatar = $(this).data('avatar');
 	const enrollmentYear = $(this).data('enrollment-year');
+	const accountID = $(this).data('account-id');
 
     // Điền thông tin vào các trường trong modal
     $('#editStudentId').val(studentId);
@@ -26,7 +27,7 @@ $(document).on('click', '.edit-student', function () {
     $('#editStudentCode').text(`${studentCode}`);
 	$('#editAvatar').attr('src', avatar);
 	$('#editEnrollmentYear').val(enrollmentYear);
-
+	$('#editAccountID').val(accountID);
     $('#edit_student').modal('show');
 });
 

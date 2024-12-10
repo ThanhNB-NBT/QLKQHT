@@ -12,15 +12,15 @@ public class Teacher {
     private String office;
     private Date hireDate;
     private int accountID;
-    private String avatar;
     private Department department;
+    private Account account;
 
 	public Teacher() {
 		super();
 	}
 
 	public Teacher(int teacherID, String firstName, String lastName, String email, String phone, Integer departmentID,
-			String office, Date hireDate, int accountID, String avatar, Department department) {
+			String office, Date hireDate, int accountID, Department department, Account account) {
 		super();
 		this.teacherID = teacherID;
 		this.firstName = firstName;
@@ -31,11 +31,11 @@ public class Teacher {
 		this.office = office;
 		this.hireDate = hireDate;
 		this.accountID = accountID;
-		this.avatar = avatar;
 		this.department = department;
+		this.account = account;
 	}
 	public Teacher( String firstName, String lastName, String email, String phone, Integer departmentID,
-			String office, Date hireDate, int accountID, String avatar, Department department) {
+			String office, Date hireDate, int accountID, Department department) {
 		super();
 		this.firstName = firstName;
 		this.lastName = lastName;
@@ -45,11 +45,10 @@ public class Teacher {
 		this.office = office;
 		this.hireDate = hireDate;
 		this.accountID = accountID;
-		this.avatar = avatar;
 		this.department = department;
 	}
 	public Teacher( String firstName, String lastName, String email, String phone, Integer departmentID,
-			String office, Date hireDate, String avatar) {
+			String office, Date hireDate) {
 		super();
 		this.firstName = firstName;
 		this.lastName = lastName;
@@ -58,7 +57,6 @@ public class Teacher {
 		this.departmentID = departmentID;
 		this.office = office;
 		this.hireDate = hireDate;
-		this.avatar = avatar;
 	}
 
 	public int getTeacherID() {
@@ -87,9 +85,6 @@ public class Teacher {
 	}
 	public int getAccountID() {
 		return accountID;
-	}
-	public String getAvatar() {
-		return avatar;
 	}
 	public Department getDepartment() {
 		return department;
@@ -125,7 +120,13 @@ public class Teacher {
 	public void setAccountID(int accountID) {
 		this.accountID = accountID;
 	}
-	public void setAvatar(String avatar) {
-		this.avatar = avatar;
+
+	public Account getAccount() {
+		return account;
 	}
+
+	public void setAccount(Account account) {
+		this.account = account;
+	}
+
 }

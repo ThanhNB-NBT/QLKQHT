@@ -15,6 +15,23 @@ public class StudentInput {
     private String majorName;
     private String studentCode;
     private Integer departmentID;
+    private Integer accountID;
+
+    public StudentInput(Integer studentID, String firstName, String lastName, Date dateOfBirth, String email, String phone,
+            String address, Date enrollmentYear, String majorName, String studentCode, Integer departmentID, Integer accountID) {
+		this.studentID = studentID;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.dateOfBirth = dateOfBirth;
+		this.email = email;
+		this.phone = phone;
+		this.address = address;
+		this.enrollmentYear = enrollmentYear;
+		this.majorName = majorName;
+		this.studentCode = studentCode;
+		this.departmentID = departmentID;
+		this.accountID = accountID;
+	}
 
     // Constructor có ID (dùng cho update)
     public StudentInput(Integer studentID, String firstName, String lastName, Date dateOfBirth, String email, String phone,
@@ -50,6 +67,7 @@ public class StudentInput {
     public String getMajorName() { return majorName; }
     public String getStudentCode() { return studentCode; }
     public Integer getDepartmentID() {return departmentID; }
+    public Integer getAccountID() {return accountID;}
 
     // Phương thức để chuyển đổi từ HttpServletRequest
     public static StudentInput fromRequest(HttpServletRequest request) {
@@ -83,6 +101,10 @@ public class StudentInput {
         Integer departmentID = (departmentIDParam != null && !departmentIDParam.isEmpty())
                 ? Integer.parseInt(departmentIDParam)
                 : null;
-        return new StudentInput(studentID, firstName, lastName, dateOfBirth, email, phone, address, enrollmentYear, majorName, studentCode, departmentID);
+        String accountIDParam = request.getParameter("accountID");
+        Integer accountID = (accountIDParam != null && !accountIDParam.isEmpty())
+                        ? Integer.parseInt(accountIDParam)
+                        : null;
+        return new StudentInput(studentID, firstName, lastName, dateOfBirth, email, phone, address, enrollmentYear, majorName, studentCode, departmentID, accountID);
     }
 }

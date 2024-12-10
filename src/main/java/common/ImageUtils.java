@@ -7,42 +7,60 @@ import java.io.IOException;
 import java.util.UUID;
 
 import javax.imageio.ImageIO;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.Part;
 
 public class ImageUtils {
 
-    public static String processAvatar(Part filePart, String uploadDir, boolean resize, int width, int height) throws IOException {
+    private static final String DEFAULT_AVATAR_PATH = "assets/img/user.jpg";
+    private static final String UPLOAD_DIRECTORY = "D:/eclipse-workspace/QLKQHT/src/main/webapp/assets/img/profile";
+
+    public static String processAvatar(HttpServletRequest request, String defaultAvatar) throws IOException, ServletException {
+        try {
+            Part avatarPart = request.getPart("avatar");
+
+            if (avatarPart != null && avatarPart.getSize() > 0) {
+                return processAvatarFile(avatarPart, UPLOAD_DIRECTORY, true, 150, 150);
+            }
+        } catch (Exception e) {
+            // Log lỗi nếu cần thiết
+            e.printStackTrace();
+        }
+        return defaultAvatar;
+    }
+
+    public static String processAvatar(HttpServletRequest request) throws IOException, ServletException {
+        return processAvatar(request, DEFAULT_AVATAR_PATH);
+    }
+
+    private static String processAvatarFile(Part filePart, String uploadDir, boolean resize, int width, int height) throws IOException {
+
         if (filePart == null || filePart.getSize() <= 0) {
-            // Không upload file, trả về avatar mặc định
-            return "assets/img/user.jpg";
+            return DEFAULT_AVATAR_PATH;
         }
 
-        // Đảm bảo thư mục tồn tại
         File directory = new File(uploadDir);
         if (!directory.exists()) {
             directory.mkdirs();
         }
 
-        // Tạo tên file duy nhất
         String fileName = UUID.randomUUID().toString() + "_" + filePart.getSubmittedFileName();
         String outputPath = uploadDir + File.separator + fileName;
 
-        // Lưu file gốc
         filePart.write(outputPath);
 
         if (resize) {
-            // Resize ảnh
+
             BufferedImage originalImage = ImageIO.read(new File(outputPath));
             Image resizedImage = originalImage.getScaledInstance(width, height, Image.SCALE_SMOOTH);
             BufferedImage bufferedResizedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 
             bufferedResizedImage.getGraphics().drawImage(resizedImage, 0, 0, null);
 
-            // Ghi đè ảnh resized lên file gốc
             ImageIO.write(bufferedResizedImage, "png", new File(outputPath));
         }
-
-        // Trả về đường dẫn tương đối để lưu vào cơ sở dữ liệu
         return "assets/img/profile/" + fileName;
     }
 }

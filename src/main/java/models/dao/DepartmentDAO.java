@@ -17,7 +17,9 @@ public class DepartmentDAO {
 	private static final String SQL_UPDATE_DEPARTMENT = "UPDATE Departments SET DepartmentName = ?, Email = ?, Phone = ? WHERE DepartmentID = ?";
 	private static final String SQL_INSERT_DEPARTMENT = "INSERT INTO Departments(DepartmentName, Email, Phone) VALUES (?, ?, ?)";
 	private static final String SQL_CHECHK_DEPARTMENTNAME = "SELECT COUNT(*) FROM Departments WHERE DepartmentName = ?";
-	
+	private static final String SQL_DEPARTMENTID_BYNAME = "SELECT DepartmentID FROM Departments WHERE DepartmentName = ?";
+	private	static final String SQL_INSERT_DEPARTMENT_NAME = "INSERT INTO Departments (DepartmentName) VALUES (?)";
+
 	private static Department mapDepartment(ResultSet rs) throws SQLException{
 		Department department = new Department();
 		department.setDepartmentID(rs.getInt("DepartmentID"));
@@ -26,13 +28,13 @@ public class DepartmentDAO {
 		department.setPhone(rs.getString("Phone"));
 		return department;
 	}
-	
+
 	public static List<Department> getAllDepartment(){
 		List<Department> departments = new ArrayList<>();
 		try(Connection conn = ConnectDatabase.checkConnect();
 			PreparedStatement stmt = conn.prepareStatement(SQL_SELECT_ALL_DEPARTMENT);
 			ResultSet rs = stmt.executeQuery()){
-			
+
 			while(rs.next()) {
 				departments.add(mapDepartment(rs));
 			}
@@ -41,21 +43,21 @@ public class DepartmentDAO {
 		}
 		return departments;
 	}
-	
+
 	public static boolean createDepartment(Department department) {
 		try(Connection conn = ConnectDatabase.checkConnect();
 			PreparedStatement stmt = conn.prepareStatement(SQL_INSERT_DEPARTMENT)){
 				stmt.setString(1, department.getDepartmentName());
 				stmt.setString(2, department.getEmail());
 				stmt.setString(3, department.getPhone());
-				
+
 				return stmt.executeUpdate() > 0;
 		} catch (SQLException e) {
 			logger.severe("error createDepartment:" + e.getMessage());//ghi lại thông báo lỗi nghiêm trọng
 		}
 		return false;
 	}
-	
+
 	public static boolean deleteDepartment(int departmentId) {
 		try(Connection conn = ConnectDatabase.checkConnect();
 			PreparedStatement stmt = conn.prepareStatement(SQL_DELETE_DEPARTMENT)){
@@ -66,7 +68,7 @@ public class DepartmentDAO {
 		}
 		return false;
 	}
-	
+
 	public static boolean updateDepartment(Department department) {
 		try(Connection conn = ConnectDatabase.checkConnect();
 			PreparedStatement stmt = conn.prepareStatement(SQL_UPDATE_DEPARTMENT)){
@@ -74,14 +76,14 @@ public class DepartmentDAO {
 				stmt.setString(2, department.getEmail());
 				stmt.setString(3, department.getPhone());
 				stmt.setInt(4, department.getDepartmentID());
-				
+
 				return stmt.executeUpdate() > 0;
 		} catch (SQLException e) {
 			logger.severe("error updateDepartment: " + e.getMessage());
 		}
 		return false;
 	}
-	
+
 	public static Department getDepartmentById(int departmentId) {
 		try(Connection conn = ConnectDatabase.checkConnect();
 			PreparedStatement stmt = conn.prepareStatement(SQL_SELECT_DEPARTMENT)){
@@ -96,10 +98,10 @@ public class DepartmentDAO {
 		}
 		return null;
 	}
-	
+
 	public static List<Department> searchByDepartmentName(String departmentName){
 		List<Department> departments = new ArrayList<>();
-		
+
 		try(Connection conn = ConnectDatabase.checkConnect();
 			PreparedStatement stmt = conn.prepareStatement(SQL_SEARCH_DEPARTMENT)) {
 				stmt.setString(1, "%" + departmentName + "%");
@@ -113,7 +115,7 @@ public class DepartmentDAO {
 		}
 		return departments;
 	}
-	
+
 	public static boolean checkDepartmentName(String departmentName) {
 		try(Connection conn = ConnectDatabase.checkConnect();
 			PreparedStatement stmt = conn.prepareStatement(SQL_CHECHK_DEPARTMENTNAME)){
@@ -127,6 +129,42 @@ public class DepartmentDAO {
 			logger.severe("error checking departmentName: " + e.getMessage());
 		}
 		return false;
-		
 	}
+
+	public static Integer getDepartmentIDByName(String departmentName) {
+	    Integer departmentID = null;
+
+	    try (Connection conn = ConnectDatabase.checkConnect();
+	         PreparedStatement ps = conn.prepareStatement(SQL_DEPARTMENTID_BYNAME)) {
+
+	        ps.setString(1, departmentName);
+	        ResultSet rs = ps.executeQuery();
+
+	        if (rs.next()) {
+	            departmentID = rs.getInt("DepartmentID");
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    return departmentID;
+	}
+
+
+	public static Integer createDepartment(String departmentName) {
+	    Connection conn = ConnectDatabase.checkConnect();
+
+	    try (PreparedStatement stmt = conn.prepareStatement(SQL_INSERT_DEPARTMENT_NAME, Statement.RETURN_GENERATED_KEYS)) {
+	        stmt.setString(1, departmentName);
+	        stmt.executeUpdate();
+
+	        ResultSet rs = stmt.getGeneratedKeys();
+	        if (rs.next()) {
+	            return rs.getInt(1); // Trả về ID của khoa vừa thêm
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	    return null;
+	}
+
 }

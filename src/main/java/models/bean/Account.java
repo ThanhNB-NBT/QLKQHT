@@ -8,6 +8,7 @@ public class Account {
     private String username;
     private String password;
     private String email;
+    private String avatar;
     private Role role;
 
     // Constructors
@@ -15,25 +16,35 @@ public class Account {
         super();
     }
 
-    public Account(int accountID, String username, String password, String email, Role role) {
+    public Account(int accountID, String username, String password, String email, String avatar, Role role) {
         this.accountID = accountID;
         this.username = username;
         setPassword(password);
         this.email = email;
+        this.avatar = avatar;
         this.role = role;
     }
-    
-    public Account(int accountID, String username, String email, Role role) {
+
+    public Account(int accountID, String username, String email, String avatar, Role role) {
+        this.accountID = accountID;
+        this.username = username;
+        this.email = email;
+        this.avatar = avatar;
+        this.role = role;
+    }
+
+    public Account(Integer accountID, String username, String email, Role role) {
         this.accountID = accountID;
         this.username = username;
         this.email = email;
         this.role = role;
     }
 
-    public Account(String username, String password, String email, Role role) {
+    public Account(String username, String password, String email, String avatar, Role role) {
         this.username = username;
         setPassword(password); // Băm mật khẩu trước khi lưu
         this.email = email;
+        this.avatar = avatar;
         this.role = role;
     }
 
@@ -68,7 +79,7 @@ public class Account {
             this.password = null; // Hoặc giữ mật khẩu cũ nếu không thay đổi
         } else {
             this.password = hashPassword(password); // Băm mật khẩu tự động nếu có mật khẩu mới
-        } 
+        }
     }
 
     public String getEmail() {
@@ -87,7 +98,15 @@ public class Account {
         this.role = role;
     }
 
-    private String hashPassword(String password) {
+    public String getAvatar() {
+		return avatar;
+	}
+
+	public void setAvatar(String avatar) {
+		this.avatar = avatar;
+	}
+
+	private String hashPassword(String password) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             byte[] hash = md.digest(password.getBytes());

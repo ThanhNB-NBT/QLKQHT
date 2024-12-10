@@ -16,6 +16,8 @@
 						<!-- Hidden ID giảng viên -->
 						<input type="hidden" id="editTeacherID" name="teacherID"
 							value="${teacher.teacherID}">
+						<input type="hidden" id="editAccountID" name="accountID"
+							value="${teacher.accountID}">
 
 						<!-- Họ và Tên -->
 						<div class="col-sm-6">
@@ -103,16 +105,19 @@
 
 						<!-- Avatar -->
 						<div class="col-sm-12">
-							<div class="form-group form-focus">
-								<input id="editAvatar" type="file" name="avatar"
-									class="form-control-file" onchange="displayEditFileName(this)">
-								<label class="focus-label">Ảnh đại diện</label> <small
-									id="editAvatarFileName" class="text-muted"> <!-- Hiển thị tên file hiện tại nếu có -->
-									<c:if test="${teacher.avatar != null}">
-                                        Hiện tại: ${teacher.avatar}
-                                    </c:if>
-								</small>
+							<input type="hidden" name="currentAvatar"
+							value="${teacher.account.avatar}">
+						<div class="col-sm-12">
+							<div class="form-group">
+								<label for="avatarInputEdit">Ảnh đại diện</label> <input
+									type="file" id="avatarInputEdit"
+									class="form-control avatar-input" data-target-img="editAvatar"
+									accept="image/*" name="avatar"> <img id="editAvatar"
+									src="${teacher.account.avatar}" alt="Ảnh đại diện"
+									class="img-thumbnail mt-2" style="max-width: 150px;">
 							</div>
+
+						</div>
 						</div>
 
 						<!-- Submit -->

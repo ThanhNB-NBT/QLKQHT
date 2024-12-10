@@ -8,8 +8,12 @@ import jakarta.servlet.http.HttpServletResponse;
 import models.bean.Account;
 import models.bean.Role;
 import models.dao.AccountDAO;
+import valid.AccountValidator;
 
 import java.io.IOException;
+
+import common.ImageUtils;
+import input.AccountInput;
 
 @WebServlet("/RegisterServlet")
 public class RegisterServlet extends HttpServlet {
@@ -26,14 +30,19 @@ public class RegisterServlet extends HttpServlet {
 
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String username = request.getParameter("username");
-        String email = request.getParameter("email");
-        String password = request.getParameter("password");
-        int roleID = Integer.parseInt(request.getParameter("roleID"));
-        
-        Role role = new Role(roleID, ""); 
-        Account newAccount = new Account(username, password, email, role);
-        
+		AccountInput input = AccountInput.fromRequest(request, false);
+
+	    if (AccountValidator.validateInput(request, input, false)) {
+	        response.sendRedirect("/register.jsp");
+	        return;
+	    }
+
+	    String avatar = ImageUtils.processAvatar(request);
+	    Role role = new Role();
+	    role.setRoleID(input.getRoleID());
+
+        Account newAccount = new Account(input.getUsername(), input.getPassword(), input.getEmail(), avatar, role);
+
         boolean isCreated = AccountDAO.createAccount(newAccount);
 
         if (isCreated) {

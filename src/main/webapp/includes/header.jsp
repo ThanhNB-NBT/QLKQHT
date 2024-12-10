@@ -33,7 +33,7 @@
 			<li class="nav-item dropdown has-arrow"><a href="#"
 				class=" nav-link user-link" data-toggle="dropdown"> <span
 					class="user-img"><img class="rounded-circle"
-						src="assets/img/user-06.jpg" width="30"> <span
+						src="assets/img/user.jpg" width="30"> <span
 						class="status online"></span> </span> <span>${username}</span>
 			</a>
 				<div class="dropdown-menu">

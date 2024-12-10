@@ -15,6 +15,8 @@
 					<div class="row justify-content-center">
 						<!-- ID Sinh viên (ẩn) -->
 						<input type="hidden" id="editStudentId" name="studentID" />
+						<input type="hidden" id="editAccountID" name="accountID"
+							value="${student.accountID}">
 						<div class="col-sm-12">
 							<div class="form-group">
 								<label for="editStudentId">Mã sinh viên</label>
@@ -117,14 +119,14 @@
 							</div>
 						</div>
 						<input type="hidden" name="currentAvatar"
-							value="${student.avatar}">
+							value="${pageContext.request.contextPath}/${student.account.avatar}">
 						<div class="col-sm-12">
 							<div class="form-group">
 								<label for="avatarInputEdit">Ảnh đại diện</label> <input
 									type="file" id="avatarInputEdit"
 									class="form-control avatar-input" data-target-img="editAvatar"
 									accept="image/*" name="avatar"> <img id="editAvatar"
-									src="${student.avatar}" alt="Ảnh đại diện"
+									src="${pageContext.request.contextPath}/${student.account.avatar}" alt="Ảnh đại diện"
 									class="img-thumbnail mt-2" style="max-width: 150px;">
 							</div>
 

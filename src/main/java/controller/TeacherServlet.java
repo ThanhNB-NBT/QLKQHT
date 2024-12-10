@@ -7,10 +7,12 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import jakarta.servlet.http.Part;
+import models.bean.Account;
+import models.bean.Role;
 import models.bean.Teacher;
 import models.dao.DepartmentDAO;
 import models.dao.TeacherDAO;
+import models.dao.AccountDAO;
 
 import common.AlertManager;
 import common.ImageUtils;
@@ -20,7 +22,9 @@ import input.TeacherInput;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.logging.Logger;
 
 import valid.TeacherValidator;
 
@@ -31,6 +35,7 @@ public class TeacherServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final String TEACHERID = "teacherID";
     private static final String TEACHER_SERVLET = "TeacherServlet";
+    private static final Logger logger = Logger.getLogger(TeacherServlet.class.getName());
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -63,11 +68,21 @@ public class TeacherServlet extends HttpServlet {
                 return;
             }
         }
+        String searchName = request.getParameter("searchName");
+        String searchEmail = request.getParameter("searchEmail");
 
-        String searchTeacher = request.getParameter("search");
-        List<Teacher> teachers = (searchTeacher != null && !searchTeacher.trim().isEmpty())
-            ? TeacherDAO.searchTeachersByName(searchTeacher)
-            : TeacherDAO.getAllTeachers();
+        boolean noCriteria = (searchName == null || searchName.trim().isEmpty()) &&
+                             (searchEmail == null || searchEmail.trim().isEmpty());
+
+        List<Teacher> teachers;
+        if (noCriteria) {
+            teachers = TeacherDAO.getAllTeachers();
+        } else {
+            teachers = TeacherDAO.searchTeachers(searchName, searchEmail);
+            if (teachers.isEmpty()) {
+                AlertManager.addMessage(request, "Không tìm thấy dữ liệu", false);
+            }
+        }
 
         request.setAttribute("departments", DepartmentDAO.getAllDepartment());
         request.setAttribute("teachers", teachers);
@@ -110,17 +125,26 @@ public class TeacherServlet extends HttpServlet {
                 return;
             }
 
-            // Xử lý ảnh đại diện
-            String avatar = processAvatar(request);
+            String avatar = ImageUtils.processAvatar(request);
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+            String password = dateFormat.format(input.getHireDate());
+            String username = TeacherInput.generateUsernameForTeacher(input.getFirstName(), input.getLastName());
+            Role role = new Role(2);
+            Account account = new Account( username, password, input.getEmail(), avatar, role);
+            int accountID = AccountDAO.createAccountAndReturnID(account);
 
-
+            if (accountID <= 0) {
+                AlertManager.addMessage(request, "Có lỗi xảy ra khi tạo tài khoản.", false);
+                response.sendRedirect(TEACHER_SERVLET);
+                return;
+            }
             // Tạo đối tượng Teacher
             Teacher teacher = new Teacher(input.getFirstName(), input.getLastName(), input.getEmail(),
                                            input.getPhone(), input.getDepartmentID(), input.getOffice(),
-                                           input.getHireDate(), avatar);
+                                           input.getHireDate());
+            teacher.setAccountID(accountID);
 
-            // Lưu thông tin Teacher vào DB
-            boolean success = TeacherDAO.createTeacherWithAccount(teacher);
+            boolean success = TeacherDAO.createTeacher(teacher);
             String message = success ? "Thêm giảng viên thành công!" : "Có lỗi xảy ra khi thêm giảng viên.";
             AlertManager.addMessage(request, message, success);
 
@@ -163,8 +187,8 @@ public class TeacherServlet extends HttpServlet {
                 return;
             }
 
-            String avatar = processAvatar(request, request.getParameter("currentAvatar"));
-
+            String avatar = ImageUtils.processAvatar(request, request.getParameter("currentAvatar"));
+            logger.info("Processing avatar. Current avatar path: " + request.getParameter("currentAvatar") + ", new avatar: " + avatar);
             // Cập nhật thông tin giảng viên
             Teacher teacher = new Teacher();
             teacher.setTeacherID(input.getTeacherID());
@@ -175,35 +199,36 @@ public class TeacherServlet extends HttpServlet {
             teacher.setDepartmentID(input.getDepartmentID());
             teacher.setOffice(input.getOffice());
             teacher.setHireDate(input.getHireDate());
-            teacher.setAvatar(avatar);
+            teacher.setAccountID(input.getAccountID());
 
-            // Cập nhật trong DB
             boolean success = TeacherDAO.updateTeacher(teacher);
+            logger.info("Updating teacher with ID: " + teacher.getAccountID());
+            int accountID = teacher.getAccountID();
+            System.out.print("AccontID: " + accountID);
+            // Cập nhật avatar trong bảng account
+            if (avatar != null && !avatar.isEmpty()) {
+                boolean avatarUpdated = AccountDAO.updateAvatar(accountID, avatar);
+                if (!avatarUpdated) {
+                	logger.warning("Failed to update avatar for teacher ID: " + input.getAccountID());
+                    AlertManager.addMessage(request, "Cập nhật avatar không thành công.", false);
+                }
+            }
+
             String message = success ? "Cập nhật giảng viên thành công!" : "Có lỗi xảy ra khi cập nhật giảng viên.";
             AlertManager.addMessage(request, message, success);
+
+            boolean avatarUpdated = AccountDAO.updateAvatar( teacher.getAccountID(), avatar);
+            if (avatarUpdated) {
+                AlertManager.addMessage(request, "Cập nhật ảnh đại diện thành công!", true);
+            } else {
+            	logger.warning("Failed to update avatar in account for teacher ID: " + teacher.getAccountID());
+                AlertManager.addMessage(request, "Có lỗi xảy ra khi cập nhật ảnh đại diện.", false);
+            }
 
             response.sendRedirect(TEACHER_SERVLET);
         } catch (ParseException e) {
             AlertManager.addMessage(request, "Định dạng ngày không hợp lệ.", false);
             response.sendRedirect(TEACHER_SERVLET);
         }
-    }
-
-    private String processAvatar(HttpServletRequest request) throws IOException, ServletException {
-        return processAvatar(request, "assets/img/user.jpg");
-    }
-
-    private String processAvatar(HttpServletRequest request, String defaultAvatar) throws IOException, ServletException {
-        try {
-        	String uploadDir = "D:/eclipse-workspace/QLKQHT/src/main/webapp/assets/img/profile";
-            Part avatarPart = request.getPart("avatar");
-
-            if (avatarPart != null && avatarPart.getSize() > 0) {
-                return ImageUtils.processAvatar(avatarPart, uploadDir, true, 150, 150);
-            }
-        } catch (Exception e) {
-            // Log lỗi nếu cần
-        }
-        return defaultAvatar;
     }
 }

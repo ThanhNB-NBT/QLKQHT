@@ -17,18 +17,18 @@ public class Student {
     private Date enrollmentYear;
     private String majorName;
     private int accountID;
-    private String avatar;
     private String studentCode;
     private Integer departmentID;
     private Department department;
+    private Account account;
 
     public Student() {
         super();
     }
 
     public Student(int studentID, String firstName, String lastName, Date dateOfBirth, String email, String phone,
-			String address, Date enrollmentYear, String majorName, int accountID, String avatar, String studentCode,
-			Integer departmentID, Department department) {
+			String address, Date enrollmentYear, String majorName, int accountID, String studentCode,
+			Integer departmentID, Department department, Account account) {
 		super();
 		this.studentID = studentID;
 		this.firstName = firstName;
@@ -40,15 +40,14 @@ public class Student {
 		this.enrollmentYear = enrollmentYear;
 		this.majorName = majorName;
 		this.accountID = accountID;
-		this.avatar = avatar;
 		this.studentCode = studentCode;
 		this.departmentID = departmentID;
 		this.department = department;
+		this.account = account;
 	}
 
-    // Constructor without studentCode
     public Student(String firstName, String lastName, Date dateOfBirth, String email, String phone,
-                   String address, Date enrollmentYear, String majorName, String avatar, String studentCode, Integer departmentID) {
+                   String address, Date enrollmentYear, String majorName, String studentCode, Integer departmentID) {
         super();
         this.firstName = firstName;
         this.lastName = lastName;
@@ -58,14 +57,13 @@ public class Student {
         this.address = address;
         this.enrollmentYear = enrollmentYear;
         this.majorName = majorName;
-        this.avatar = avatar;
         this.studentCode = studentCode;
         this.departmentID = departmentID;
     }
 
     // Constructor without studentCode
     public Student(int studentID, String firstName, String lastName, Date dateOfBirth, String email, String phone,
-                   String address, Date enrollmentYear, String majorName, String avatar, Integer departmentID) {
+                   String address, Date enrollmentYear, String majorName, Integer departmentID) {
         super();
 		this.studentID = studentID;
         this.firstName = firstName;
@@ -76,7 +74,6 @@ public class Student {
         this.address = address;
         this.enrollmentYear = enrollmentYear;
         this.majorName = majorName;
-        this.avatar = avatar;
         this.departmentID = departmentID;
     }
 
@@ -136,10 +133,6 @@ public class Student {
         return accountID;
     }
 
-    public String getAvatar() {
-        return avatar;
-    }
-
     public String getStudentCode() {
         return studentCode;
     }
@@ -189,8 +182,12 @@ public class Student {
         this.accountID = accountID;
     }
 
-    public void setAvatar(String avatar) {
-        this.avatar = avatar;
+    public Account getAccount() {
+        return account;
+    }
+
+    public void setAccount(Account account) {
+        this.account = account;
     }
 
     // Phương thức sinh mã sinh viên

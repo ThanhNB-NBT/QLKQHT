@@ -80,8 +80,10 @@ response.setDateHeader("Expires", 0);
 												<c:forEach var="teacher" items="${teachers}" varStatus="status">
 													<tr data-teacher-id="${teacher.teacherID}">
 														<td>${status.index + 1}</td>
-														<td>
-															<img src="${pageContext.request.contextPath}/${teacher.avatar}" alt="Avatar" class="img-thumbnail" width="40" height="40">
+														<td><img
+															src="${pageContext.request.contextPath}/${teacher.account.avatar != null ? teacher.account.avatar : 'assets/img/user.jpg'}"
+															alt="Avatar" class="img-thumbnail" width="40" height="40">
+
 														</td>
 														<td>${teacher.firstName} ${teacher.lastName}</td>
 														<td>${teacher.email}</td>
@@ -104,7 +106,8 @@ response.setDateHeader("Expires", 0);
 																		data-department-id="${teacher.departmentID}"
 																		data-office="${teacher.office}"
 																		data-hire-date="${teacher.hireDate}"
-																		data-avatar="${pageContext.request.contextPath}/${teacher.avatar}">
+																		data-avatar="${pageContext.request.contextPath}/${teacher.account.avatar}"
+																		data-account-id="${teacher.accountID}">
 																		<i class="fas fa-pencil-alt m-r-5"></i> Sửa
 																	</a>
 																	<a class="dropdown-item delete-teacher" data-id="${teacher.teacherID}">

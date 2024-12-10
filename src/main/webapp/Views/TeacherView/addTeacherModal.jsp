@@ -29,10 +29,9 @@
                         <div class="col-sm-12">
                             <div class="form-group form-focus">
                                 <input id="email" name="email" type="email" class="form-control floating" required>
-                                <label class="focus-label">Email <span class="text-danger">*</span><span id="EmailError"
-									class="text-danger" style="display: none;">Email không
-										hợp lệ!</span></label>
-
+                                <label class="focus-label">Email <span class="text-danger">*</span></label>
+								<div class="text-danger small" id="emailError"
+									style="display: none;">Email không hợp lệ</div>
                             </div>
                         </div>
 
@@ -40,9 +39,9 @@
                         <div class="col-sm-12">
                             <div class="form-group form-focus">
                                 <input id="phone" name="phone" type="text" class="form-control floating" pattern="0[0-9]{9}" title="Số điện thoại phải từ 10-11 chữ số" required>
-                                <label class="focus-label">Số điện thoại <span class="text-danger">*</span><span id="PhoneError"
-									class="text-danger" style="display: none;">Số điện thoại
-										không hợp lệ!</span></label>
+                                <label class="focus-label">Số điện thoại <span class="text-danger">*</span></label>
+                                <div class="text-danger small" id="phoneError"
+									style="display: none;">Số điện thoại không hợp lệ</div>
                             </div>
                         </div>
 

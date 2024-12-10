@@ -84,10 +84,26 @@ response.setDateHeader("Expires", 0);
 													varStatus="status">
 													<tr>
 														<td>${status.index + 1}</td>
-														<td><a href="profile.html" class="avatar">${fn:substring(account.username, 0, 1).toUpperCase()}</a>
+														<td>
+															<a href="profile.html" class="avatar">
+																<c:choose>
+																	<c:when test="${empty account.avatar}">
+																		<img
+																			src="${pageContext.request.contextPath}/assets/img/user.jpg"
+																			alt="${account.username}" />
+																	</c:when>
+																	<c:otherwise>
+																		<img
+																			src="${pageContext.request.contextPath}/${account.avatar}"
+																			alt="${account.username}" />
+																	</c:otherwise>
+																</c:choose>
+															</a>
+
 															<h2>
 																<a class="badge" href="profile.html">${account.username}</a>
-															</h2></td>
+															</h2>
+														</td>
 														<td>${account.email}</td>
 														<td><c:choose>
 																<c:when test="${account.role.roleID == 1}">
@@ -102,7 +118,8 @@ response.setDateHeader("Expires", 0);
 																<c:otherwise>
 																	<span>${account.role.role}</span>
 																</c:otherwise>
-															</c:choose></td>
+															</c:choose>
+														</td>
 														<c:if test="${isAdmin}">
 															<td class="text-right">
 																<div class="dropdown dropdown-action">
@@ -116,7 +133,8 @@ response.setDateHeader("Expires", 0);
 																			data-username="${account.username}"
 																			data-email="${account.email}"
 																			data-role="${account.role.role}"
-																			data-role-id="${account.role.roleID}"> <i
+																			data-role-id="${account.role.roleID}"
+																			data-avatar="${pageContext.request.contextPath}/${account.avatar}"> <i
 																			class="fas fa-pencil-alt m-r-5"></i> Sửa
 																		</a> <a class="dropdown-item delete-account"
 																			data-id="${account.accountID}"> <i
@@ -151,8 +169,7 @@ response.setDateHeader("Expires", 0);
 	</div>
 	<jsp:include page="../../includes/footer.jsp" />
 	<script
-		src="${pageContext.request.contextPath}/Views/AccountView/accountJS.js?v=<%= System.currentTimeMillis() %>"></script>
-
-
+		src="${pageContext.request.contextPath}/Views/AccountView/accountJS.js?v=<%= System.currentTimeMillis() %>">
+	</script>
 </body>
 </html>

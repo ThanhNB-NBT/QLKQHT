@@ -1,30 +1,26 @@
-document.body.addEventListener('click', function(event) {
-	if (event.target.classList.contains('edit-account')) {
-		// Lấy các dữ liệu từ thuộc tính data- của link sửa
-		const accountId = event.target.getAttribute('data-id');
-		const username = event.target.getAttribute('data-username');
-		const email = event.target.getAttribute('data-email');
-		const role = event.target.getAttribute('data-role');
+$(document).on('click', '.edit-account', function () {
+		const accountID = $(this).data('id');
+		const username = $(this).data('username');
+		const email = $(this).data('email');
+		const role = $(this).data('role');
+		const roleID = $(this).data('role-id');
+		const avatar = $(this).data('avatar');
 
-		document.getElementById('editAccountID').value = accountId;
-		document.getElementById('editName').value = username;
-		document.getElementById('editEmail').value = email;
-		document.getElementById('editRole').value = role;
+		$('#editAccountID').val(accountID);
+		$('#editName').val(username);
+		$('#editEmail').val(email);
+		$('#editRole').val(role);
+		$('#editRoleID').val(roleID);
+		$('#editAvatar').val(avatar);
 
-		// Hiển thị modal chỉnh sửa
 		$('#edit_account').modal('show');
-	}
 });
 
 $(document).on('click', '.delete-account', function() {
-	// Lấy ID tài khoản từ thuộc tính data-id của nút Xóa
 	var accountId = $(this).data('id');
-	console.log("Account ID đang lấy:", accountId);
 
-	// Gán giá trị accountId vào input hidden trong form của modal
 	$('#deleteAccountId').val(accountId);
 
-	// Hiển thị modal
 	$('#delete_account').modal('show');
 });
 
@@ -56,4 +52,36 @@ document.getElementById("addAccountForm").addEventListener("submit", function(ev
 // Cập nhật tài khoản - Gắn kiểm tra mật khẩu khi submit
 document.getElementById("editAccountForm").addEventListener("submit", function(event) {
 	checkPasswordMatch("editPassword", "editConfirmPassword", "editPasswordMismatchWarning", event);
+});
+
+const emailField = document.getElementsByName('email')[0];
+if (emailField) {
+    emailField.addEventListener('input', function () {
+        const email = this.value;
+        const errorElement = document.getElementById('EmailError');
+        const emailPattern = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,6}$/;
+
+        if (!emailPattern.test(email)) {
+            errorElement.style.display = 'block';
+            this.style.borderColor = 'red';
+        } else {
+            errorElement.style.display = 'none';
+            this.style.borderColor = 'green';
+        }
+    });
+}
+
+$(document).on('change', '.avatar-input', function (e) {
+    const file = e.target.files[0]; // Lấy file người dùng chọn
+    const reader = new FileReader();
+
+    reader.onload = function (event) {
+        // Lấy data URL của file và cập nhật ảnh
+        const targetImgId = $(e.target).data('target-img'); // Lấy ID của thẻ img từ data attribute
+        $('#' + targetImgId).attr('src', event.target.result); // Cập nhật ảnh
+    };
+
+    if (file) {
+        reader.readAsDataURL(file); // Đọc file dưới dạng base64
+    }
 });

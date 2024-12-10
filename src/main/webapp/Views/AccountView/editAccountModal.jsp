@@ -14,7 +14,7 @@
 				</button>
 			</div>
 			<form id="editAccountForm" action="AccountServlet" method="post"
-				class="m-b-30">
+				class="m-b-30" enctype="multipart/form-data">
 				<div class="modal-body">
 					<input type="hidden" id="editAccountID" name="accountID"
 						value="${account.accountID}">
@@ -25,9 +25,7 @@
 							id="editName" name="name" class="form-control"
 							value="${account.username}" required pattern=".{3,}"
 							title="Tài khoản phải có ít nhất 3 ký tự">
-						<c:if test="${not empty errorMessages.name}">
-							<small class="text-danger">${errorMessages.name}</small>
-						</c:if>
+
 					</div>
 
 					<!-- Email -->
@@ -35,9 +33,7 @@
 						<label for="editEmail">Email</label> <input type="email"
 							id="editEmail" name="email" class="form-control"
 							value="${account.email}" required title="Email không hợp lệ!">
-						<c:if test="${not empty errorMessages.email}">
-							<small class="text-danger">${errorMessages.email}</small>
-						</c:if>
+
 					</div>
 
 					<!-- Vai trò -->
@@ -48,9 +44,17 @@
 							<option value="2">Giảng viên</option>
 							<option value="3">Sinh viên</option>
 						</select>
-						<c:if test="${not empty errorMessages.role}">
-							<small class="text-danger">${errorMessages.role}</small>
-						</c:if>
+
+					</div>
+					<input type="hidden" name="currentAvatar"
+							value="${pageContext.request.contextPath}/${account.avatar}">
+					<div class="form-group">
+						<label for="avatarInputEdit">Ảnh đại diện</label> <input
+							type="file" id="avatarInputEdit"
+							class="form-control avatar-input" data-target-img="editAvatar"
+							accept="image/*" name="avatar"> <img id="editAvatar"
+							src="${pageContext.request.contextPath}/${account.avatar}" alt="Ảnh đại diện"
+							class="img-thumbnail mt-2" style="max-width: 150px;">
 					</div>
 
 					<!-- Mật khẩu -->
@@ -66,9 +70,6 @@
 						<label for="editConfirmPassword">Xác nhận mật khẩu mới</label> <input
 							type="password" id="editConfirmPassword" name="cpass"
 							class="form-control" placeholder="Nhập lại mật khẩu mới">
-						<c:if test="${not empty errorMessages.password}">
-							<small class="text-danger">${errorMessages.password}</small>
-						</c:if>
 					</div>
 				</div>
 				<div class="modal-footer">

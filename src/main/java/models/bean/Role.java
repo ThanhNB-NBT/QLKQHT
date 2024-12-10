@@ -1,19 +1,22 @@
 package models.bean;
 
 public class Role {
-	private int roleID;
+	private Integer roleID;
 	private String role;
-	
+
 	public Role(){
 		super();
 	}
-	
-	public Role(int roleID, String role) {
+
+	public Role(Integer roleID, String role) {
         this.roleID = roleID;
         this.role = role;
     }
+	public Role(Integer roleID) {
+        this.roleID = roleID;
+    }
 
-	public int getRoleID() {
+	public Integer getRoleID() {
 		return roleID;
 	}
 
@@ -21,7 +24,7 @@ public class Role {
 		return role;
 	}
 
-	public void setRoleID(int roleID) {
+	public void setRoleID(Integer roleID) {
 		this.roleID = roleID;
 	}
 

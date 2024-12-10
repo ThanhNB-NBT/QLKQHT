@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-	
+
 <div id="add_account" class="modal" role="dialog">
 	<div class="modal-dialog modal-dialog-centered justify-content-center">
 		<div class="modal-content modal-lg">
@@ -10,9 +10,9 @@
 			</div>
 			<div class="modal-body">
 				<form id="addAccountForm" action="AccountServlet" method="post"
-					class="m-b-30">
+					class="m-b-30" enctype="multipart/form-data">
 					<div class="row justify-content-center">
-						<div class="col-sm-8">
+						<div class="col-sm-12">
 							<div class="form-group form-focus">
 								<input name="name" type="text" class="form-control floating"
 									required pattern=".{3,}"
@@ -20,14 +20,16 @@
 									class="focus-label">Tên <span class="text-danger">*</span></label>
 							</div>
 						</div>
-						<div class="col-sm-8">
+						<div class="col-sm-12">
 							<div class="form-group form-focus">
 								<input name="email" type="email" class="form-control floating"
 									required title="Email không hợp lệ!"> <label
 									class="focus-label">Email <span class="text-danger">*</span></label>
+								<div class="text-danger small" id="EmailError"
+									style="display: none;">Email không hợp lệ</div>
 							</div>
 						</div>
-						<div class="col-sm-8">
+						<div class="col-sm-12">
 							<div class="form-group form-focus">
 								<input id="password" name="password" type="password"
 									class="form-control floating" required pattern=".{6,}"
@@ -35,7 +37,7 @@
 									class="focus-label">Mật khẩu <span class="text-danger">*</span></label>
 							</div>
 						</div>
-						<div class="col-sm-8">
+						<div class="col-sm-12">
 							<div class="form-group form-focus">
 								<input id="confirmPassword" name="cpass" type="password"
 									class="form-control floating" required
@@ -46,13 +48,24 @@
 									style="display: none;">Mật khẩu không khớp</small>
 							</div>
 						</div>
-						<div class="col-sm-8">
+						<div class="col-sm-12">
 							<div class="form-group form-focus">
 								<select class="form-control" name="role" required>
 									<option value="1">Quản trị</option>
 									<option value="2">Giảng viên</option>
 									<option value="3">Sinh viên</option>
 								</select> <label class="focus-label">Quyền</label>
+							</div>
+							<div class="col-sm-12">
+								<div class="form-group">
+									<label for="avatarInputAdd">Ảnh đại diện</label> <input
+										type="file" id="avatarInputAdd"
+										class="form-control avatar-input" data-target-img="addAvatar"
+										accept="image/*" name="avatar"> <img id="addAvatar"
+										src="assets/img/user.jpg" alt="Ảnh đại diện"
+										class="img-thumbnail mt-2" name="avatar"
+										style="max-width: 150px;">
+								</div>
 							</div>
 							<div class="m-t-20 text-center">
 								<button type="submit" class="btn btn-primary btn-lg"

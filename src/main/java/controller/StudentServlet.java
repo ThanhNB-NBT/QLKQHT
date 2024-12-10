@@ -8,19 +8,23 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.Part;
-
+import models.bean.Account;
+import models.bean.Role;
 import models.bean.Student;
+import models.dao.AccountDAO;
 import models.dao.DepartmentDAO;
 import models.dao.StudentDAO;
 
 import common.AlertManager;
+import common.ExcelImportUtils;
 import common.ImageUtils;
 import common.SessionUtils;
 import common.RoleUtils;
 import input.StudentInput;
 
 import java.io.IOException;
-import java.sql.Date;
+import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import valid.StudentValidator;
@@ -80,24 +84,6 @@ public class StudentServlet extends HttpServlet {
         }
     }
 
-
-    private void handleEditRequest(HttpServletRequest request, HttpServletResponse response, String studentIDStr)
-            throws ServletException, IOException {
-        try {
-            int studentID = Integer.parseInt(studentIDStr);
-            Student studentToEdit = StudentDAO.getStudentById(studentID);
-
-            if (studentToEdit != null) {
-                request.setAttribute("studentToEdit", studentToEdit);
-                request.getRequestDispatcher("/Views/StudentView/editStudentModal.jsp").forward(request, response);
-            } else {
-                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Sinh viên không tồn tại.");
-            }
-        } catch (NumberFormatException e) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID không hợp lệ.");
-        }
-    }
-
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -118,6 +104,9 @@ public class StudentServlet extends HttpServlet {
             case "update":
                 updateStudent(request, response);
                 break;
+            case "import":
+                importStudents(request, response);
+                break;
             default:
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Hành động không hợp lệ.");
                 break;
@@ -126,52 +115,22 @@ public class StudentServlet extends HttpServlet {
 
     private void createStudent(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         try {
-            // Lấy dữ liệu từ form
             StudentInput input = StudentInput.fromRequest(request);
 
-            // Kiểm tra dữ liệu đầu vào
             boolean hasErrors = StudentValidator.validateInput(input, request);
             if (hasErrors) {
-                // Thêm thông báo lỗi nếu có và chuyển hướng về trang quản lý sinh viên
                 AlertManager.addMessage(request, "Dữ liệu nhập vào không hợp lệ, vui lòng kiểm tra lại.", false);
                 response.sendRedirect(STUDENT_SERVLET);
                 return;
             }
 
-            // Xử lý ảnh đại diện
-            String avatar = processAvatar(request);
+            boolean success = handleCreateStudent(input, request);
 
-            Date birthDay = input.getDateOfBirth();
-            Date enrollment = input.getEnrollmentYear();
-            String majorName = input.getMajorName();
-            String studentCode = input.getStudentCode();
-
-            if(studentCode == null || studentCode.trim().isEmpty()) {
-            	Student tempStudent = new Student(input.getFirstName(), input.getLastName(), input.getDateOfBirth(),
-                        input.getEmail(), input.getPhone(), input.getAddress(), input.getEnrollmentYear(), input.getMajorName(), avatar,"", input.getDepartmentID());
-
-            	studentCode = tempStudent.generateStudentCode(majorName, birthDay, enrollment, null);
-            	if (StudentDAO.checkStudentCode(studentCode)) {
-    	            AlertManager.addMessage(request, "Không thể tạo mã tự động vì mã bị trùng. Vui lòng nhập mã khác.", false);
-    	            response.sendRedirect(STUDENT_SERVLET);
-    	            return;
-    	        }
-            }
-
-            Student student = new Student(input.getFirstName(), input.getLastName(), input.getDateOfBirth(),
-                    input.getEmail(), input.getPhone(), input.getAddress(), input.getEnrollmentYear(), input.getMajorName(), avatar, studentCode, input.getDepartmentID());
-
-            // Thêm sinh viên vào cơ sở dữ liệu
-            boolean success = StudentDAO.createStudentWithAccount(student);
-
-            // Thêm thông báo thành công hoặc thất bại
             String message = success ? "Thêm sinh viên thành công!" : "Có lỗi xảy ra khi thêm sinh viên.";
             AlertManager.addMessage(request, message, success);
-
-            // Chuyển hướng lại trang danh sách sinh viên
             response.sendRedirect(STUDENT_SERVLET);
+
         } catch (Exception e) {
-            // Xử lý các lỗi không mong muốn
             AlertManager.addMessage(request, "Có lỗi xảy ra: " + e.getMessage(), false);
             response.sendRedirect(STUDENT_SERVLET);
         }
@@ -207,7 +166,7 @@ public class StudentServlet extends HttpServlet {
                 return;
             }
 
-            String avatar = processAvatar(request, request.getParameter("currentAvatar"));
+            String avatar = ImageUtils.processAvatar(request, request.getParameter("currentAvatar"));
             if (avatar == null || avatar.isEmpty()) {
                 avatar = request.getParameter("currentAvatar");
             }
@@ -222,13 +181,20 @@ public class StudentServlet extends HttpServlet {
             student.setAddress(input.getAddress());
             student.setEnrollmentYear(input.getEnrollmentYear());
             student.setMajorName(input.getMajorName());
-            student.setAvatar(avatar);
             student.setDepartmentID(input.getDepartmentID());
             student.setStudentID(input.getStudentID());
+            student.setAccountID(input.getAccountID());
 
             boolean success = StudentDAO.updateStudent(student);
             String message = success ? "Cập nhật sinh viên thành công!" : "Có lỗi xảy ra khi cập nhật sinh viên.";
             AlertManager.addMessage(request, message, success);
+
+            boolean avatarUpdated = AccountDAO.updateAvatar(student.getAccountID(), avatar);
+            if (avatarUpdated) {
+                AlertManager.addMessage(request, "Cập nhật ảnh đại diện thành công!", true);
+            } else {
+                AlertManager.addMessage(request, "Có lỗi xảy ra khi cập nhật ảnh đại diện.", false);
+            }
 
             response.sendRedirect(STUDENT_SERVLET);
         } catch (Exception e) {
@@ -237,21 +203,121 @@ public class StudentServlet extends HttpServlet {
         }
     }
 
-    private String processAvatar(HttpServletRequest request) throws IOException, ServletException {
-        return processAvatar(request, "assets/img/user.jpg");
+    private void handleEditRequest(HttpServletRequest request, HttpServletResponse response, String studentIDStr)
+            throws ServletException, IOException {
+        try {
+            int studentID = Integer.parseInt(studentIDStr);
+            Student studentToEdit = StudentDAO.getStudentById(studentID);
+
+            if (studentToEdit != null) {
+                request.setAttribute("studentToEdit", studentToEdit);
+                request.getRequestDispatcher("/Views/StudentView/editStudentModal.jsp").forward(request, response);
+            } else {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Sinh viên không tồn tại.");
+            }
+        } catch (NumberFormatException e) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID không hợp lệ.");
+        }
     }
 
-    private String processAvatar(HttpServletRequest request, String defaultAvatar) throws IOException, ServletException {
-        try {
-        	String uploadDir = "D:/eclipse-workspace/QLKQHT/src/main/webapp/assets/img/profile";
-            Part avatarPart = request.getPart("avatar");
-
-            if (avatarPart != null && avatarPart.getSize() > 0) {
-                return ImageUtils.processAvatar(avatarPart, uploadDir, true, 150, 150);
+    private boolean handleCreateStudent(StudentInput input, HttpServletRequest request) throws Exception {
+        // 1. Tạo mã sinh viên
+        String studentCode = input.getStudentCode();
+        if (studentCode == null || studentCode.trim().isEmpty()) {
+            studentCode = generateStudentCode(input, request);
+            if (studentCode == null) {
+                return false; // Thông báo lỗi đã được xử lý trong generateStudentCode
             }
-        } catch (Exception e) {
-            System.out.print("Lỗi: " + e);
         }
-        return defaultAvatar;
+
+        // 2. Xử lý ảnh đại diện
+        String avatar = ImageUtils.processAvatar(request);
+        if (avatar == null || avatar.isEmpty()) {
+            AlertManager.addMessage(request, "Ảnh đại diện không hợp lệ, vui lòng thử lại.", false);
+            return false;
+        }
+
+        // 3. Tạo tài khoản
+        String password = new SimpleDateFormat("dd/MM/yyyy").format(input.getDateOfBirth());
+        Role role = new Role(3);
+        Account account = new Account(studentCode, password, input.getEmail(), avatar, role);
+        int accountID = AccountDAO.createAccountAndReturnID(account);
+
+        if (accountID <= 0) {
+            AlertManager.addMessage(request, "Có lỗi xảy ra khi tạo tài khoản.", false);
+            return false;
+        }
+
+        // 4. Tạo đối tượng Student
+        Student student = new Student(
+                input.getFirstName(),
+                input.getLastName(),
+                input.getDateOfBirth(),
+                input.getEmail(),
+                input.getPhone(),
+                input.getAddress(),
+                input.getEnrollmentYear(),
+                input.getMajorName(),
+                studentCode,
+                input.getDepartmentID()
+        );
+        student.setAccountID(accountID);
+
+        // 5. Lưu vào DB
+        return StudentDAO.createStudent(student);
+    }
+
+    private String generateStudentCode(StudentInput input, HttpServletRequest request) {
+        try {
+            Student tempStudent = new Student(
+                    input.getFirstName(),
+                    input.getLastName(),
+                    input.getDateOfBirth(),
+                    input.getEmail(),
+                    input.getPhone(),
+                    input.getAddress(),
+                    input.getEnrollmentYear(),
+                    input.getMajorName(),
+                    null,
+                    input.getDepartmentID()
+            );
+
+            String studentCode = tempStudent.generateStudentCode(input.getMajorName(), input.getEnrollmentYear(),
+                    input.getDateOfBirth(), null);
+
+            if (StudentDAO.checkStudentCode(studentCode)) {
+                AlertManager.addMessage(request, "Không thể tạo mã sinh viên tự động vì mã bị trùng. Vui lòng nhập mã khác.", false);
+                return null;
+            }
+
+            return studentCode;
+        } catch (RuntimeException e) {
+            AlertManager.addMessage(request, "Không thể tạo mã sinh viên duy nhất. Vui lòng thử lại.", false);
+            return null;
+        }
+    }
+
+    private void importStudents(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        try {
+            Part filePart = request.getPart("importFile");
+            InputStream fileContent = filePart.getInputStream();
+
+            List<StudentInput> inputs = ExcelImportUtils.importStudentsFromExcel(fileContent);
+
+            int successCount = 0;
+            for (StudentInput input : inputs) {
+
+                if (handleCreateStudent(input, request)) {
+                    successCount++;
+                }
+            }
+
+            // Thông báo kết quả
+            AlertManager.addMessage(request, "Nhập dữ liệu sinh viên thành công: " + successCount + " sinh viên.", true);
+            response.sendRedirect(STUDENT_SERVLET);
+        } catch (Exception e) {
+            AlertManager.addMessage(request, "Có lỗi khi nhập dữ liệu: " + e.getMessage(), false);
+            response.sendRedirect(STUDENT_SERVLET);
+        }
     }
 }
