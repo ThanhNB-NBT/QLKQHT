@@ -54,6 +54,7 @@ public class StudentDAO {
 
     private static Student mapStudent(ResultSet rs) throws SQLException {
 
+        // Tạo đối tượng Student
         Student student = new Student();
         student.setStudentID(rs.getInt("StudentID"));
         student.setFirstName(rs.getString("FirstName"));
@@ -66,20 +67,21 @@ public class StudentDAO {
         student.setMajorName(rs.getString("MajorName"));
         student.setStudentCode(rs.getString("StudentCode"));
 
-        // Thiết lập Department
+        // Thiết lập đối tượng Department
         Department department = new Department();
         department.setDepartmentID(rs.getInt("DepartmentID"));
         department.setDepartmentName(rs.getString("DepartmentName"));
         student.setDepartment(department);
-        student.setDepartmentID(rs.getInt("DepartmentID"));
 
+        // Thiết lập đối tượng Account
         Account account = new Account();
+        account.setAccountID(rs.getInt("AccountID"));
         account.setAvatar(rs.getString("Avatar"));
         student.setAccount(account);
-        student.setAccountID(rs.getInt("AccountID"));
 
         return student;
     }
+
 
     public static List<Student> getAllStudents() {
         List<Student> students = new ArrayList<>();
@@ -191,17 +193,7 @@ public class StudentDAO {
 
             // 1. Thêm sinh viên vào bảng Students
             insertStudentStmt = conn.prepareStatement(SQL_INSERT_STUDENT);
-            insertStudentStmt.setString(1, student.getStudentCode());
-            insertStudentStmt.setString(2, student.getFirstName());
-            insertStudentStmt.setString(3, student.getLastName());
-            insertStudentStmt.setDate(4, new java.sql.Date(student.getDateOfBirth().getTime()));
-            insertStudentStmt.setString(5, student.getEmail());
-            insertStudentStmt.setString(6, student.getPhone());
-            insertStudentStmt.setString(7, student.getAddress());
-            insertStudentStmt.setDate(8, new java.sql.Date(student.getEnrollmentYear().getTime()));
-            insertStudentStmt.setString(9, student.getMajorName());
-            insertStudentStmt.setInt(10, student.getDepartmentID());
-            insertStudentStmt.setInt(11, student.getAccountID()); // Thêm AccountID (đã được tạo ở servlet)
+            mapStudentToPreparedStatement(insertStudentStmt, student, false);
 
             int rowsInserted = insertStudentStmt.executeUpdate();
             return rowsInserted > 0;
@@ -262,6 +254,24 @@ public class StudentDAO {
         } catch (SQLException e) {
             logger.severe("Lỗi khi cập nhật sinh viên: " + e.getMessage());
             return false;
+        }
+    }
+
+    private static void mapStudentToPreparedStatement(PreparedStatement pstmt, Student student, boolean includeStudentID) throws SQLException {
+        pstmt.setString(1, student.getStudentCode());
+        pstmt.setString(2, student.getFirstName());
+        pstmt.setString(3, student.getLastName());
+        pstmt.setDate(4, new java.sql.Date(student.getDateOfBirth().getTime()));
+        pstmt.setString(5, student.getEmail());
+        pstmt.setString(6, student.getPhone());
+        pstmt.setString(7, student.getAddress());
+        pstmt.setDate(8, new java.sql.Date(student.getEnrollmentYear().getTime()));
+        pstmt.setString(9, student.getMajorName());
+        pstmt.setInt(10, student.getDepartmentID());
+        pstmt.setInt(11, student.getAccountID());
+
+        if (includeStudentID) {
+            pstmt.setInt(12, student.getStudentID());
         }
     }
 }

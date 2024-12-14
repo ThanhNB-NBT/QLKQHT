@@ -1,35 +1,44 @@
 
-$(document).on('click', '.edit-student', function () {
-    const studentId = $(this).data('id');
-    const firstName = $(this).data('first-name');
-    const lastName = $(this).data('last-name');
-    const dateOfBirth = $(this).data('dob');
-    const email = $(this).data('email');
-    const phone = $(this).data('phone');
-    const address = $(this).data('address');
-    const majorName = $(this).data('major-name');
-    const departmentID = $(this).data('department-id');
-	const studentCode = $(this).data('student-code');
-	const avatar = $(this).data('avatar');
-	const enrollmentYear = $(this).data('enrollment-year');
-	const accountID = $(this).data('account-id');
+document.body.addEventListener('click', function (event) {
+    if (event.target.classList.contains('edit-student')) {
+        const studentId = event.target.getAttribute('data-id');
+        const firstName = event.target.getAttribute('data-first-name');
+        const lastName = event.target.getAttribute('data-last-name');
+        const dateOfBirth = event.target.getAttribute('data-dob');
+        const email = event.target.getAttribute('data-email');
+        const phone = event.target.getAttribute('data-phone');
+        const address = event.target.getAttribute('data-address');
+        const majorName = event.target.getAttribute('data-major-name');
+        const departmentID = event.target.getAttribute('data-department-id');
+        const studentCode = event.target.getAttribute('data-student-code');
+        const avatar = event.target.getAttribute('data-avatar');
+        const enrollmentYear = event.target.getAttribute('data-enrollment-year');
+        const accountID = event.target.getAttribute('data-account-id');
 
-    // Điền thông tin vào các trường trong modal
-    $('#editStudentId').val(studentId);
-    $('#editFirstName').val(firstName);
-    $('#editLastName').val(lastName);
-    $('#editDateOfBirth').val(dateOfBirth);
-    $('#editEmail').val(email);
-    $('#editPhone').val(phone);
-    $('#editAddress').val(address);
-    $('#editMajorName').val(majorName);
-    $('#editDepartmentID').val(departmentID);
-    $('#editStudentCode').text(`${studentCode}`);
-	$('#editAvatar').attr('src', avatar);
-	$('#editEnrollmentYear').val(enrollmentYear);
-	$('#editAccountID').val(accountID);
-    $('#edit_student').modal('show');
+        // Điền thông tin vào form chỉnh sửa
+        document.getElementById('editStudentId').value = studentId;
+        document.getElementById('editFirstName').value = firstName;
+        document.getElementById('editLastName').value = lastName;
+        document.getElementById('editDateOfBirth').value = dateOfBirth;
+        document.getElementById('editEmail').value = email;
+        document.getElementById('editPhone').value = phone;
+        document.getElementById('editAddress').value = address;
+        document.getElementById('editMajorName').value = majorName;
+        document.getElementById('editDepartmentID').value = departmentID;
+        document.getElementById('editStudentCode').textContent = studentCode;
+        document.getElementById('editEnrollmentYearShow').textContent = enrollmentYear;
+		document.getElementById('editEnrollmentYear').value = enrollmentYear;
+        document.getElementById('editAccountID').value = accountID;
+
+        // Gán lại avatar
+        $('#editAvatar').attr('src', avatar);
+        document.querySelector('[name="currentAvatar"]').value = avatar; // Lưu lại ảnh hiện tại trong input hidden
+
+        // Hiển thị modal sửa student
+        $('#edit_student').modal('show');
+    }
 });
+
 
 
 $(document).on('click', '.delete-student', function () {

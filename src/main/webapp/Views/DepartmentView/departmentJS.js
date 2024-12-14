@@ -2,13 +2,11 @@
 document.body.addEventListener('click', function(event) {
 	if (event.target.classList.contains('edit-department')) {
 		const departmentId = event.target.getAttribute('data-id');
-		// Đưa departmentId vào form để có thể sửa
-		document.getElementById('editDepartmentID').value = departmentId;
-		// Đưa thông tin khoa vào các trường của modal chỉnh sửa
 		const departmentName = event.target.getAttribute('data-name');
 		const email = event.target.getAttribute('data-email');
 		const phone = event.target.getAttribute('data-phone');
 
+		document.getElementById('editDepartmentID').value = departmentId;
 		document.getElementById('editDepartmentName').value = departmentName;
 		document.getElementById('editEmail').value = email;
 		document.getElementById('editPhone').value = phone;

@@ -15,17 +15,22 @@
 					<div class="row justify-content-center">
 						<!-- ID Sinh viên (ẩn) -->
 						<input type="hidden" id="editStudentId" name="studentID" />
-						<input type="hidden" id="editAccountID" name="accountID"
-							value="${student.accountID}">
+						<input type="hidden" id="editAccountID" name="accountID" />
+						<input type="hidden" id="editEnrollmentYear" name="enrollmentYear" />
 						<div class="col-sm-12">
 							<div class="form-group">
-								<label for="editStudentId">Mã sinh viên</label>
-								<p id="editStudentCode"></p>
-								<!-- Hiển thị studentCode -->
+								<label>MSSV:</label> <span id="editStudentCode"
+									class="font-weight-bold"></span>
 							</div>
 						</div>
 
-						<!-- Họ và Tên -->
+						<div class="col-sm-12">
+							<div class="form-group">
+								<label>Năm nhập học:</label> <span id="editEnrollmentYearShow"
+									class="font-weight-bold"></span>
+							</div>
+						</div>
+
 						<div class="col-sm-6">
 							<div class="form-group form-focus">
 								<input id="editFirstName" name="firstName" type="text"
@@ -41,7 +46,6 @@
 							</div>
 						</div>
 
-						<!-- Ngày sinh -->
 						<div class="col-sm-12">
 							<div class="form-group form-focus">
 								<input id="editDateOfBirth" name="dateOfBirth" type="date"
@@ -52,7 +56,6 @@
 							</div>
 						</div>
 
-						<!-- Email -->
 						<div class="col-sm-12">
 							<div class="form-group form-focus">
 								<input id="editEmail" name="email" type="email"
@@ -63,7 +66,6 @@
 							</div>
 						</div>
 
-						<!-- Số điện thoại -->
 						<div class="col-sm-12">
 							<div class="form-group form-focus">
 								<input id="editPhone" name="phone" type="text"
@@ -75,7 +77,6 @@
 							</div>
 						</div>
 
-						<!-- Địa chỉ -->
 						<div class="col-sm-12">
 							<div class="form-group form-focus">
 								<input id="editAddress" name="address" type="text"
@@ -84,7 +85,6 @@
 							</div>
 						</div>
 
-						<!-- Ngành học -->
 						<div class="col-sm-12">
 							<div class="form-group form-focus">
 								<input id="editMajorName" name="majorName" type="text"
@@ -95,29 +95,20 @@
 
 						<div class="col-sm-12">
 							<div class="form-group form-focus">
-								<input id="editEnrollmentYear" name="enrollmentYear" type="date"
-									class="form-control floating" required> <label
-									class="focus-label">Năm nhập học <span
-									class="text-danger">*</span></label>
-								<div class="text-danger small" id="enrollmentYearError"
-									style="display: none;">Năm nhập học không hợp lệ</div>
-							</div>
-						</div>
-
-						<!-- Khoa -->
-						<div class="col-sm-12">
-							<div class="form-group form-focus">
-								<label class="focus-label" for="editDepartmentID">Khoa</label> <select
-									class="form-control" id="editDepartmentID" name="departmentID"
-									required>
+								<select id="editDepartmentID" class="form-control"
+									name="departmentID" required>
 									<option value="" disabled>Chọn khoa</option>
 									<c:forEach var="department" items="${departments}">
 										<option value="${department.departmentID}">
-											${department.departmentName}</option>
+											${department.departmentName}
+										</option>
 									</c:forEach>
-								</select>
+								</select> <label class="focus-label">Khoa<span
+									class="text-danger">*</span></label>
 							</div>
 						</div>
+
+
 						<input type="hidden" name="currentAvatar"
 							value="${pageContext.request.contextPath}/${student.account.avatar}">
 						<div class="col-sm-12">
@@ -126,13 +117,13 @@
 									type="file" id="avatarInputEdit"
 									class="form-control avatar-input" data-target-img="editAvatar"
 									accept="image/*" name="avatar"> <img id="editAvatar"
-									src="${pageContext.request.contextPath}/${student.account.avatar}" alt="Ảnh đại diện"
-									class="img-thumbnail mt-2" style="max-width: 150px;">
+									src="${pageContext.request.contextPath}/${student.account.avatar}"
+									alt="Ảnh đại diện" class="img-thumbnail mt-2"
+									style="max-width: 150px;">
 							</div>
 
 						</div>
 
-						<!-- Submit -->
 						<div class="col-sm-12">
 							<div class="m-t-20 text-center">
 								<button type="submit" class="btn btn-primary btn-lg"

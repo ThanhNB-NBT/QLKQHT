@@ -38,7 +38,7 @@
 
 					<!-- Vai trò -->
 					<div class="form-group">
-						<label for="editRole">Vai trò</label> <select id="editRole"
+						<label for="editRole">Vai trò</label> <select id="editRoleID"
 							name="role" class="form-control" required>
 							<option value="1">Quản trị viên</option>
 							<option value="2">Giảng viên</option>

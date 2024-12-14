@@ -9,11 +9,11 @@ public class Course {
     private String courseName;
     private int credits;
     private int departmentID;
-    private String courseCode;    
-    private String courseType;  
-    private String status; 
+    private String courseCode;
+    private String courseType;
+    private String status;
     private Department department;
-    
+
 	public Course() {
 		super();
 	}
@@ -30,7 +30,7 @@ public class Course {
 		this.status = status;
 		this.department = department;
 	}
-	
+
 	public Course( String courseName, int credits, int departmentID,
 			 String courseCode, String courseType,String status) {
 		super();
@@ -41,15 +41,11 @@ public class Course {
 		this.courseType = courseType;
 		this.status = status;
 	}
-	
-	public Course(int courseID, String courseName, int credits, int departmentID,
-			 String courseCode, String courseType, String status) {
+
+	public Course(int courseID, int credits, String courseType, String status) {
 		super();
 		this.courseID = courseID;
-		this.courseName = courseName;
 		this.credits = credits;
-		this.departmentID = departmentID;
-		this.courseCode = courseCode;
 		this.courseType = courseType;
 		this.status = status;
 	}
@@ -112,11 +108,11 @@ public class Course {
 	public void setCourseType(String courseType) {
 		this.courseType = courseType;
 	}
-	
+
 	public void setDepartment(Department department) {
 	    this.department = department;
 	}
-	
+
 	public String generateCourseCode(int departmentID, Integer excludeCourseID) {
 	    // Kiểm tra courseName trước
 	    if (this.courseName == null || this.courseName.trim().isEmpty()) {
@@ -151,7 +147,7 @@ public class Course {
 
 	        StringBuilder codeBuilder = new StringBuilder(initials);
 
-	        codeBuilder.append(String.format("%02d", departmentID % 100)); 
+	        codeBuilder.append(String.format("%02d", departmentID % 100));
 
 	        // Thêm số ngẫu nhiên để đạt 10 ký tự
 	        while (codeBuilder.length() < 10) {
@@ -161,8 +157,8 @@ public class Course {
 	        courseCode = codeBuilder.toString();
 	        attempts++;
 	    } while (excludeCourseID == null
-	             ? CourseDAO.checkCourseCode(courseCode) 
-	             : CourseDAO.checkCourseCode(courseCode, excludeCourseID)); 
+	             ? CourseDAO.checkCourseCode(courseCode)
+	             : CourseDAO.checkCourseCode(courseCode, excludeCourseID));
 
 	    return courseCode;
 	}

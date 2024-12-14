@@ -44,12 +44,14 @@ response.setDateHeader("Expires", 0);
 						<div class="row filter-row">
 							<div class="col-sm-8 col-md-3">
 								<div class="form-group form-focus">
-									<input type="text" name="search" class="form-control floating">
+									<input type="text" name="searchName" class="form-control floating">
 									<label class="focus-label">Tên giáo viên</label>
 								</div>
 							</div>
 							<div class="col-sm-6 col-md-3">
-								<div class="form-group form-focus"></div>
+								<div class="form-group form-focus">
+								<input type="text" name="searchEmail" class="form-control floating">
+									<label class="focus-label">Email</label></div>
 							</div>
 							<div class="col-sm-6 col-md-3">
 								<div class="form-group form-focus"></div>
@@ -91,31 +93,33 @@ response.setDateHeader("Expires", 0);
 														<td>
 															<fmt:formatDate value="${teacher.hireDate}" pattern="dd/MM/yyyy"/>
 														</td>
-														<td class="text-right">
-															<div class="dropdown dropdown-action">
-																<a href="#" class="action-icon dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-																	<i class="fas fa-ellipsis-v"></i>
-																</a>
-																<div class="dropdown-menu dropdown-menu-right">
-																	<a class="dropdown-item edit-teacher"
-																		data-id="${teacher.teacherID}"
-																		data-first-name="${teacher.firstName}"
-																		data-last-name="${teacher.lastName}"
-																		data-email="${teacher.email}"
-																		data-phone="${teacher.phone}"
-																		data-department-id="${teacher.departmentID}"
-																		data-office="${teacher.office}"
-																		data-hire-date="${teacher.hireDate}"
-																		data-avatar="${pageContext.request.contextPath}/${teacher.account.avatar}"
-																		data-account-id="${teacher.accountID}">
-																		<i class="fas fa-pencil-alt m-r-5"></i> Sửa
+														<c:if test="${isAdmin}">
+															<td class="text-right">
+																<div class="dropdown dropdown-action">
+																	<a href="#" class="action-icon dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+																		<i class="fas fa-ellipsis-v"></i>
 																	</a>
-																	<a class="dropdown-item delete-teacher" data-id="${teacher.teacherID}">
-																		<i class="fas fa-trash-alt m-r-5"></i> Xóa
-																	</a>
+																	<div class="dropdown-menu dropdown-menu-right">
+																		<a class="dropdown-item edit-teacher"
+																			data-id="${teacher.teacherID}"
+																			data-first-name="${teacher.firstName}"
+																			data-last-name="${teacher.lastName}"
+																			data-email="${teacher.email}"
+																			data-phone="${teacher.phone}"
+																			data-department-id="${teacher.departmentID}"
+																			data-office="${teacher.office}"
+																			data-hire-date="${teacher.hireDate}"
+																			data-avatar="${pageContext.request.contextPath}/${teacher.account.avatar}"
+																			data-account-id="${teacher.accountID}">
+																			<i class="fas fa-pencil-alt m-r-5"></i> Sửa
+																		</a>
+																		<a class="dropdown-item delete-teacher" data-id="${teacher.teacherID}">
+																			<i class="fas fa-trash-alt m-r-5"></i> Xóa
+																		</a>
+																	</div>
 																</div>
-															</div>
-														</td>
+															</td>
+														</c:if>
 													</tr>
 												</c:forEach>
 											</c:when>

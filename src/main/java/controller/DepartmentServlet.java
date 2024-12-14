@@ -40,28 +40,6 @@ public class DepartmentServlet extends HttpServlet {
 		boolean isAdmin = RoleUtils.isAdmin(session);
 		request.setAttribute("isAdmin", isAdmin);
 
-		String departmentIDStr = request.getParameter(DEPARTMENTID);
-		if (departmentIDStr != null) {
-			try {
-				int departmentID = Integer.parseInt(departmentIDStr);
-				Department departmentToEdit = DepartmentDAO.getDepartmentById(departmentID);
-
-				if (departmentToEdit != null) {
-
-					request.setAttribute("departmentToEdit", departmentToEdit);
-
-					request.getRequestDispatcher("/Views/DepartmentView/editDepartmentModal.jsp").forward(request,
-							response);
-				} else {
-					response.sendError(HttpServletResponse.SC_NOT_FOUND, "Tài khoản không tồn tại.");
-				}
-				return;
-			} catch (NumberFormatException e) {
-				response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID không hợp lệ.");
-				return;
-			}
-		}
-
 		String searchDepartment = request.getParameter("search");
 		List<Department> departments = (searchDepartment != null && !searchDepartment.trim().isEmpty())
 				? DepartmentDAO.searchByDepartmentName(searchDepartment)
@@ -132,8 +110,7 @@ public class DepartmentServlet extends HttpServlet {
 	private void updateDepartment(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		DepartmentInput input = DepartmentInput.fromRequest(request);
 
-
-		 boolean hasErrors = DepartmentValidator.validateInput(input, request);
+		boolean hasErrors = DepartmentValidator.validateInput(input, request);
         if (hasErrors) {
             // Thêm thông báo lỗi nếu có và chuyển hướng về trang quản lý sinh viên
             AlertManager.addMessage(request, "Dữ liệu nhập vào không hợp lệ, vui lòng kiểm tra lại.", false);

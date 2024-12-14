@@ -9,7 +9,8 @@ import java.util.ArrayList;
 import java.util.logging.Logger;
 
 public class DepartmentDAO {
-	private static final Logger logger = Logger.getLogger(DepartmentDAO.class.getName());//Ghi lại thông tin hoạt động
+	private static final Logger logger = Logger.getLogger(DepartmentDAO.class.getName());
+
 	private static final String SQL_SELECT_ALL_DEPARTMENT = "SELECT DepartmentID, DepartmentName, Email, Phone FROM Departments";
 	private static final String SQL_SELECT_DEPARTMENT = "SELECT DepartmentID, DepartmentName, Email, Phone FROM Departments WHERE DepartmentID = ?";
 	private static final String SQL_SEARCH_DEPARTMENT = "SELECT DepartmentID, DepartmentName, Email, Phone FROM Departments WHERE DepartmentName LIKE ?";
@@ -39,7 +40,7 @@ public class DepartmentDAO {
 				departments.add(mapDepartment(rs));
 			}
 		} catch (SQLException e) {
-			logger.severe("error get:" + e.getMessage());
+			logger.severe("Lỗi lấy danh sách khoa:" + e.getMessage());
 		}
 		return departments;
 	}
@@ -53,7 +54,7 @@ public class DepartmentDAO {
 
 				return stmt.executeUpdate() > 0;
 		} catch (SQLException e) {
-			logger.severe("error createDepartment:" + e.getMessage());//ghi lại thông báo lỗi nghiêm trọng
+			logger.severe("lỗi tạo khoa:" + e.getMessage());
 		}
 		return false;
 	}
@@ -64,7 +65,7 @@ public class DepartmentDAO {
 			stmt.setInt(1, departmentId);
 			return stmt.executeUpdate() > 0;
 		} catch (SQLException e) {
-			logger.severe("error deleteDepartment:" + e.getMessage());
+			logger.severe("Lỗi xóa khoa:" + e.getMessage());
 		}
 		return false;
 	}
@@ -79,7 +80,7 @@ public class DepartmentDAO {
 
 				return stmt.executeUpdate() > 0;
 		} catch (SQLException e) {
-			logger.severe("error updateDepartment: " + e.getMessage());
+			logger.severe("lỗi chỉnh sửa khoa: " + e.getMessage());
 		}
 		return false;
 	}
@@ -94,7 +95,7 @@ public class DepartmentDAO {
 					}
 				}
 		} catch(SQLException e) {
-			logger.severe("error getDepartmentId: " + e.getMessage());
+			logger.severe("Lỗi lấy khoa theo ID: " + e.getMessage());
 		}
 		return null;
 	}
@@ -111,7 +112,7 @@ public class DepartmentDAO {
 					}
 				}
 		} catch(SQLException e) {
-			logger.severe("error searchByDepartmentName: " + e.getMessage());
+			logger.severe("lỗi tìm kiếm: " + e.getMessage());
 		}
 		return departments;
 	}
@@ -126,7 +127,7 @@ public class DepartmentDAO {
 					}
 				}
 		} catch(SQLException e) {
-			logger.severe("error checking departmentName: " + e.getMessage());
+			logger.severe("Lỗi kiểm tra tên khoa: " + e.getMessage());
 		}
 		return false;
 	}
@@ -144,7 +145,7 @@ public class DepartmentDAO {
 	            departmentID = rs.getInt("DepartmentID");
 	        }
 	    } catch (Exception e) {
-	        e.printStackTrace();
+	        logger.severe("Lỗi lấy tên khoa theo ID: " + e.getMessage());;
 	    }
 	    return departmentID;
 	}
@@ -162,7 +163,7 @@ public class DepartmentDAO {
 	            return rs.getInt(1); // Trả về ID của khoa vừa thêm
 	        }
 	    } catch (SQLException e) {
-	        e.printStackTrace();
+	        logger.severe("Lỗi tạo khoa theo tên Khoa: " + e.getMessage());;
 	    }
 	    return null;
 	}

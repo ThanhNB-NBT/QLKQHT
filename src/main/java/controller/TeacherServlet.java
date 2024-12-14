@@ -49,25 +49,6 @@ public class TeacherServlet extends HttpServlet {
         boolean isAdmin = RoleUtils.isAdmin(session);
         request.setAttribute("isAdmin", isAdmin);
 
-        // Xử lý chỉnh sửa giảng viên
-        String teacherIDStr = request.getParameter(TEACHERID);
-        if (teacherIDStr != null) {
-            try {
-                int teacherID = Integer.parseInt(teacherIDStr);
-                Teacher teacherToEdit = TeacherDAO.getTeacherById(teacherID);
-
-                if (teacherToEdit != null) {
-                    request.setAttribute("teacherToEdit", teacherToEdit);
-                    request.getRequestDispatcher("/Views/TeacherView/editTeacherModal.jsp").forward(request, response);
-                } else {
-                    response.sendError(HttpServletResponse.SC_NOT_FOUND, "Giảng viên không tồn tại.");
-                }
-                return;
-            } catch (NumberFormatException e) {
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID không hợp lệ.");
-                return;
-            }
-        }
         String searchName = request.getParameter("searchName");
         String searchEmail = request.getParameter("searchEmail");
 
@@ -202,14 +183,13 @@ public class TeacherServlet extends HttpServlet {
             teacher.setAccountID(input.getAccountID());
 
             boolean success = TeacherDAO.updateTeacher(teacher);
-            logger.info("Updating teacher with ID: " + teacher.getAccountID());
+
             int accountID = teacher.getAccountID();
-            System.out.print("AccontID: " + accountID);
-            // Cập nhật avatar trong bảng account
+
             if (avatar != null && !avatar.isEmpty()) {
                 boolean avatarUpdated = AccountDAO.updateAvatar(accountID, avatar);
                 if (!avatarUpdated) {
-                	logger.warning("Failed to update avatar for teacher ID: " + input.getAccountID());
+
                     AlertManager.addMessage(request, "Cập nhật avatar không thành công.", false);
                 }
             }
@@ -221,7 +201,7 @@ public class TeacherServlet extends HttpServlet {
             if (avatarUpdated) {
                 AlertManager.addMessage(request, "Cập nhật ảnh đại diện thành công!", true);
             } else {
-            	logger.warning("Failed to update avatar in account for teacher ID: " + teacher.getAccountID());
+
                 AlertManager.addMessage(request, "Có lỗi xảy ra khi cập nhật ảnh đại diện.", false);
             }
 

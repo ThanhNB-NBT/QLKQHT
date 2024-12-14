@@ -42,24 +42,6 @@ public class AccountServlet extends HttpServlet {
 		boolean isAdmin = RoleUtils.isAdmin(session);
 		request.setAttribute("isAdmin", isAdmin);
 
-		String accountIDStr = request.getParameter(ACCOUNTID);
-		if (accountIDStr != null) {
-			try {
-				int accountID = Integer.parseInt(accountIDStr);
-				Account accountToEdit = AccountDAO.getAccountById(accountID);
-
-				if (accountToEdit != null) {
-					request.setAttribute("accountToEdit", accountToEdit);
-					request.getRequestDispatcher("/Views/AccountView/editAccountModal.jsp").forward(request, response);
-				} else {
-					response.sendError(HttpServletResponse.SC_NOT_FOUND, "Tài khoản không tồn tại.");
-				}
-				return;
-			} catch (NumberFormatException e) {
-				response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID không hợp lệ.");
-				return;
-			}
-		}
 
 		String searchAccount = request.getParameter("search");
 		 List<Account> accounts = (searchAccount != null && !searchAccount.trim().isEmpty())

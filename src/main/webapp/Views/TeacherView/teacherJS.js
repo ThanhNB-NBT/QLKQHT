@@ -9,7 +9,7 @@ document.body.addEventListener('click', function (event) {
         const departmentId = event.target.getAttribute('data-department-id');
         const office = event.target.getAttribute('data-office');
         const hireDate = event.target.getAttribute('data-hire-date');
-        const avatar = event.target.getAttribute('data-avatar'); // Ensure this is correct
+        const avatar = event.target.getAttribute('data-avatar');
 		const accountID = event.target.getAttribute('data-account-id');
 
         // Điền thông tin vào form chỉnh sửa

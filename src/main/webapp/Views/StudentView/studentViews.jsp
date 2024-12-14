@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 
 <%
 response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
@@ -100,41 +100,43 @@ response.setDateHeader("Expires", 0);
 															alt="Avatar" class="img-thumbnail" width="40" height="40">
 
 														</td>
-														<td>${student.firstName} ${student.lastName}</td>
+														<td>${student.firstName}${student.lastName}</td>
 														<td><fmt:formatDate value="${student.dateOfBirth}"
 																pattern="dd/MM/yyyy" /></td>
 														<td>${student.majorName}</td>
 														<td>${student.address}</td>
-
-														<td class="text-right">
-															<div class="dropdown dropdown-action">
-																<a href="#" class="action-icon dropdown-toggle"
-																	data-toggle="dropdown" aria-expanded="false"> <i
-																	class="fas fa-ellipsis-v"></i>
-																</a>
-																<div class="dropdown-menu dropdown-menu-right">
-																	<a class="dropdown-item edit-student"
-																		data-id="${student.studentID}"
-																		data-first-name="${student.firstName}"
-																		data-last-name="${student.lastName}"
-																		data-dob="${student.dateOfBirth}"
-																		data-email="${student.email}"
-																		data-phone="${student.phone}"
-																		data-department-id="${student.departmentID}"
-																		data-major-name="${student.majorName}"
-																		data-address="${student.address}"
-																		data-enrollment-year="${student.enrollmentYear}"
-																		data-student-code="${student.studentCode}"
-																		data-avatar="${pageContext.request.contextPath}/${student.account.avatar}"
-																		data-account-id="${student.accountID}">
-																		<i class="fas fa-pencil-alt m-r-5"></i> Sửa
-																	</a> <a class="dropdown-item delete-student"
-																		data-id="${student.studentID}"> <i
-																		class="fas fa-trash-alt m-r-5"></i> Xóa
+														<c:if test="${isAdmin}">
+															<td class="text-right">
+																<div class="dropdown dropdown-action">
+																	<a href="#" class="action-icon dropdown-toggle"
+																		data-toggle="dropdown" aria-expanded="false"> <i
+																		class="fas fa-ellipsis-v"></i>
 																	</a>
+																	<div class="dropdown-menu dropdown-menu-right">
+																		<a class="dropdown-item edit-student"
+																			data-id="${student.studentID}"
+																			data-first-name="${student.firstName}"
+																			data-last-name="${student.lastName}"
+																			data-dob="${student.dateOfBirth}"
+																			data-email="${student.email}"
+																			data-phone="${student.phone}"
+																			data-department-id="${student.departmentID}"
+																			data-major-name="${student.majorName}"
+																			data-address="${student.address}"
+																			data-enrollment-year="${student.enrollmentYear}"
+																			data-student-code="${student.studentCode}"
+																			data-avatar="${pageContext.request.contextPath}/${student.account.avatar}"
+																			data-account-id="${student.accountID}"> <i
+																			class="fas fa-pencil-alt m-r-5"></i> Sửa
+																		</a> <a class="dropdown-item delete-student"
+																			data-id="${student.studentID}"> <i
+																			class="fas fa-trash-alt m-r-5"></i> Xóa
+																		</a>
+																	</div>
 																</div>
-															</div>
-														</td>
+															</td>
+														</c:if>
+
 													</tr>
 												</c:forEach>
 											</c:when>

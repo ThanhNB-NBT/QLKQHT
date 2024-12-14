@@ -36,7 +36,7 @@ public class CourseDAO {
 	    "DELETE FROM Courses WHERE CourseID = ?";
 
 	private static final String SQL_UPDATE_COURSE =
-	    "UPDATE Courses SET CourseName = ?, Credits = ?, DepartmentID = ?, CourseCode = ?, CourseType = ?, Status = ? WHERE CourseID = ?";
+	    "UPDATE Courses SET Credits = ?, CourseType = ?, Status = ? WHERE CourseID = ?";
 
 	private static final String SQL_INSERT_COURSE =
 	    "INSERT INTO Courses (CourseName, Credits, DepartmentID, CourseCode, CourseType, Status) VALUES (?, ?, ?, ?, ?, ?)";
@@ -84,12 +84,7 @@ public class CourseDAO {
         try (Connection conn = ConnectDatabase.checkConnect();
              PreparedStatement stmt = conn.prepareStatement(SQL_INSERT_COURSE)) {
 
-            stmt.setString(1, course.getCourseName());
-            stmt.setInt(2, course.getCredits());
-            stmt.setInt(3, course.getDepartmentID());
-            stmt.setString(4, course.getCourseCode());
-            stmt.setString(5, course.getCourseType());
-            stmt.setString(6, course.getStatus());
+        	setCoursePreparedStatement(stmt, course, false);
 
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -113,19 +108,29 @@ public class CourseDAO {
         try (Connection conn = ConnectDatabase.checkConnect();
              PreparedStatement stmt = conn.prepareStatement(SQL_UPDATE_COURSE)) {
 
-            stmt.setString(1, course.getCourseName());
-            stmt.setInt(2, course.getCredits());
-            stmt.setInt(3, course.getDepartmentID());
-            stmt.setString(4, course.getCourseCode());
-            stmt.setString(5, course.getCourseType());
-            stmt.setString(6, course.getStatus());
-            stmt.setInt(7, course.getCourseID());
+        	stmt.setInt(1, course.getCredits());
+            stmt.setString(2, course.getCourseType());
+            stmt.setString(3, course.getStatus());
+            stmt.setInt(4, course.getCourseID());
 
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             logger.severe("Error while updating course: " + e.getMessage());
         }
         return false;
+    }
+
+	private static void setCoursePreparedStatement(PreparedStatement stmt, Course course, boolean includeCourseID) throws SQLException {
+		stmt.setString(1, course.getCourseName());
+        stmt.setInt(2, course.getCredits());
+        stmt.setInt(3, course.getDepartmentID());
+        stmt.setString(4, course.getCourseCode());
+        stmt.setString(5, course.getCourseType());
+        stmt.setString(6, course.getStatus());
+        if(includeCourseID) {
+        	stmt.setInt(7, course.getCourseID());
+        }
+
     }
 
 	public static Course getCourseById(int courseID) {

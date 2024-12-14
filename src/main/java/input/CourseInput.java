@@ -42,6 +42,24 @@ public class CourseInput {
         return new CourseInput(courseID, courseName, courseCode, credits, departmentID, courseType, status);
     }
 
+    public CourseInput(Integer courseID, int credits, String courseType, String status) {
+        this.courseID = courseID;
+        this.credits = credits;
+        this.courseType = courseType;
+        this.status = status;
+    }
+
+    public static CourseInput updateForm(HttpServletRequest request) {
+        String courseIDStr = request.getParameter("courseID");
+        Integer courseID = courseIDStr != null ? Integer.parseInt(courseIDStr) : null;
+
+        int credits = Integer.parseInt(request.getParameter("credits"));
+        String courseType = request.getParameter("courseType");
+        String status = request.getParameter("status");
+
+        return new CourseInput(courseID, credits, courseType, status);
+    }
+
     public Integer getCourseID() {
         return courseID;
     }

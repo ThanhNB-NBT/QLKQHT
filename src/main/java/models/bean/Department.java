@@ -5,11 +5,11 @@ public class Department {
     private String departmentName;
     private String email;
     private String phone;
-    
+
 	public Department() {
 		super();
 	}
-	
+
 	public Department(int departmentID, String departmentName, String email, String phone) {
 		super();
 		this.departmentID = departmentID;
@@ -17,12 +17,13 @@ public class Department {
 		this.email = email;
 		this.phone = phone;
 	}
+
 	public Department(String departmentName, String email, String phone) {
 		this.departmentName = departmentName;
 		this.email = email;
 		this.phone = phone;
 	}
-	
+
 	public int getDepartmentID() {
 		return departmentID;
 	}
@@ -47,5 +48,5 @@ public class Department {
 	public void setPhone(String phone) {
 		this.phone = phone;
 	}
-	
+
 }

@@ -15,18 +15,30 @@ public class CourseValidator {
             hasErrors = true;
         }
 
-        if (input.getCourseName() == null || input.getCourseName().trim().isEmpty()) {
-            AlertManager.addMessage(request, "Tên học phần không được để trống.", false);
-            hasErrors = true;
+        if (!isUpdate) {
+            if (input.getCourseName() == null || input.getCourseName().trim().isEmpty()) {
+                AlertManager.addMessage(request, "Tên học phần không được để trống.", false);
+                hasErrors = true;
+            }
+
+            if (input.getDepartmentID() <= 0) {
+                AlertManager.addMessage(request, "Khoa không hợp lệ.", false);
+                hasErrors = true;
+            }
+
+            if (input.getCourseCode() == null || input.getCourseCode().trim().isEmpty()) {
+                AlertManager.addMessage(request, "Mã học phần không được để trống.", false);
+                hasErrors = true;
+            }
+
+            if (CourseDAO.checkCourseCode(input.getCourseCode())) {
+                AlertManager.addMessage(request, "Mã học phần đã tồn tại.", false);
+                hasErrors = true;
+            }
         }
 
         if (input.getCredits() <= 0) {
             AlertManager.addMessage(request, "Số tín chỉ phải lớn hơn 0.", false);
-            hasErrors = true;
-        }
-
-        if (input.getDepartmentID() <= 0) {
-            AlertManager.addMessage(request, "Khoa không hợp lệ.", false);
             hasErrors = true;
         }
 
@@ -37,11 +49,6 @@ public class CourseValidator {
 
         if (input.getStatus() == null || input.getStatus().trim().isEmpty()) {
             AlertManager.addMessage(request, "Trạng thái không được để trống.", false);
-            hasErrors = true;
-        }
-
-        if (!isUpdate && CourseDAO.checkCourseCode(input.getCourseCode())) {
-            AlertManager.addMessage(request, "Mã học phần đã tồn tại.", false);
             hasErrors = true;
         }
 

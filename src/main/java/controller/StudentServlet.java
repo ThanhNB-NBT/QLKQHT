@@ -51,12 +51,6 @@ public class StudentServlet extends HttpServlet {
 
         try {
 
-        	String studentIDStr = request.getParameter(STUDENTID);
-            if (studentIDStr != null) {
-                handleEditRequest(request, response, studentIDStr);
-                return;
-            }
-
             String searchName = request.getParameter("search");
             String majorName = request.getParameter("major");
             String address = request.getParameter("address");
@@ -200,23 +194,6 @@ public class StudentServlet extends HttpServlet {
         } catch (Exception e) {
             AlertManager.addMessage(request, "Định dạng ngày không hợp lệ.", false);
             response.sendRedirect(STUDENT_SERVLET);
-        }
-    }
-
-    private void handleEditRequest(HttpServletRequest request, HttpServletResponse response, String studentIDStr)
-            throws ServletException, IOException {
-        try {
-            int studentID = Integer.parseInt(studentIDStr);
-            Student studentToEdit = StudentDAO.getStudentById(studentID);
-
-            if (studentToEdit != null) {
-                request.setAttribute("studentToEdit", studentToEdit);
-                request.getRequestDispatcher("/Views/StudentView/editStudentModal.jsp").forward(request, response);
-            } else {
-                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Sinh viên không tồn tại.");
-            }
-        } catch (NumberFormatException e) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID không hợp lệ.");
         }
     }
 

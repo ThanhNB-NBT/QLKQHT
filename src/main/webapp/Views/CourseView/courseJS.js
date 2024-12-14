@@ -1,22 +1,22 @@
-document.body.addEventListener('click', function(event) {
+$(document).on('click', '.edit-course', function () {
 
-    if (event.target.classList.contains('edit-course')) {
-        const courseId = event.target.getAttribute('data-id');
-        const courseName = event.target.getAttribute('data-name');
-        const credits = event.target.getAttribute('data-credits');
-        const courseType = event.target.getAttribute('data-type');
-        const departmentId = event.target.getAttribute('data-departmentid');
-        const status = event.target.getAttribute('data-status');
+    const courseId = $(this).data('id');
+    const courseName = $(this).data('name');
+    const credits = $(this).data('credits');
+    const courseType = $(this).data('type');
+	const departmentName = $(this).data('department');
+    const departmentId = $(this).data('departmentid');
+    const status = $(this).data('status');
 
-        document.getElementById('editCourseID').value = courseId;
-        document.getElementById('editCourseName').value = courseName;
-        document.getElementById('editCredits').value = credits;
-        document.getElementById('editCourseType').value = courseType;
-        document.getElementById('editDepartmentID').value = departmentId;
-        document.getElementById('editStatus').value = status;
+    $('#editCourseID').val(courseId);
+    $('#editCourseName').text(courseName);
+    $('#editCredits').val(credits);
+    $('#editCourseType').val(courseType);
+    $('#editDepartmentID').val(departmentId);
+    $('#editStatus').val(status);
+	$('#editDepartment').text(departmentName);
 
-        $('#edit_course').modal('show');
-    }
+    $('#edit_course').modal('show');
 });
 
 

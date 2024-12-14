@@ -1,17 +1,16 @@
 package models.bean;
 
 public class StudentClass {
-	private String studentClassID;
-    private String classID;
-    private String studentID;
+	private Integer studentClassID;
+    private Integer classID;
+    private Integer studentID;
     private String status;
-    
+
 	public StudentClass() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
-	public StudentClass(String studentClassID, String classID, String studentID, String status) {
+	public StudentClass(Integer studentClassID, Integer classID, Integer studentID, String status) {
 		super();
 		this.studentClassID = studentClassID;
 		this.classID = classID;
@@ -19,15 +18,15 @@ public class StudentClass {
 		this.status = status;
 	}
 
-	public String getStudentClassID() {
+	public Integer getStudentClassID() {
 		return studentClassID;
 	}
 
-	public String getClassID() {
+	public Integer getClassID() {
 		return classID;
 	}
 
-	public String getStudentID() {
+	public Integer getStudentID() {
 		return studentID;
 	}
 
@@ -35,21 +34,21 @@ public class StudentClass {
 		return status;
 	}
 
-	public void setStudentClassID(String studentClassID) {
+	public void setStudentClassID(Integer studentClassID) {
 		this.studentClassID = studentClassID;
 	}
 
-	public void setClassID(String classID) {
+	public void setClassID(Integer classID) {
 		this.classID = classID;
 	}
 
-	public void setStudentID(String studentID) {
+	public void setStudentID(Integer studentID) {
 		this.studentID = studentID;
 	}
 
 	public void setStatus(String status) {
 		this.status = status;
 	}
-    
-    
+
+
 }

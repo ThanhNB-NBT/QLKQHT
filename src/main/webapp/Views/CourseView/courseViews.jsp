@@ -79,7 +79,7 @@ response.setDateHeader("Expires", 0);
 										<c:choose>
 											<c:when test="${not empty courses}">
 												<c:forEach var="course" items="${courses}" varStatus="number">
-													<tr data-course-id="${course.courseID }">
+													<tr>
 														<td>${number.index + 1}</td>
 														<td><span class="badge" style="font-size: 13px;">${course.courseCode}</span></td>
 														<td>${course.courseName}</td>

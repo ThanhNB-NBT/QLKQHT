@@ -31,6 +31,12 @@
         </li>
 
         <li class="#">
+          <a href="ClassServlet">
+            <img src="assets/img/sidebar/icon-4.png" alt="icon"> <span> Lớp </span>
+          </a>
+        </li>
+
+        <li class="#">
           <a href="CourseServlet">
             <img src="assets/img/sidebar/icon-4.png" alt="icon"> <span> Học phần </span>
           </a>
