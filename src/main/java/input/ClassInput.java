@@ -49,9 +49,8 @@ public class ClassInput {
 	}
 
 	// Tạo đối tượng từ request
-	public static ClassInput fromRequest(HttpServletRequest request, boolean isUpdate) {
-		String classIDStr = request.getParameter("classID");
-		Integer classID = isUpdate && classIDStr != null && !classIDStr.isEmpty() ? Integer.parseInt(classIDStr) : null;
+	public static ClassInput fromRequest(HttpServletRequest request) {
+
 
 		int courseID = Integer.parseInt(request.getParameter("courseID"));
 		int teacherID = Integer.parseInt(request.getParameter("teacherID"));
@@ -71,14 +70,13 @@ public class ClassInput {
 			parentClassID = Integer.parseInt(parentClassIDStr);
 		}
 
-		return new ClassInput(classID, courseID, teacherID, classTime, room, semester, className, status, maxStudents,
+		return new ClassInput(courseID, teacherID, classTime, room, semester, className, status, maxStudents,
 				totalLessions, startDate, endDate, classType, parentClassID);
 	}
 
 	public ClassInput(Integer classID, int teacherID, String classTime, String room, String status, int maxStudents,
 			int totalLessions) {
 		this.classID = classID;
-
 		this.teacherID = teacherID;
 		this.classTime = classTime;
 		this.room = room;

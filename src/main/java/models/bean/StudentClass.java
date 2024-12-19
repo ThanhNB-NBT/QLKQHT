@@ -5,6 +5,9 @@ public class StudentClass {
     private Integer classID;
     private Integer studentID;
     private String status;
+    private String className;
+    private String studentName;
+    private String studentCode;
 
 	public StudentClass() {
 		super();
@@ -15,6 +18,19 @@ public class StudentClass {
 		this.studentClassID = studentClassID;
 		this.classID = classID;
 		this.studentID = studentID;
+		this.status = status;
+	}
+
+	public StudentClass( Integer classID, Integer studentID, String status) {
+		super();
+		this.classID = classID;
+		this.studentID = studentID;
+		this.status = status;
+	}
+
+	public StudentClass(Integer studentClassID, String status) {
+		super();
+		this.studentClassID = studentClassID;
 		this.status = status;
 	}
 
@@ -49,6 +65,31 @@ public class StudentClass {
 	public void setStatus(String status) {
 		this.status = status;
 	}
+
+	public String getStudentName() {
+		return studentName;
+	}
+
+	public String getStudentCode() {
+		return studentCode;
+	}
+
+	public void setStudentName(String studentName) {
+		this.studentName = studentName;
+	}
+
+	public void setStudentCode(String studentCode) {
+		this.studentCode = studentCode;
+	}
+
+	public String getClassName() {
+		return className;
+	}
+
+	public void setClassName(String className) {
+		this.className = className;
+	}
+
 
 
 }

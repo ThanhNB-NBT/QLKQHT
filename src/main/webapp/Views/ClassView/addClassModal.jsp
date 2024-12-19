@@ -72,7 +72,7 @@
                         <!-- Tổng số buổi học -->
                         <div class="col-sm-4">
                             <div class="form-group form-focus">
-                                <input name="totalLessons" type="number" class="form-control floating" required min="1">
+                                <input name="totalLessions" type="number" class="form-control floating" required min="1">
                                 <label class="focus-label">Số tiết <span class="text-danger">*</span></label>
                             </div>
                         </div>

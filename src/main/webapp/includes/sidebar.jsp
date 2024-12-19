@@ -30,11 +30,16 @@
           </a>
         </li>
 
-        <li class="#">
-          <a href="ClassServlet">
-            <img src="assets/img/sidebar/icon-4.png" alt="icon"> <span> Lớp </span>
-          </a>
-        </li>
+		<li class="submenu">
+            <a href="#">
+              <img src="assets/img/sidebar/icon-4.png" alt="icon"> <span> Lớp </span> <span class="menu-arrow"></span>
+            </a>
+            <ul class="list-unstyled" style="display: none;">
+              <li><a href="ClassServlet" ><span>Lớp học phần</span></a></li>
+              <li><a href="StudentClassServlet" ><span>Danh sách đăng kí</span></a></li>
+
+            </ul>
+          </li>
 
         <li class="#">
           <a href="CourseServlet">

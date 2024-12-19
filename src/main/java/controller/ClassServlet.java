@@ -102,7 +102,7 @@ public class ClassServlet extends HttpServlet {
 
 	private void createClass(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-		ClassInput input = ClassInput.fromRequest(request, false);
+		ClassInput input = ClassInput.fromRequest(request);
 
 		if (ClassValidator.validateInput(input, request, false)) {
 			response.sendRedirect(CLASS_SERVLET);
