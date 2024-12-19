@@ -21,6 +21,12 @@ public class StudentClassDAO {
 			+ "FROM StudentClasses sc " + "JOIN Classes c ON sc.ClassID = c.ClassID "
 			+ "JOIN Students s ON sc.StudentID = s.StudentID " + "WHERE sc.StudentClassID = ?";
 
+	private static final String SQL_SEARCH = "SELECT sc.StudentClassID, sc.ClassID, sc.StudentID, sc.Status, "
+			+ "c.ClassName, s.StudentCode, CONCAT(s.FirstName, ' ', s.LastName) AS StudentName "
+			+ "FROM StudentClasses sc " + "JOIN Classes c ON sc.ClassID = c.ClassID "
+			+ "JOIN Students s ON sc.StudentID = s.StudentID "
+			+ "WHERE c.ClassName LIKE ? OR CONCAT(s.FirstName, ' ', s.LastName) LIKE ?";
+
 	private static final String SQL_CREATE_STUDENTCLASS = "INSERT INTO StudentClasses (ClassID, StudentID, Status) VALUES (?, ?, ?)";
 
 	private static final String SQL_UPDATE_STUDENTCLASS = "UPDATE StudentClasses SET Status = ? WHERE StudentClassID = ?";
@@ -235,13 +241,8 @@ public class StudentClassDAO {
 	//Tìm kiếm
 	public static List<StudentClass> searchByStudentOrClass(String searchValue) {
 		List<StudentClass> studentClasses = new ArrayList<>();
-		String query = "SELECT sc.StudentClassID, sc.ClassID, sc.StudentID, sc.Status, "
-				+ "c.ClassName, s.StudentCode, CONCAT(s.FirstName, ' ', s.LastName) AS StudentName "
-				+ "FROM StudentClasses sc " + "JOIN Classes c ON sc.ClassID = c.ClassID "
-				+ "JOIN Students s ON sc.StudentID = s.StudentID "
-				+ "WHERE c.ClassName LIKE ? OR CONCAT(s.FirstName, ' ', s.LastName) LIKE ?";
 
-		try (Connection conn = ConnectDatabase.checkConnect(); PreparedStatement ps = conn.prepareStatement(query)) {
+		try (Connection conn = ConnectDatabase.checkConnect(); PreparedStatement ps = conn.prepareStatement(SQL_SEARCH)) {
 
 			ps.setString(1, "%" + searchValue + "%");
 			ps.setString(2, "%" + searchValue + "%");

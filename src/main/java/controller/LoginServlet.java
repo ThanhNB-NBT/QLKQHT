@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.Optional;
 
 import common.AlertManager;
+import common.RoleUtils;
 import models.bean.Account;
 import models.dao.AccountDAO;
 
@@ -23,38 +24,52 @@ public class LoginServlet extends HttpServlet {
         super();
     }
 
-	@Override
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String identifier = request.getParameter("identifier"); // Username hoặc email
+        String password = request.getParameter("password");
 
-	}
+        if (identifier == null || password == null || identifier.trim().isEmpty() || password.trim().isEmpty()) {
+            AlertManager.addMessage(request, "Vui lòng nhập đầy đủ thông tin đăng nhập!", false);
+            request.getRequestDispatcher("login.jsp").forward(request, response);
+            return;
+        }
+        Account account = new Account(identifier, password);
+        AccountDAO accountDAO = new AccountDAO();
+        Optional<Account> loggedInAccount = accountDAO.checkAccount(account);
 
-	@Override
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String identifier = request.getParameter("identifier");
-	    String password = request.getParameter("password");
-	    Account account = new Account(identifier, password);
-	    AccountDAO accountDAO = new AccountDAO();
-	    Optional<Account> loggedInAccount = accountDAO.checkAccount(account);
+        HttpSession session = request.getSession();
 
-	 // Lấy hoặc tạo mới session
-	    HttpSession session = request.getSession();
+        if (loggedInAccount.isPresent()) {
+            session.setAttribute("loggedInUser", loggedInAccount.get());
 
-	    if (loggedInAccount.isPresent()) {
-	        // Đăng nhập thành công
-	        session.setAttribute("loggedInUser", loggedInAccount.get());
+            String roleMessage;
+            if (RoleUtils.isAdmin(session)) {
+                roleMessage = "Đăng nhập thành công với vai trò Quản trị viên.";
+            } else if (RoleUtils.isTeacher(session)) {
+                roleMessage = "Đăng nhập thành công với vai trò Giảng viên.";
+            } else if (RoleUtils.isStudent(session)) {
+                roleMessage = "Đăng nhập thành công với vai trò Sinh viên.";
+            } else {
+                session.invalidate();
+                AlertManager.addMessage(request, "Vai trò không hợp lệ. Vui lòng liên hệ quản trị viên!", false);
+                request.getRequestDispatcher("login.jsp").forward(request, response);
+                return;
+            }
 
-	        // Thêm thông báo thành công
-	        AlertManager.addMessage(request, "Đăng nhập thành công!", true);
+            AlertManager.addMessage(request, roleMessage, true);
+            response.sendRedirect(request.getContextPath() + "/index.jsp");
+        } else {
+            // Đăng nhập thất bại
+            AlertManager.addMessage(request, "Tài khoản hoặc mật khẩu không chính xác!", false);
+            request.getRequestDispatcher("login.jsp").forward(request, response);
+        }
+    }
 
-	        // Redirect tới trang index
-	        response.sendRedirect(request.getContextPath() + "/index.jsp");
-	    } else {
-	        // Đăng nhập thất bại
-	        AlertManager.addMessage(request, "Tài khoản hoặc mật khẩu không chính xác!", false);
-
-	        // Forward lại trang login
-	        request.getRequestDispatcher("login.jsp").forward(request, response);
-	    }
-	}
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Chuyển hướng GET sang trang login
+        response.sendRedirect(request.getContextPath() + "/login.jsp");
+    }
 
 }

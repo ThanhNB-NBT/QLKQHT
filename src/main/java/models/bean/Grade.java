@@ -13,49 +13,77 @@ public class Grade {
     private String createdBy;
     private Date createdDate;
     private Date updatedDate;
-    
-    private ScoreCalculator scoreCalculator;
-    
-    private GradeLetterCalculator gradeLetterCalculator;
 
     public Grade() {
-        super();
-        scoreCalculator = new ScoreCalculator();
-        gradeLetterCalculator = new GradeLetterCalculator();
+
     }
 
+    // Constructor cho việc tạo mới điểm
     public Grade(String gradeID, String studentClassID, double attendanceScore, double midtermScore,
-                 double finalExamScore, String createdBy, Date createdDate, Date updatedDate) {
-        this();
+                 double finalExamScore, String createdBy, Date createdDate) {
         this.gradeID = gradeID;
         this.studentClassID = studentClassID;
-        setAttendanceScore(attendanceScore);
-        setMidtermScore(midtermScore);
-        setFinalExamScore(finalExamScore);
+        this.attendanceScore = attendanceScore;
+        this.midtermScore = midtermScore;
+        this.finalExamScore = finalExamScore;
+        this.componentScore = calculateComponentScore(attendanceScore, midtermScore, finalExamScore);
+        this.gradeLetter = calculateGradeLetter(this.componentScore);
         this.createdBy = createdBy;
         this.createdDate = createdDate;
+    }
+
+    // Constructor cho việc cập nhật điểm
+    public Grade(String gradeID, double attendanceScore, double midtermScore, double finalExamScore, Date updatedDate) {
+        this.gradeID = gradeID;
+        this.attendanceScore = attendanceScore;
+        this.midtermScore = midtermScore;
+        this.finalExamScore = finalExamScore;
+        this.componentScore = calculateComponentScore(attendanceScore, midtermScore, finalExamScore);
+        this.gradeLetter = calculateGradeLetter(this.componentScore);
         this.updatedDate = updatedDate;
-        this.gradeLetter = calculateGradeLetter();
     }
 
     public String getGradeID() {
         return gradeID;
     }
 
+    public void setGradeID(String gradeID) {
+        this.gradeID = gradeID;
+    }
+
     public String getStudentClassID() {
         return studentClassID;
+    }
+
+    public void setStudentClassID(String studentClassID) {
+        this.studentClassID = studentClassID;
     }
 
     public double getAttendanceScore() {
         return attendanceScore;
     }
 
+    public void setAttendanceScore(double attendanceScore) {
+        this.attendanceScore = attendanceScore;
+        updateComponentScoreAndGradeLetter();
+    }
+
     public double getMidtermScore() {
         return midtermScore;
     }
 
+    public void setMidtermScore(double midtermScore) {
+        this.midtermScore = midtermScore;
+        updateComponentScoreAndGradeLetter();
+    }
+
     public double getFinalExamScore() {
         return finalExamScore;
+    }
+
+    public void setFinalExamScore(double finalExamScore) {
+        this.finalExamScore = finalExamScore;
+        updateComponentScoreAndGradeLetter();
     }
 
     public double getComponentScore() {
@@ -70,93 +98,64 @@ public class Grade {
         return createdBy;
     }
 
-    public Date getCreatedDate() {
-        return createdDate;
-    }
-
-    public Date getUpdatedDate() {
-        return updatedDate;
-    }
-
-    public void setGradeID(String gradeID) {
-        this.gradeID = gradeID;
-    }
-
-    public void setStudentClassID(String studentClassID) {
-        this.studentClassID = studentClassID;
-    }
-
-    public void setAttendanceScore(double attendanceScore) {
-        if (isValidScore(attendanceScore)) {
-            this.attendanceScore = roundToOneDecimal(attendanceScore);
-            this.componentScore = scoreCalculator.calculateComponentScore(this.attendanceScore, this.midtermScore, this.finalExamScore);
-        } else {
-            throw new IllegalArgumentException("Invalid attendance score");
-        }
-    }
-
-    public void setMidtermScore(double midtermScore) {
-        if (isValidScore(midtermScore)) {
-            this.midtermScore = roundToOneDecimal(midtermScore);
-            this.componentScore = scoreCalculator.calculateComponentScore(this.attendanceScore, this.midtermScore, this.finalExamScore);
-        } else {
-            throw new IllegalArgumentException("Invalid midterm score");
-        }
-    }
-
-    public void setFinalExamScore(double finalExamScore) {
-        if (isValidScore(finalExamScore)) {
-            this.finalExamScore = roundToOneDecimal(finalExamScore);
-            this.componentScore = scoreCalculator.calculateComponentScore(this.attendanceScore, this.midtermScore, this.finalExamScore);
-        } else {
-            throw new IllegalArgumentException("Invalid final exam score");
-        }
-    }
-
-
     public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
+    }
+
+    public Date getCreatedDate() {
+        return createdDate;
     }
 
     public void setCreatedDate(Date createdDate) {
         this.createdDate = createdDate;
     }
 
+    public Date getUpdatedDate() {
+        return updatedDate;
+    }
+
     public void setUpdatedDate(Date updatedDate) {
         this.updatedDate = updatedDate;
     }
 
-    private boolean isValidScore(double score) {
-        return score >= 0 && score <= 10;
+    // Phương thức tính ComponentScore
+    private double calculateComponentScore(double attendanceScore, double midtermScore, double finalExamScore) {
+        return roundToOneDecimal(attendanceScore * 0.2 + midtermScore * 0.3 + finalExamScore * 0.5);
     }
 
-    public String calculateGradeLetter() {
-        return gradeLetterCalculator.calculateGradeLetter(this.componentScore);
+    // Phương thức tính GradeLetter
+    private String calculateGradeLetter(double componentScore) {
+        if (componentScore >= 8.5) return "A";
+        if (componentScore >= 7.0) return "B";
+        if (componentScore >= 5.5) return "C";
+        if (componentScore >= 4.0) return "D";
+        return "F";
     }
 
-    public void updateGradeLetter() {
-        this.gradeLetter = calculateGradeLetter();
+    // Cập nhật ComponentScore và GradeLetter khi điểm thay đổi
+    private void updateComponentScoreAndGradeLetter() {
+        this.componentScore = calculateComponentScore(this.attendanceScore, this.midtermScore, this.finalExamScore);
+        this.gradeLetter = calculateGradeLetter(this.componentScore);
     }
 
-    private static class ScoreCalculator {
-
-        public double calculateComponentScore(double attendanceScore, double midtermScore, double finalExamScore) {
-            return attendanceScore * 0.2 + midtermScore * 0.3 + finalExamScore * 0.5;
-        }
-    }
-
+    // Làm tròn số thập phân đến một chữ số
     private double roundToOneDecimal(double value) {
         return Math.round(value * 10.0) / 10.0;
     }
 
-    private static class GradeLetterCalculator {
-
-        public String calculateGradeLetter(double componentScore) {
-            if (componentScore >= 8.5) return "A";
-            if (componentScore >= 7.0) return "B";
-            if (componentScore >= 5.5) return "C";
-            if (componentScore >= 4.0) return "D";
-            return "F";
-        }
+    @Override
+    public String toString() {
+        return "Grade{" +
+                "gradeID='" + gradeID + '\'' +
+                ", studentClassID='" + studentClassID + '\'' +
+                ", attendanceScore=" + attendanceScore +
+                ", midtermScore=" + midtermScore +
+                ", finalExamScore=" + finalExamScore +
+                ", componentScore=" + componentScore +
+                ", gradeLetter='" + gradeLetter + '\'' +
+                ", createdBy='" + createdBy + '\'' +
+                ", createdDate=" + createdDate +
+                ", updatedDate=" + updatedDate +
+                '}';
     }
 }

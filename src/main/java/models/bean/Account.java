@@ -10,6 +10,9 @@ public class Account {
     private String email;
     private String avatar;
     private Role role;
+    private int roleID;
+    private String teacherID;
+    private String studentID;
 
     // Constructors
     public Account() {
@@ -104,6 +107,30 @@ public class Account {
 
 	public void setAvatar(String avatar) {
 		this.avatar = avatar;
+	}
+
+	public String getTeacherID() {
+		return teacherID;
+	}
+
+	public String getStudentID() {
+		return studentID;
+	}
+
+	public void setTeacherID(String teacherID) {
+		this.teacherID = teacherID;
+	}
+
+	public void setStudentID(String studentID) {
+		this.studentID = studentID;
+	}
+
+	public int getRoleID() {
+		return roleID;
+	}
+
+	public void setRoleID(int roleID) {
+		this.roleID = roleID;
 	}
 
 	private String hashPassword(String password) {
