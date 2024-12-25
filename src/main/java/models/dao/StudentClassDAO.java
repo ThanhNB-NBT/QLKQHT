@@ -9,264 +9,270 @@ import java.util.List;
 import java.util.logging.Logger;
 
 public class StudentClassDAO {
-	private static final Logger logger = Logger.getLogger(StudentClassDAO.class.getName());
+    private static final Logger logger = Logger.getLogger(StudentClassDAO.class.getName());
 
-	private static final String SQL_GET_ALL_STUDENTCLASS = "SELECT sc.StudentClassID, sc.ClassID, sc.StudentID, sc.Status, "
-			+ "c.ClassName, s.StudentCode, CONCAT(s.FirstName, ' ', s.LastName) AS StudentName "
-			+ "FROM StudentClasses sc " + "JOIN Classes c ON sc.ClassID = c.ClassID "
-			+ "JOIN Students s ON sc.StudentID = s.StudentID";
+    private static final String SQL_GET_ALL_STUDENTCLASS = "SELECT sc.StudentClassID, sc.ClassID, sc.StudentID, sc.Status, "
+            + "c.ClassName, s.StudentCode, CONCAT(s.FirstName, ' ', s.LastName) AS StudentName "
+            + "FROM StudentClasses sc "
+            + "JOIN Classes c ON sc.ClassID = c.ClassID "
+            + "JOIN Students s ON sc.StudentID = s.StudentID "
+            + "GROUP BY sc.StudentClassID, sc.ClassID, sc.StudentID, sc.Status, c.ClassName, s.StudentCode, s.FirstName, s.LastName "
+            + "ORDER BY sc.ClassID";
 
-	private static final String SQL_GET_BY_ID = "SELECT sc.StudentClassID, sc.ClassID, sc.StudentID, sc.Status, "
-			+ "c.ClassName, s.StudentCode, CONCAT(s.FirstName, ' ', s.LastName) AS StudentName "
-			+ "FROM StudentClasses sc " + "JOIN Classes c ON sc.ClassID = c.ClassID "
-			+ "JOIN Students s ON sc.StudentID = s.StudentID " + "WHERE sc.StudentClassID = ?";
+    private static final String SQL_GET_BY_ID = "SELECT sc.StudentClassID, sc.ClassID, sc.StudentID, sc.Status, "
+            + "c.ClassName, s.StudentCode, CONCAT(s.FirstName, ' ', s.LastName) AS StudentName "
+            + "FROM StudentClasses sc "
+            + "JOIN Classes c ON sc.ClassID = c.ClassID "
+            + "JOIN Students s ON sc.StudentID = s.StudentID "
+            + "WHERE sc.StudentClassID = ? "
+            + "ORDER BY sc.ClassID";
 
-	private static final String SQL_SEARCH = "SELECT sc.StudentClassID, sc.ClassID, sc.StudentID, sc.Status, "
-			+ "c.ClassName, s.StudentCode, CONCAT(s.FirstName, ' ', s.LastName) AS StudentName "
-			+ "FROM StudentClasses sc " + "JOIN Classes c ON sc.ClassID = c.ClassID "
-			+ "JOIN Students s ON sc.StudentID = s.StudentID "
-			+ "WHERE c.ClassName LIKE ? OR CONCAT(s.FirstName, ' ', s.LastName) LIKE ?";
+    private static final String SQL_SEARCH = "SELECT sc.StudentClassID, sc.ClassID, sc.StudentID, sc.Status, "
+            + "c.ClassName, s.StudentCode, CONCAT(s.FirstName, ' ', s.LastName) AS StudentName "
+            + "FROM StudentClasses sc "
+            + "JOIN Classes c ON sc.ClassID = c.ClassID "
+            + "JOIN Students s ON sc.StudentID = s.StudentID "
+            + "WHERE c.ClassName LIKE ? OR CONCAT(s.FirstName, ' ', s.LastName) LIKE ? "
+            + "ORDER BY sc.ClassID";
 
-	private static final String SQL_CREATE_STUDENTCLASS = "INSERT INTO StudentClasses (ClassID, StudentID, Status) VALUES (?, ?, ?)";
+    private static final String SQL_CREATE_STUDENTCLASS = "INSERT INTO StudentClasses (ClassID, StudentID, Status) VALUES (?, ?, ?)";
+    private static final String SQL_UPDATE_STUDENTCLASS = "UPDATE StudentClasses SET Status = ? WHERE StudentClassID = ?";
+    private static final String SQL_DELETE_STUDENTCLASS = "DELETE FROM StudentClasses WHERE StudentClassID = ?";
+    private static final String SQL_CREATE_GRADE = "INSERT INTO Grades (StudentClassID, MidtermScore, AttendanceScore, FinalExamScore) VALUES (?, 0, 0, 0)";
+    private static final String SQL_DELETE_GRADE = "DELETE FROM Grades WHERE StudentClassID = ?";
+    private static final String SQL_CHECK_STUDENT = "SELECT COUNT(*) AS count FROM StudentClasses WHERE ClassID = ? AND StudentID = ?";
+    private static final String SQL_GET_CLASSID_BY_STUDENTCLASSID = "SELECT ClassID FROM StudentClasses WHERE StudentClassID = ?";
+    private static final String SQL_UPDATE_REGISTERED_STUDENTS = "UPDATE Classes SET RegisteredStudents = RegisteredStudents + ? WHERE ClassID = ?";
 
-	private static final String SQL_UPDATE_STUDENTCLASS = "UPDATE StudentClasses SET Status = ? WHERE StudentClassID = ?";
+    // Lấy danh sách tất cả StudentClass
+    public static List<StudentClass> getAllStudentClasses() {
+        List<StudentClass> studentClasses = new ArrayList<>();
+        try (Connection conn = ConnectDatabase.checkConnect();
+             PreparedStatement pstmt = conn.prepareStatement(SQL_GET_ALL_STUDENTCLASS);
+             ResultSet rs = pstmt.executeQuery()) {
 
-	private static final String SQL_DELETE_STUDENTCLASS = "DELETE FROM StudentClasses WHERE StudentClassID = ?";
+            while (rs.next()) {
+                studentClasses.add(mapStudentClass(rs));
+            }
+        } catch (SQLException e) {
+            logger.severe("Lỗi khi lấy danh sách StudentClasses: " + e.getMessage());
+        }
+        return studentClasses;
+    }
 
-	private static final String SQL_CHECK_STUDENT = "SELECT COUNT(*) AS count FROM StudentClasses WHERE ClassID = ? AND StudentID = ?";
+    // Lấy thông tin StudentClass theo ID
+    public static StudentClass getStudentClassById(int studentClassID) {
+        try (Connection conn = ConnectDatabase.checkConnect();
+             PreparedStatement pstmt = conn.prepareStatement(SQL_GET_BY_ID)) {
 
-	private static final String SQL_GET_CLASSID_BY_STUDENTCLASSID = "SELECT ClassID FROM StudentClasses WHERE StudentClassID = ?";
+            pstmt.setInt(1, studentClassID);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return mapStudentClass(rs);
+                }
+            }
+        } catch (SQLException e) {
+            logger.severe("Lỗi khi lấy StudentClass theo ID: " + e.getMessage());
+        }
+        return null;
+    }
 
-	// Lấy danh sách tất cả StudentClass
-	public static List<StudentClass> getAllStudentClasses() {
-		List<StudentClass> studentClasses = new ArrayList<>();
-		try (Connection conn = ConnectDatabase.checkConnect();
-				PreparedStatement pstmt = conn.prepareStatement(SQL_GET_ALL_STUDENTCLASS);
-				ResultSet rs = pstmt.executeQuery()) {
-			while (rs.next()) {
-				studentClasses.add(mapStudentClass(rs));
-			}
-		} catch (SQLException e) {
-			logger.severe("Lỗi khi lấy danh sách StudentClasses: " + e.getMessage());
-		}
-		return studentClasses;
-	}
+    // Thêm mới StudentClass
+    public static boolean createStudentClass(StudentClass studentClass) {
+        Connection conn = null;
+        try {
+            conn = ConnectDatabase.checkConnect();
+            conn.setAutoCommit(false);
 
-	// Lấy thông tin StudentClass theo ID
-	public static StudentClass getStudentClassById(int studentClassID) {
-		try (Connection conn = ConnectDatabase.checkConnect();
-				PreparedStatement pstmt = conn.prepareStatement(SQL_GET_BY_ID)) {
-			pstmt.setInt(1, studentClassID);
-			try (ResultSet rs = pstmt.executeQuery()) {
-				if (rs.next()) {
-					return mapStudentClass(rs);
-				}
-			}
-		} catch (SQLException e) {
-			logger.severe("Lỗi khi lấy StudentClass theo ID: " + e.getMessage());
-		}
-		return null;
-	}
+            int newStudentClassID = insertStudentClass(conn, studentClass);
+            if (newStudentClassID > 0) {
+                if (createGradeRecord(conn, newStudentClassID) &&
+                    updateRegisteredStudents(conn, studentClass.getClassID(), 1)) {
+                    conn.commit();
+                    return true;
+                }
+            }
+            conn.rollback();
+            return false;
+        } catch (SQLException e) {
+            handleTransactionError(conn, e, "Lỗi khi thêm StudentClass và các bản ghi liên quan");
+            return false;
+        } finally {
+            closeConnection(conn);
+        }
+    }
 
-	// Thêm mới StudentClass
-	public static boolean createStudentClass(StudentClass studentClass) {
-		Connection conn = null;
-		PreparedStatement pstmtInsert = null;
-		PreparedStatement pstmtUpdate = null;
+    // Cập nhật StudentClass
+    public static boolean updateStudentClass(StudentClass studentClass) {
+        try (Connection conn = ConnectDatabase.checkConnect();
+             PreparedStatement pstmt = conn.prepareStatement(SQL_UPDATE_STUDENTCLASS)) {
 
-		String sqlUpdateRegistered = "UPDATE Classes SET RegisteredStudents = RegisteredStudents + 1 WHERE ClassID = ?";
+            pstmt.setString(1, studentClass.getStatus());
+            pstmt.setInt(2, studentClass.getStudentClassID());
+            return pstmt.executeUpdate() > 0;
 
-		try {
-			conn = ConnectDatabase.checkConnect();
-			conn.setAutoCommit(false);
+        } catch (SQLException e) {
+            logger.severe("Lỗi khi cập nhật StudentClass: " + e.getMessage());
+            return false;
+        }
+    }
 
-			// Thêm mới StudentClass
-			pstmtInsert = conn.prepareStatement(SQL_CREATE_STUDENTCLASS);
-			pstmtInsert.setInt(1, studentClass.getClassID());
-			pstmtInsert.setInt(2, studentClass.getStudentID());
-			pstmtInsert.setString(3, studentClass.getStatus());
+    // Xóa StudentClass
+    public static boolean deleteStudentClass(int studentClassID, int classID) {
+        Connection conn = null;
+        try {
+            conn = ConnectDatabase.checkConnect();
+            conn.setAutoCommit(false);
 
-			int rowsInserted = pstmtInsert.executeUpdate();
+            if (deleteGradeRecord(conn, studentClassID) &&
+                deleteStudentClassRecord(conn, studentClassID) &&
+                updateRegisteredStudents(conn, classID, -1)) {
 
-			if (rowsInserted > 0) {
-				// Cập nhật RegisteredStudents trong Classes
-				pstmtUpdate = conn.prepareStatement(sqlUpdateRegistered);
-				pstmtUpdate.setInt(1, studentClass.getClassID());
-				int rowsUpdated = pstmtUpdate.executeUpdate();
+                conn.commit();
+                return true;
+            }
+            conn.rollback();
+            return false;
+        } catch (SQLException e) {
+            handleTransactionError(conn, e, "Lỗi khi xóa StudentClass và các bản ghi liên quan");
+            return false;
+        } finally {
+            closeConnection(conn);
+        }
+    }
 
-				if (rowsUpdated > 0) {
-					conn.commit(); // Commit nếu cả hai thành công
-					return true;
-				} else {
-					conn.rollback(); // Rollback nếu cập nhật thất bại
-				}
-			} else {
-				conn.rollback(); // Rollback nếu thêm thất bại
-			}
-		} catch (SQLException e) {
-			logger.severe("Lỗi khi thêm StudentClass và cập nhật RegisteredStudents: " + e.getMessage());
-			try {
-				if (conn != null)
-					conn.rollback(); // Rollback nếu có lỗi
-			} catch (SQLException ex) {
-				logger.severe("Lỗi rollback: " + ex.getMessage());
-			}
-		} finally {
-			try {
-				if (pstmtInsert != null)
-					pstmtInsert.close();
-				if (pstmtUpdate != null)
-					pstmtUpdate.close();
-				if (conn != null)
-					conn.setAutoCommit(true); // Trả lại trạng thái AutoCommit
-				if (conn != null)
-					conn.close();
-			} catch (SQLException e) {
-				logger.severe("Lỗi khi đóng tài nguyên: " + e.getMessage());
-			}
-		}
-		return false;
-	}
+    // Tìm kiếm StudentClass
+    public static List<StudentClass> searchByStudentOrClass(String searchValue) {
+        List<StudentClass> studentClasses = new ArrayList<>();
+        try (Connection conn = ConnectDatabase.checkConnect();
+             PreparedStatement ps = conn.prepareStatement(SQL_SEARCH)) {
 
-	// Cập nhật StudentClass
-	public static boolean updateStudentClass(StudentClass studentClass) {
-		try (Connection conn = ConnectDatabase.checkConnect();
-				PreparedStatement pstmt = conn.prepareStatement(SQL_UPDATE_STUDENTCLASS)) {
-			pstmt.setString(1, studentClass.getStatus());
-			pstmt.setInt(2, studentClass.getStudentClassID());
+            ps.setString(1, "%" + searchValue + "%");
+            ps.setString(2, "%" + searchValue + "%");
 
-			return pstmt.executeUpdate() > 0;
-		} catch (SQLException e) {
-			logger.severe("Lỗi khi cập nhật StudentClass: " + e.getMessage());
-		}
-		return false;
-	}
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    studentClasses.add(mapStudentClass(rs));
+                }
+            }
+        } catch (SQLException e) {
+            logger.severe("Lỗi khi tìm kiếm StudentClasses: " + e.getMessage());
+        }
+        return studentClasses;
+    }
 
-	// Xóa StudentClass
-	public static boolean deleteStudentClass(int studentClassID, int classID) {
-		Connection conn = null;
-		PreparedStatement pstmtDelete = null;
-		PreparedStatement pstmtUpdate = null;
+    // Kiểm tra trùng lớp
+    public static boolean isDuplicate(Integer classID, Integer studentID) {
+        try (Connection conn = ConnectDatabase.checkConnect();
+             PreparedStatement ps = conn.prepareStatement(SQL_CHECK_STUDENT)) {
 
-		String sqlUpdateRegistered = "UPDATE Classes SET RegisteredStudents = RegisteredStudents - 1 WHERE ClassID = ?";
+            ps.setInt(1, classID);
+            ps.setInt(2, studentID);
 
-		try {
-			conn = ConnectDatabase.checkConnect();
-			conn.setAutoCommit(false); // Bắt đầu transaction
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() && rs.getInt("count") > 0;
+            }
+        } catch (SQLException e) {
+            logger.severe("Lỗi kiểm tra sinh viên tồn tại: " + e.getMessage());
+            return false;
+        }
+    }
 
-			// Xóa StudentClass
-			pstmtDelete = conn.prepareStatement(SQL_DELETE_STUDENTCLASS);
-			pstmtDelete.setInt(1, studentClassID);
+    // Lấy ClassID theo StudentClassID
+    public static Integer getClassIDByStudentClassID(int studentClassID) {
+        try (Connection conn = ConnectDatabase.checkConnect();
+             PreparedStatement ps = conn.prepareStatement(SQL_GET_CLASSID_BY_STUDENTCLASSID)) {
 
-			int rowsDeleted = pstmtDelete.executeUpdate();
+            ps.setInt(1, studentClassID);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("ClassID");
+                }
+            }
+        } catch (SQLException e) {
+            logger.severe("Lỗi khi lấy ClassID: " + e.getMessage());
+        }
+        return null;
+    }
 
-			if (rowsDeleted > 0) {
-				// Giảm RegisteredStudents trong Classes
-				pstmtUpdate = conn.prepareStatement(sqlUpdateRegistered);
-				pstmtUpdate.setInt(1, classID);
+    // Các phương thức helper private
+    private static int insertStudentClass(Connection conn, StudentClass studentClass) throws SQLException {
+        try (PreparedStatement pstmt = conn.prepareStatement(SQL_CREATE_STUDENTCLASS, Statement.RETURN_GENERATED_KEYS)) {
+            pstmt.setInt(1, studentClass.getClassID());
+            pstmt.setInt(2, studentClass.getStudentID());
+            pstmt.setString(3, studentClass.getStatus());
 
-				int rowsUpdated = pstmtUpdate.executeUpdate();
+            if (pstmt.executeUpdate() > 0) {
+                try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        return generatedKeys.getInt(1);
+                    }
+                }
+            }
+        }
+        return -1;
+    }
 
-				if (rowsUpdated > 0) {
-					conn.commit(); // Commit nếu cả hai thành công
-					return true;
-				} else {
-					conn.rollback(); // Rollback nếu cập nhật thất bại
-				}
-			} else {
-				conn.rollback(); // Rollback nếu xóa thất bại
-			}
-		} catch (SQLException e) {
-			logger.severe("Lỗi khi xóa StudentClass và cập nhật RegisteredStudents: " + e.getMessage());
-			try {
-				if (conn != null)
-					conn.rollback(); // Rollback nếu có lỗi
-			} catch (SQLException ex) {
-				logger.severe("Lỗi rollback: " + ex.getMessage());
-			}
-		} finally {
-			try {
-				if (pstmtDelete != null)
-					pstmtDelete.close();
-				if (pstmtUpdate != null)
-					pstmtUpdate.close();
-				if (conn != null)
-					conn.setAutoCommit(true); // Trả lại trạng thái AutoCommit
-				if (conn != null)
-					conn.close();
-			} catch (SQLException e) {
-				logger.severe("Lỗi khi đóng tài nguyên: " + e.getMessage());
-			}
-		}
-		return false;
-	}
+    private static boolean createGradeRecord(Connection conn, int studentClassID) throws SQLException {
+        try (PreparedStatement pstmt = conn.prepareStatement(SQL_CREATE_GRADE)) {
+            pstmt.setInt(1, studentClassID);
+            return pstmt.executeUpdate() > 0;
+        }
+    }
 
-	//Lấy ClassID theo StudentClassID để xóa
-	public static Integer getClassIDByStudentClassID(int studentClassID) {
-		try (Connection conn = ConnectDatabase.checkConnect();
-				PreparedStatement ps = conn.prepareStatement(SQL_GET_CLASSID_BY_STUDENTCLASSID)) {
-			ps.setInt(1, studentClassID);
-			try (ResultSet rs = ps.executeQuery()) {
-				if (rs.next()) {
-					return rs.getInt("ClassID");
-				}
-			}
-		} catch (SQLException e) {
-			logger.severe("Lỗi khi lấy ClassID từ StudentClassID: " + e.getMessage());
-		}
-		return null;
-	}
+    private static boolean deleteGradeRecord(Connection conn, int studentClassID) throws SQLException {
+        try (PreparedStatement pstmt = conn.prepareStatement(SQL_DELETE_GRADE)) {
+            pstmt.setInt(1, studentClassID);
+            return pstmt.executeUpdate() >= 0; // Trả về true ngay cả khi không có bản ghi nào bị xóa
+        }
+    }
 
-	//Kiểm tra trùng lớp
-	public static boolean isDuplicate(Integer classID, Integer studentID) {
+    private static boolean deleteStudentClassRecord(Connection conn, int studentClassID) throws SQLException {
+        try (PreparedStatement pstmt = conn.prepareStatement(SQL_DELETE_STUDENTCLASS)) {
+            pstmt.setInt(1, studentClassID);
+            return pstmt.executeUpdate() > 0;
+        }
+    }
 
-		try (Connection connection = ConnectDatabase.checkConnect();
-				PreparedStatement preparedStatement = connection.prepareStatement(SQL_CHECK_STUDENT)) {
+    private static boolean updateRegisteredStudents(Connection conn, int classID, int change) throws SQLException {
+        try (PreparedStatement pstmt = conn.prepareStatement(SQL_UPDATE_REGISTERED_STUDENTS)) {
+            pstmt.setInt(1, change); // +1 cho thêm mới, -1 cho xóa
+            pstmt.setInt(2, classID);
+            return pstmt.executeUpdate() > 0;
+        }
+    }
 
-			preparedStatement.setInt(1, classID);
-			preparedStatement.setInt(2, studentID);
+    private static void handleTransactionError(Connection conn, SQLException e, String errorMessage) {
+        logger.severe(errorMessage + ": " + e.getMessage());
+        try {
+            if (conn != null) {
+                conn.rollback();
+            }
+        } catch (SQLException ex) {
+            logger.severe("Lỗi rollback: " + ex.getMessage());
+        }
+    }
 
-			try (ResultSet resultSet = preparedStatement.executeQuery()) {
-				if (resultSet.next()) {
-					int count = resultSet.getInt("count");
-					return count > 0;
-				}
-			}
-		} catch (Exception e) {
-			logger.severe("Lỗi kiểm tra sinh viên tồn tại: " + e.getMessage());
-		}
-		return false;
-	}
+    private static void closeConnection(Connection conn) {
+        try {
+            if (conn != null) {
+                conn.setAutoCommit(true);
+                conn.close();
+            }
+        } catch (SQLException e) {
+            logger.severe("Lỗi khi đóng kết nối: " + e.getMessage());
+        }
+    }
 
-	//Tìm kiếm
-	public static List<StudentClass> searchByStudentOrClass(String searchValue) {
-		List<StudentClass> studentClasses = new ArrayList<>();
-
-		try (Connection conn = ConnectDatabase.checkConnect(); PreparedStatement ps = conn.prepareStatement(SQL_SEARCH)) {
-
-			ps.setString(1, "%" + searchValue + "%");
-			ps.setString(2, "%" + searchValue + "%");
-
-			try (ResultSet rs = ps.executeQuery()) {
-				while (rs.next()) {
-					studentClasses.add(mapStudentClass(rs));
-				}
-			}
-		} catch (SQLException e) {
-			logger.severe("Lỗi khi tìm kiếm StudentClasses theo tên lớp hoặc tên sinh viên: " + e.getMessage());
-		}
-		return studentClasses;
-	}
-
-	private static StudentClass mapStudentClass(ResultSet rs) throws SQLException {
-		StudentClass sc = new StudentClass();
-		sc.setStudentClassID(rs.getInt("StudentClassID"));
-		sc.setClassID(rs.getInt("ClassID"));
-		sc.setStudentID(rs.getInt("StudentID"));
-		sc.setStatus(rs.getString("Status"));
-		sc.setClassName(rs.getString("ClassName"));
-		sc.setStudentCode(rs.getString("StudentCode"));
-		sc.setStudentName(rs.getString("StudentName"));
-		return sc;
-	}
+    private static StudentClass mapStudentClass(ResultSet rs) throws SQLException {
+        StudentClass sc = new StudentClass();
+        sc.setStudentClassID(rs.getInt("StudentClassID"));
+        sc.setClassID(rs.getInt("ClassID"));
+        sc.setStudentID(rs.getInt("StudentID"));
+        sc.setStatus(rs.getString("Status"));
+        sc.setClassName(rs.getString("ClassName"));
+        sc.setStudentCode(rs.getString("StudentCode"));
+        sc.setStudentName(rs.getString("StudentName"));
+        return sc;
+    }
 }

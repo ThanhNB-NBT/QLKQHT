@@ -11,9 +11,9 @@ response.setDateHeader("Expires", 0);
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>Quản lý tài khoản</title>
-<jsp:include page="../../includes/resources.jsp" />
+	<meta charset="UTF-8">
+	<title>Quản lý tài khoản</title>
+	<jsp:include page="../../includes/resources.jsp" />
 </head>
 <body>
 	<div class="main-wrapper">

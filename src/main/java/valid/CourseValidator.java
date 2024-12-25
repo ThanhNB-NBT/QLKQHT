@@ -26,11 +26,6 @@ public class CourseValidator {
                 hasErrors = true;
             }
 
-            if (input.getCourseCode() == null || input.getCourseCode().trim().isEmpty()) {
-                AlertManager.addMessage(request, "Mã học phần không được để trống.", false);
-                hasErrors = true;
-            }
-
             if (CourseDAO.checkCourseCode(input.getCourseCode())) {
                 AlertManager.addMessage(request, "Mã học phần đã tồn tại.", false);
                 hasErrors = true;

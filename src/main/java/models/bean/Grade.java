@@ -1,7 +1,5 @@
 package models.bean;
 
-import java.sql.Date;
-
 public class Grade {
     private String gradeID;
     private String studentClassID;
@@ -10,39 +8,23 @@ public class Grade {
     private double finalExamScore;
     private double componentScore;
     private String gradeLetter;
-    private String createdBy;
-    private Date createdDate;
-    private Date updatedDate;
+    private String studentCode;
+    private String studentName;
 
     public Grade() {
-
-    }
-
-    // Constructor cho việc tạo mới điểm
-    public Grade(String gradeID, String studentClassID, double attendanceScore, double midtermScore,
-                 double finalExamScore, String createdBy, Date createdDate) {
-        this.gradeID = gradeID;
-        this.studentClassID = studentClassID;
-        this.attendanceScore = attendanceScore;
-        this.midtermScore = midtermScore;
-        this.finalExamScore = finalExamScore;
-        this.componentScore = calculateComponentScore(attendanceScore, midtermScore, finalExamScore);
-        this.gradeLetter = calculateGradeLetter(this.componentScore);
-        this.createdBy = createdBy;
-        this.createdDate = createdDate;
     }
 
     // Constructor cho việc cập nhật điểm
-    public Grade(String gradeID, double attendanceScore, double midtermScore, double finalExamScore, Date updatedDate) {
+    public Grade(String gradeID, double attendanceScore, double midtermScore, double finalExamScore) {
         this.gradeID = gradeID;
         this.attendanceScore = attendanceScore;
         this.midtermScore = midtermScore;
         this.finalExamScore = finalExamScore;
-        this.componentScore = calculateComponentScore(attendanceScore, midtermScore, finalExamScore);
-        this.gradeLetter = calculateGradeLetter(this.componentScore);
-        this.updatedDate = updatedDate;
+        this.componentScore = calculateComponentScore();
+        this.gradeLetter = calculateGradeLetter();
     }
 
+    // Getters và Setters
     public String getGradeID() {
         return gradeID;
     }
@@ -94,37 +76,29 @@ public class Grade {
         return gradeLetter;
     }
 
-    public String getCreatedBy() {
-        return createdBy;
+    public String getStudentCode() {
+		return studentCode;
+	}
+
+	public String getStudentName() {
+		return studentName;
+	}
+
+	public void setStudentCode(String studentCode) {
+		this.studentCode = studentCode;
+	}
+
+	public void setStudentName(String studentName) {
+		this.studentName = studentName;
+	}
+
+	// Phương thức tính toán điểm thành phần
+    private double calculateComponentScore() {
+        return roundToOneDecimal(this.attendanceScore * 0.2 + this.midtermScore * 0.3 + this.finalExamScore * 0.5);
     }
 
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public Date getCreatedDate() {
-        return createdDate;
-    }
-
-    public void setCreatedDate(Date createdDate) {
-        this.createdDate = createdDate;
-    }
-
-    public Date getUpdatedDate() {
-        return updatedDate;
-    }
-
-    public void setUpdatedDate(Date updatedDate) {
-        this.updatedDate = updatedDate;
-    }
-
-    // Phương thức tính ComponentScore
-    private double calculateComponentScore(double attendanceScore, double midtermScore, double finalExamScore) {
-        return roundToOneDecimal(attendanceScore * 0.2 + midtermScore * 0.3 + finalExamScore * 0.5);
-    }
-
-    // Phương thức tính GradeLetter
-    private String calculateGradeLetter(double componentScore) {
+    // Phương thức xác định hạng điểm
+    private String calculateGradeLetter() {
         if (componentScore >= 8.5) return "A";
         if (componentScore >= 7.0) return "B";
         if (componentScore >= 5.5) return "C";
@@ -132,13 +106,13 @@ public class Grade {
         return "F";
     }
 
-    // Cập nhật ComponentScore và GradeLetter khi điểm thay đổi
+    // Cập nhật điểm thành phần và hạng điểm khi có thay đổi
     private void updateComponentScoreAndGradeLetter() {
-        this.componentScore = calculateComponentScore(this.attendanceScore, this.midtermScore, this.finalExamScore);
-        this.gradeLetter = calculateGradeLetter(this.componentScore);
+        this.componentScore = calculateComponentScore();
+        this.gradeLetter = calculateGradeLetter();
     }
 
-    // Làm tròn số thập phân đến một chữ số
+    // Làm tròn giá trị đến 1 chữ số thập phân
     private double roundToOneDecimal(double value) {
         return Math.round(value * 10.0) / 10.0;
     }
@@ -153,9 +127,6 @@ public class Grade {
                 ", finalExamScore=" + finalExamScore +
                 ", componentScore=" + componentScore +
                 ", gradeLetter='" + gradeLetter + '\'' +
-                ", createdBy='" + createdBy + '\'' +
-                ", createdDate=" + createdDate +
-                ", updatedDate=" + updatedDate +
                 '}';
     }
 }
