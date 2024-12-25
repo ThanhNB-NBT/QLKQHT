@@ -13,6 +13,8 @@ public class Account {
     private int roleID;
     private String teacherID;
     private String studentID;
+    private String studentName;
+    private String teacherName;
 
     // Constructors
     public Account() {
@@ -131,6 +133,22 @@ public class Account {
 
 	public void setRoleID(int roleID) {
 		this.roleID = roleID;
+	}
+
+	public String getStudentName() {
+		return studentName;
+	}
+
+	public String getTeacherName() {
+		return teacherName;
+	}
+
+	public void setStudentName(String studentName) {
+		this.studentName = studentName;
+	}
+
+	public void setTeacherName(String teacherName) {
+		this.teacherName = teacherName;
 	}
 
 	private String hashPassword(String password) {

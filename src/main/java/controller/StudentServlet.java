@@ -19,7 +19,6 @@ import common.AlertManager;
 import common.ExcelImportUtils;
 import common.ImageUtils;
 import common.SessionUtils;
-import common.RoleUtils;
 import input.StudentInput;
 
 import java.io.IOException;
@@ -45,9 +44,6 @@ public class StudentServlet extends HttpServlet {
             response.sendRedirect("login.jsp");
             return;
         }
-
-        boolean isAdmin = RoleUtils.isAdmin(session);
-        request.setAttribute("isAdmin", isAdmin);
 
         try {
 

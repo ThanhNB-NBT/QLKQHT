@@ -8,7 +8,7 @@
                 <h5 class="modal-title">Thêm mới Học viên vào Lớp</h5>
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
             </div>
-            <form action="StudentClassServlet" method="POST">
+            <form action="TeacherStudentClassServlet" method="POST">
                 <div class="modal-body">
 
                     <!-- Sinh viên -->
@@ -27,7 +27,7 @@
                     <div class="form-group">
                         <label for="classID">Lớp</label>
                         <select class="form-control" id="classID" name="classID" required>
-                            <c:forEach var="cls" items="${classes}">
+                            <c:forEach var="cls" items="${classList}">
                                 <option value="${cls.classID}">
                                     ${cls.className}
                                 </option>

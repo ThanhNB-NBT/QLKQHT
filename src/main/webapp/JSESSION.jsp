@@ -16,10 +16,13 @@
             <p>Account ID: ${sessionScope.loggedInUser.accountID}</p>
             <p>Username: ${sessionScope.loggedInUser.username}</p>
             <p>Email: ${sessionScope.loggedInUser.email}</p>
+            <p>Avatar: ${sessionScope.loggedInUser.avatar}</p>
             <p>Role ID: ${sessionScope.loggedInUser.role.roleID}</p>
             <p>Role: ${sessionScope.loggedInUser.role.role}</p>
             <p>Teacher ID: ${sessionScope.loggedInUser.teacherID != null ? sessionScope.loggedInUser.teacherID : 'N/A'}</p>
+            <p>TeacherName: ${sessionScope.loggedInUser.teacherName != null ? sessionScope.loggedInUser.teacherName : 'N/A'}</p>
             <p>Student ID: ${sessionScope.loggedInUser.studentID != null ? sessionScope.loggedInUser.studentID : 'N/A'}</p>
+            <p>StudentName: ${sessionScope.loggedInUser.studentName != null ? sessionScope.loggedInUser.studentName : 'N/A'}</p>
             <a href="LogoutServlet">Logout</a>
         </c:when>
         <c:otherwise>

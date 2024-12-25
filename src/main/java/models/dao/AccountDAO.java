@@ -14,7 +14,8 @@ public class AccountDAO {
 	private static final Logger logger = Logger.getLogger(AccountDAO.class.getName());
 
 	private static final String SQL_CHECK_ACCOUNT =
-		"SELECT a.accountID, a.username, a.password, a.email, a.avatar, r.roleID, r.role, t.teacherID, s.studentID "
+		"SELECT a.accountID, a.username, a.password, a.email, a.avatar, r.roleID, r.role, t.teacherID, s.studentID,"
+		+ "CONCAT(t.FirstName, ' ' , t.LastName) AS TeacherName, CONCAT(s.FirstName, ' ' , s.LastName) AS StudentName "
 		+ "FROM Accounts a "
 		+ "JOIN Roles r ON a.roleID = r.roleID "
 		+ "LEFT JOIN Teachers t ON a.accountID = t.accountID "
@@ -54,6 +55,8 @@ public class AccountDAO {
         String studentID = rs.getString("studentID");
         account.setTeacherID(teacherID != null ? teacherID : null);
         account.setStudentID(studentID != null ? studentID : null);
+        account.setStudentName(rs.getString("studentName"));
+        account.setTeacherName(rs.getString("teacherName"));
 
         return account;
     }

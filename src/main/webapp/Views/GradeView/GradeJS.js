@@ -8,16 +8,6 @@ $(document).on('click', '.edit-grade', function () {
     const studentName = $(this).data('student-name');
     const classID = $(this).data('class-id');
 
-	console.log('Grade Data:', {
-	        gradeID: $(this).data('id'),
-	        attendance: $(this).data('attendance'),
-	        midterm: $(this).data('midterm'),
-	        final: $(this).data('final'),
-	        studentCode: $(this).data('student-code'),
-	        studentName: $(this).data('student-name'),
-	        classID: $(this).data('class-id'),
-	    });
-
     // Gán dữ liệu vào modal
     $('#editGradeID').val(gradeID);
     $('#editAttendanceScore').val(attendance);

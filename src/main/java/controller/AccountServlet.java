@@ -14,7 +14,6 @@ import common.AlertManager;
 import common.ImageUtils;
 import common.SessionUtils;
 import input.AccountInput;
-import common.RoleUtils;
 import java.io.IOException;
 import java.util.List;
 import valid.AccountValidator;
@@ -39,12 +38,8 @@ public class AccountServlet extends HttpServlet {
 			return;
 		}
 
-		boolean isAdmin = RoleUtils.isAdmin(session);
-		request.setAttribute("isAdmin", isAdmin);
-
-
 		String searchAccount = request.getParameter("search");
-		 List<Account> accounts = (searchAccount != null && !searchAccount.trim().isEmpty())
+		List<Account> accounts = (searchAccount != null && !searchAccount.trim().isEmpty())
 		            ? AccountDAO.searchAccountByUsername(searchAccount)
 		            : AccountDAO.getAllAccounts();
 		Account loggedInUser = SessionUtils.getLoggedInAccount(session);

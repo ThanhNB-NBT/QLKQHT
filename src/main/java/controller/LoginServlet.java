@@ -31,7 +31,7 @@ public class LoginServlet extends HttpServlet {
 
         if (identifier == null || password == null || identifier.trim().isEmpty() || password.trim().isEmpty()) {
             AlertManager.addMessage(request, "Vui lòng nhập đầy đủ thông tin đăng nhập!", false);
-            request.getRequestDispatcher("login.jsp").forward(request, response);
+            request.getRequestDispatcher("/login.jsp").forward(request, response);
             return;
         }
         Account account = new Account(identifier, password);
@@ -56,6 +56,10 @@ public class LoginServlet extends HttpServlet {
                 request.getRequestDispatcher("login.jsp").forward(request, response);
                 return;
             }
+
+            session.setAttribute("isAdmin", RoleUtils.isAdmin(session));
+            session.setAttribute("isTeacher", RoleUtils.isTeacher(session));
+            session.setAttribute("isStudent", RoleUtils.isStudent(session));
 
             AlertManager.addMessage(request, roleMessage, true);
             response.sendRedirect(request.getContextPath() + "/index.jsp");

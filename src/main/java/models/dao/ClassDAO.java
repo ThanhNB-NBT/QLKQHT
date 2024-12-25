@@ -33,10 +33,10 @@ public class ClassDAO {
 
 	private static final String SQL_SEARCH = "SELECT c.ClassID, c.CourseID, co.CourseName, c.TeacherID, t.FirstName, t.LastName"
 			+ "c.ClassTime, c.Room, c.Semester, c.ClassName, c.Status,"
-			+ "c.MaxStudents, c.TotalLessons, c.StartDate, c.EndDate," + "c.ClassType, c.ParentClassID"
+			+ "c.MaxStudents, c.TotalLessions, c.StartDate, c.EndDate, c.ClassType, c.ParentClassID"
 			+ "FROM Classes c" + "JOIN Courses co ON c.CourseID = co.CourseID"
 			+ "JOIN Teachers t ON c.TeacherID = t.TeacherID"
-			+ "WHERE co.CourseName LIKE ? OR CONCAT(t.FirstName, ' ', t.LastName) LIKE ?";
+			+ "WHERE c.ClassName LIKE ? OR CONCAT(t.FirstName, ' ', t.LastName) LIKE ?";
 
 	private static final String SQL_COUNT_CLASS = "SELECT COUNT(*) FROM Classes WHERE CourseID = ? AND ClassType = ?";
 
@@ -146,11 +146,11 @@ public class ClassDAO {
 		return classes;
 	}
 
-	public static List<Class> searchByClassName(String courseName, String teacherName) {
+	public static List<Class> searchByClassName(String className, String teacherName) {
 		List<Class> classes = new ArrayList<>();
 		try (Connection conn = ConnectDatabase.checkConnect();
 				PreparedStatement pstmt = conn.prepareStatement(SQL_SEARCH)) {
-			pstmt.setString(1, "%" + courseName + "%");
+			pstmt.setString(1, "%" + className + "%");
 			pstmt.setString(2, "%" + teacherName + "%");
 			try (ResultSet rs = pstmt.executeQuery()) {
 				while (rs.next()) {

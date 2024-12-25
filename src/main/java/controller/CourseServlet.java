@@ -12,7 +12,6 @@ import models.dao.CourseDAO;
 import models.dao.DepartmentDAO;
 import valid.CourseValidator;
 import common.AlertManager;
-import common.RoleUtils;
 
 import java.io.IOException;
 import java.util.List;
@@ -38,9 +37,6 @@ public class CourseServlet extends HttpServlet {
             response.sendRedirect("login.jsp");
             return;
         }
-
-        boolean isAdmin = RoleUtils.isAdmin(session);
-        request.setAttribute("isAdmin", isAdmin);
 
         String searchCourse = request.getParameter("search");
         List<Course> courses = (searchCourse != null && !searchCourse.trim().isEmpty())

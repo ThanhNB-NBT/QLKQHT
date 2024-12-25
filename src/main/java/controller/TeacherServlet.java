@@ -17,7 +17,6 @@ import models.dao.AccountDAO;
 import common.AlertManager;
 import common.ImageUtils;
 import common.SessionUtils;
-import common.RoleUtils;
 import input.TeacherInput;
 
 import java.io.IOException;
@@ -45,9 +44,6 @@ public class TeacherServlet extends HttpServlet {
             response.sendRedirect("login.jsp");
             return;
         }
-
-        boolean isAdmin = RoleUtils.isAdmin(session);
-        request.setAttribute("isAdmin", isAdmin);
 
         String searchName = request.getParameter("searchName");
         String searchEmail = request.getParameter("searchEmail");

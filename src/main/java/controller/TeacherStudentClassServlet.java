@@ -1,5 +1,10 @@
 package controller;
 
+import java.io.IOException;
+import java.util.List;
+
+import common.AlertManager;
+import input.StudentClassInput;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -7,44 +12,37 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import models.bean.StudentClass;
+import models.bean.Account;
 import models.dao.StudentClassDAO;
-import models.dao.ClassDAO;
 import models.dao.StudentDAO;
+import models.dao.TeacherClassDAO;
+import models.dao.TeacherStudentClassDAO;
 import valid.StudentClassValidator;
-import common.AlertManager;
-import common.SessionUtils;
-import input.StudentClassInput;
 
-import java.io.IOException;
-import java.util.List;
-
-@WebServlet("/StudentClassServlet")
-public class StudentClassServlet extends HttpServlet {
+@WebServlet("/TeacherStudentClassServlet")
+public class TeacherStudentClassServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
-    private static final String STUDENTCLASS_SERVLET = "StudentClassServlet";
-
-    public StudentClassServlet() {
-        super();
-    }
+    private static final String TEACHER_STUDENTCLASS_SERVLET = "TeacherStudentClassServlet";
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        HttpSession session = request.getSession(false);
-        if (!SessionUtils.isLoggedIn(session)) {
-            response.sendRedirect("login.jsp");
-            return;
-        }
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        Account loggedInUser = (Account) session.getAttribute("loggedInUser");
 
-        String searchStudentClass = request.getParameter("search");
-        List<StudentClass> studentClasses = (searchStudentClass != null && !searchStudentClass.trim().isEmpty())
-            ? StudentClassDAO.searchByStudentOrClass(searchStudentClass)
-            : StudentClassDAO.getAllStudentClasses();
+        // Lấy teacherID từ thông tin người dùng đăng nhập
+        String teacherID = loggedInUser.getTeacherID();
+        String studentName = request.getParameter("studentName");
 
-        request.setAttribute("studentClasses", studentClasses);
-        request.setAttribute("classes", ClassDAO.getAllClasses());
+        // Lấy danh sách sinh viên theo teacherID hoặc tìm kiếm theo tên sinh viên
+        List<StudentClass> studentClasses = (studentName != null && !studentName.trim().isEmpty())
+                ? TeacherStudentClassDAO.searchStudentsByTeacherId(studentName, teacherID)
+                : TeacherStudentClassDAO.getStudentsByTeacherId(teacherID);
+
+        request.setAttribute("classList", TeacherClassDAO.getClassesByTeacher(teacherID));
         request.setAttribute("students", StudentDAO.getAllStudents());
-
-        request.getRequestDispatcher("/Views/StudentClassView/studentClassViews.jsp").forward(request, response);
+        request.setAttribute("studentClasses", studentClasses);
+        request.getRequestDispatcher("/Views/TeacherStudentClassView/teacherStudentClassViews.jsp").forward(request, response);
     }
 
     @Override
@@ -71,7 +69,7 @@ public class StudentClassServlet extends HttpServlet {
         StudentClassInput input = StudentClassInput.inputCreate(request);
 
         if (StudentClassValidator.validateInput(input, request, false)) {
-            response.sendRedirect(STUDENTCLASS_SERVLET);
+            response.sendRedirect(TEACHER_STUDENTCLASS_SERVLET);
             return;
         }
 
@@ -79,7 +77,7 @@ public class StudentClassServlet extends HttpServlet {
         boolean success = StudentClassDAO.createStudentClass(studentClass);
 
         AlertManager.addMessage(request, success ? "Thêm sinh viên vào lớp thành công!" : "Có lỗi khi thêm sinh viên vào lớp", success);
-        response.sendRedirect(STUDENTCLASS_SERVLET);
+        response.sendRedirect(TEACHER_STUDENTCLASS_SERVLET);
     }
 
     private void deleteStudentClass(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -102,7 +100,7 @@ public class StudentClassServlet extends HttpServlet {
         boolean success = StudentClassDAO.deleteStudentClass(studentClassID, classID);
 
         AlertManager.addMessage(request, success ? "Xóa sinh viên khỏi lớp thành công!" : "Có lỗi khi xóa sinh viên khỏi lớp", success);
-        response.sendRedirect(STUDENTCLASS_SERVLET);
+        response.sendRedirect(TEACHER_STUDENTCLASS_SERVLET);
     }
 
 
@@ -110,7 +108,7 @@ public class StudentClassServlet extends HttpServlet {
     	StudentClassInput input = StudentClassInput.inputUpdate(request);
 
         if (StudentClassValidator.validateInput(input, request, true)) {
-            response.sendRedirect(STUDENTCLASS_SERVLET);
+            response.sendRedirect(TEACHER_STUDENTCLASS_SERVLET);
             return;
         }
 
@@ -118,6 +116,6 @@ public class StudentClassServlet extends HttpServlet {
 
         boolean success = StudentClassDAO.updateStudentClass(updatedStudentClass);
         AlertManager.addMessage(request, success ? "Cập nhật thông tin sinh viên trong lớp thành công!" : "Có lỗi khi cập nhật thông tin", success);
-        response.sendRedirect(STUDENTCLASS_SERVLET);
+        response.sendRedirect(TEACHER_STUDENTCLASS_SERVLET);
     }
 }

@@ -16,13 +16,10 @@ import common.SessionUtils;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.logging.Logger;
 
 @WebServlet("/GradeServlet")
 public class GradeServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
-    private static final Logger LOGGER = Logger.getLogger(GradeServlet.class.getName());
-
 
     public GradeServlet() {
         super();
@@ -98,8 +95,7 @@ public class GradeServlet extends HttpServlet {
             success ? "Cập nhật điểm thành công!" : "Có lỗi khi cập nhật điểm",
             success
         );
-        System.out.println("classID: " + classID);
-        // Điều hướng trở lại trang danh sách điểm
+
         response.sendRedirect("GradeServlet?classID=" + classID);
     }
 

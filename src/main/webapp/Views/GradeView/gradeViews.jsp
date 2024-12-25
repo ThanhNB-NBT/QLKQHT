@@ -70,7 +70,9 @@ response.setDateHeader("Expires", 0);
 										<th>Điểm cuối kỳ</th>
 										<th>Điểm thành phần</th>
 										<th>Điểm chữ</th>
-										<th class="text-right">Chức năng</th>
+										<c:if test="${isTeacher}">
+											<th class="text-right">Chức năng</th>
+										</c:if>
 									</tr>
 								</thead>
 								<tbody>
@@ -81,12 +83,13 @@ response.setDateHeader("Expires", 0);
 													<td>${number.index + 1}</td>
 													<td>${grade.studentCode}</td>
 													<td>${grade.studentName}</td>
-													<td>${grade.attendanceScore}</td>
-													<td>${grade.midtermScore}</td>
-													<td>${grade.finalExamScore}</td>
-													<td>${grade.componentScore}</td>
-													<td>${grade.gradeLetter}</td>
-													<td class="align-items-center"><a
+													<td class="text-center">${grade.attendanceScore}</td>
+													<td class="text-center">${grade.midtermScore}</td>
+													<td class="text-center">${grade.finalExamScore}</td>
+													<td class="text-center">${grade.componentScore}</td>
+													<td class="text-center">${grade.gradeLetter}</td>
+													<c:if test="${isTeacher}">
+														<td class="align-items-center"><a
 														class="btn btn-primary edit-grade"
 														data-id="${grade.gradeID}"
 														data-student-code="${grade.studentCode}"
@@ -96,7 +99,8 @@ response.setDateHeader("Expires", 0);
 														data-final="${grade.finalExamScore}"
 														data-class-id="${selectedClassID}"> <i
 															class="far fa-edit"></i>
-													</a></td>
+														</a></td>
+													</c:if>
 												</tr>
 											</c:forEach>
 										</c:when>

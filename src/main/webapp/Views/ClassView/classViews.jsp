@@ -47,9 +47,9 @@ response.setDateHeader("Expires", 0);
 						<div class="row filter-row">
 							<div class="col-sm-6 col-md-3">
 								<div class="form-group form-focus">
-									<input type="text" name="courseName"
+									<input type="text" name="className"
 										class="form-control floating"> <label
-										class="focus-label">Tên khóa học</label>
+										class="focus-label">Tên lớp</label>
 								</div>
 							</div>
 							<div class="col-sm-6 col-md-3">
@@ -96,37 +96,35 @@ response.setDateHeader("Expires", 0);
 														<td>${classObj.classTime}</td>
 														<td>${classObj.room}</td>
 														<td>${classObj.status}</td>
-														<c:if test="${isAdmin}">
-															<td class="text-right">
-																<div class="dropdown dropdown-action">
-																	<a href="#" class="action-icon dropdown-toggle"
-																		data-toggle="dropdown" aria-expanded="false"> <i
-																		class="fas fa-ellipsis-v"></i>
+														<td class="text-right">
+															<div class="dropdown dropdown-action">
+																<a class="action-icon dropdown-toggle"
+																	data-toggle="dropdown" aria-expanded="false"> <i
+																	class="fas fa-ellipsis-v"></i>
+																</a>
+																<div class="dropdown-menu dropdown-menu-right">
+																	<a class="dropdown-item edit-class"
+																		data-id="${classObj.classID}"
+																		data-name="${classObj.className}"
+																		data-start-date="${classObj.startDate}"
+																		data-end-date="${classObj.endDate}"
+																		data-type="${classObj.classType}"
+																		data-teacher-id="${classObj.teacherID}"
+																		data-course-id="${classObj.courseID}"
+																		data-status="${classObj.status}"
+																		data-room="${classObj.room}"
+																		data-time="${classObj.classTime}"
+																		data-semester="${classObj.semester}"
+																		data-max-students="${classObj.maxStudents}"
+																		data-total-lessions="${classObj.totalLessions}"><i
+																		class="fas fa-pencil-alt m-r-5"></i> Sửa
+																	</a> <a class="dropdown-item delete-class"
+																		data-id="${classObj.classID}"> <i
+																		class="fas fa-trash-alt m-r-5"></i> Xóa
 																	</a>
-																	<div class="dropdown-menu dropdown-menu-right">
-																		<a class="dropdown-item edit-class"
-																			data-id="${classObj.classID}"
-																			data-name="${classObj.className}"
-																			data-start-date="${classObj.startDate}"
-																			data-end-date="${classObj.endDate}"
-																			data-type="${classObj.classType}"
-																			data-teacher-id="${classObj.teacherID}"
-																			data-course-id="${classObj.courseID}"
-																			data-status="${classObj.status}"
-																			data-room="${classObj.room}"
-																			data-time="${classObj.classTime}"
-																			data-semester="${classObj.semester}"
-																			data-max-students="${classObj.maxStudents}"
-																			data-total-lessions="${classObj.totalLessions}"><i
-																			class="fas fa-pencil-alt m-r-5"></i> Sửa
-																		</a> <a class="dropdown-item delete-class"
-																			data-id="${classObj.classID}"> <i
-																			class="fas fa-trash-alt m-r-5"></i> Xóa
-																		</a>
-																	</div>
 																</div>
-															</td>
-														</c:if>
+															</div>
+														</td>
 													</tr>
 												</c:forEach>
 											</c:when>

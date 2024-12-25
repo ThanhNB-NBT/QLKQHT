@@ -12,7 +12,6 @@ import java.util.List;
 import common.AlertManager;
 import common.SessionUtils;
 import input.DepartmentInput;
-import common.RoleUtils;
 import models.bean.Account;
 import models.bean.Department;
 import models.dao.DepartmentDAO;
@@ -36,9 +35,6 @@ public class DepartmentServlet extends HttpServlet {
 			response.sendRedirect("login.jsp");
 			return;
 		}
-
-		boolean isAdmin = RoleUtils.isAdmin(session);
-		request.setAttribute("isAdmin", isAdmin);
 
 		String searchDepartment = request.getParameter("search");
 		List<Department> departments = (searchDepartment != null && !searchDepartment.trim().isEmpty())

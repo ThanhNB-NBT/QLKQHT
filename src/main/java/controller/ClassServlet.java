@@ -1,7 +1,6 @@
 package controller;
 
 import common.AlertManager;
-import common.RoleUtils;
 import common.SessionUtils;
 import input.ClassInput;
 import jakarta.servlet.ServletException;
@@ -40,18 +39,17 @@ public class ClassServlet extends HttpServlet {
 		}
 
 		HttpSession session = request.getSession();
-		request.setAttribute("isAdmin", RoleUtils.isAdmin(session));
 
 		try {
 
-			String courseName = request.getParameter("courseName");
+			String className = request.getParameter("className");
 			String teacherName = request.getParameter("teacherName");
 
-			boolean noCriteria = (courseName == null || courseName.trim().isEmpty())
+			boolean noCriteria = (className == null || className.trim().isEmpty())
 					&& (teacherName == null || teacherName.trim().isEmpty());
 
 			List<Class> classes = noCriteria ? ClassDAO.getAllClasses()
-					: ClassDAO.searchByClassName(courseName, teacherName);
+					: ClassDAO.searchByClassName(className, teacherName);
 
 			if (!noCriteria && classes.isEmpty()) {
 				AlertManager.addMessage(request, "Không tìm thấy lớp học nào phù hợp với tiêu chí tìm kiếm.", false);
