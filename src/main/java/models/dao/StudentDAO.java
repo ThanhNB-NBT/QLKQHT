@@ -274,4 +274,20 @@ public class StudentDAO {
             pstmt.setInt(12, student.getStudentID());
         }
     }
+
+    public static Integer getStudentIDByCode(String studentCode) {
+        String sql = "SELECT StudentID FROM Students WHERE StudentCode = ?";
+        try (Connection conn = ConnectDatabase.checkConnect();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, studentCode);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("StudentID");
+            }
+        } catch (SQLException e) {
+            logger.severe("Lỗi khi lấy sinh viên theo MSV: " + e.getMessage());
+        }
+        return null;
+    }
+
 }

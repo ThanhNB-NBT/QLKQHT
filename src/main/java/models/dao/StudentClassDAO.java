@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 public class StudentClassDAO {
     private static final Logger logger = Logger.getLogger(StudentClassDAO.class.getName());
 
+    // Lấy danh sách tất cả StudentClass
     private static final String SQL_GET_ALL_STUDENTCLASS = "SELECT sc.StudentClassID, sc.ClassID, sc.StudentID, sc.Status, "
             + "c.ClassName, s.StudentCode, CONCAT(s.FirstName, ' ', s.LastName) AS StudentName "
             + "FROM StudentClasses sc "
@@ -18,33 +19,6 @@ public class StudentClassDAO {
             + "JOIN Students s ON sc.StudentID = s.StudentID "
             + "GROUP BY sc.StudentClassID, sc.ClassID, sc.StudentID, sc.Status, c.ClassName, s.StudentCode, s.FirstName, s.LastName "
             + "ORDER BY sc.ClassID";
-
-    private static final String SQL_GET_BY_ID = "SELECT sc.StudentClassID, sc.ClassID, sc.StudentID, sc.Status, "
-            + "c.ClassName, s.StudentCode, CONCAT(s.FirstName, ' ', s.LastName) AS StudentName "
-            + "FROM StudentClasses sc "
-            + "JOIN Classes c ON sc.ClassID = c.ClassID "
-            + "JOIN Students s ON sc.StudentID = s.StudentID "
-            + "WHERE sc.StudentClassID = ? "
-            + "ORDER BY sc.ClassID";
-
-    private static final String SQL_SEARCH = "SELECT sc.StudentClassID, sc.ClassID, sc.StudentID, sc.Status, "
-            + "c.ClassName, s.StudentCode, CONCAT(s.FirstName, ' ', s.LastName) AS StudentName "
-            + "FROM StudentClasses sc "
-            + "JOIN Classes c ON sc.ClassID = c.ClassID "
-            + "JOIN Students s ON sc.StudentID = s.StudentID "
-            + "WHERE c.ClassName LIKE ? OR CONCAT(s.FirstName, ' ', s.LastName) LIKE ? "
-            + "ORDER BY sc.ClassID";
-
-    private static final String SQL_CREATE_STUDENTCLASS = "INSERT INTO StudentClasses (ClassID, StudentID, Status) VALUES (?, ?, ?)";
-    private static final String SQL_UPDATE_STUDENTCLASS = "UPDATE StudentClasses SET Status = ? WHERE StudentClassID = ?";
-    private static final String SQL_DELETE_STUDENTCLASS = "DELETE FROM StudentClasses WHERE StudentClassID = ?";
-    private static final String SQL_CREATE_GRADE = "INSERT INTO Grades (StudentClassID, MidtermScore, AttendanceScore, FinalExamScore) VALUES (?, 0, 0, 0)";
-    private static final String SQL_DELETE_GRADE = "DELETE FROM Grades WHERE StudentClassID = ?";
-    private static final String SQL_CHECK_STUDENT = "SELECT COUNT(*) AS count FROM StudentClasses WHERE ClassID = ? AND StudentID = ?";
-    private static final String SQL_GET_CLASSID_BY_STUDENTCLASSID = "SELECT ClassID FROM StudentClasses WHERE StudentClassID = ?";
-    private static final String SQL_UPDATE_REGISTERED_STUDENTS = "UPDATE Classes SET RegisteredStudents = RegisteredStudents + ? WHERE ClassID = ?";
-
-    // Lấy danh sách tất cả StudentClass
     public static List<StudentClass> getAllStudentClasses() {
         List<StudentClass> studentClasses = new ArrayList<>();
         try (Connection conn = ConnectDatabase.checkConnect();
@@ -61,6 +35,13 @@ public class StudentClassDAO {
     }
 
     // Lấy thông tin StudentClass theo ID
+    private static final String SQL_GET_BY_ID = "SELECT sc.StudentClassID, sc.ClassID, sc.StudentID, sc.Status, "
+            + "c.ClassName, s.StudentCode, CONCAT(s.FirstName, ' ', s.LastName) AS StudentName "
+            + "FROM StudentClasses sc "
+            + "JOIN Classes c ON sc.ClassID = c.ClassID "
+            + "JOIN Students s ON sc.StudentID = s.StudentID "
+            + "WHERE sc.StudentClassID = ? "
+            + "ORDER BY sc.ClassID";
     public static StudentClass getStudentClassById(int studentClassID) {
         try (Connection conn = ConnectDatabase.checkConnect();
              PreparedStatement pstmt = conn.prepareStatement(SQL_GET_BY_ID)) {
@@ -103,6 +84,7 @@ public class StudentClassDAO {
     }
 
     // Cập nhật StudentClass
+    private static final String SQL_UPDATE_STUDENTCLASS = "UPDATE StudentClasses SET Status = ? WHERE StudentClassID = ?";
     public static boolean updateStudentClass(StudentClass studentClass) {
         try (Connection conn = ConnectDatabase.checkConnect();
              PreparedStatement pstmt = conn.prepareStatement(SQL_UPDATE_STUDENTCLASS)) {
@@ -142,6 +124,13 @@ public class StudentClassDAO {
     }
 
     // Tìm kiếm StudentClass
+    private static final String SQL_SEARCH = "SELECT sc.StudentClassID, sc.ClassID, sc.StudentID, sc.Status, "
+            + "c.ClassName, s.StudentCode, CONCAT(s.FirstName, ' ', s.LastName) AS StudentName "
+            + "FROM StudentClasses sc "
+            + "JOIN Classes c ON sc.ClassID = c.ClassID "
+            + "JOIN Students s ON sc.StudentID = s.StudentID "
+            + "WHERE c.ClassName LIKE ? OR CONCAT(s.FirstName, ' ', s.LastName) LIKE ? "
+            + "ORDER BY sc.ClassID";
     public static List<StudentClass> searchByStudentOrClass(String searchValue) {
         List<StudentClass> studentClasses = new ArrayList<>();
         try (Connection conn = ConnectDatabase.checkConnect();
@@ -161,24 +150,32 @@ public class StudentClassDAO {
         return studentClasses;
     }
 
-    // Kiểm tra trùng lớp
-    public static boolean isDuplicate(Integer classID, Integer studentID) {
-        try (Connection conn = ConnectDatabase.checkConnect();
-             PreparedStatement ps = conn.prepareStatement(SQL_CHECK_STUDENT)) {
+    // Kiểm tra trùng lớp và khóa học
+    private static final String SQL_CHECK_DUPLICATE =
+            "SELECT COUNT(*) AS count " +
+            "FROM StudentClasses sc " +
+            "JOIN Classes c ON sc.ClassID = c.ClassID " +
+            "WHERE sc.StudentID = ? AND (c.ClassID = ? OR c.CourseID = ?)";
 
-            ps.setInt(1, classID);
-            ps.setInt(2, studentID);
+    public static boolean isDuplicate(Integer classID, Integer studentID, Integer courseID) {
+        try (Connection conn = ConnectDatabase.checkConnect();
+             PreparedStatement ps = conn.prepareStatement(SQL_CHECK_DUPLICATE)) {
+
+            ps.setInt(1, studentID);
+            ps.setInt(2, classID);
+            ps.setInt(3, courseID);
 
             try (ResultSet rs = ps.executeQuery()) {
                 return rs.next() && rs.getInt("count") > 0;
             }
         } catch (SQLException e) {
-            logger.severe("Lỗi kiểm tra sinh viên tồn tại: " + e.getMessage());
+            logger.severe("Lỗi kiểm tra trùng lặp: " + e.getMessage());
             return false;
         }
     }
 
     // Lấy ClassID theo StudentClassID
+    private static final String SQL_GET_CLASSID_BY_STUDENTCLASSID = "SELECT ClassID FROM StudentClasses WHERE StudentClassID = ?";
     public static Integer getClassIDByStudentClassID(int studentClassID) {
         try (Connection conn = ConnectDatabase.checkConnect();
              PreparedStatement ps = conn.prepareStatement(SQL_GET_CLASSID_BY_STUDENTCLASSID)) {
@@ -196,6 +193,9 @@ public class StudentClassDAO {
     }
 
     // Các phương thức helper private
+
+    //Thêm mới
+    private static final String SQL_CREATE_STUDENTCLASS = "INSERT INTO StudentClasses (ClassID, StudentID, Status) VALUES (?, ?, ?)";
     private static int insertStudentClass(Connection conn, StudentClass studentClass) throws SQLException {
         try (PreparedStatement pstmt = conn.prepareStatement(SQL_CREATE_STUDENTCLASS, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setInt(1, studentClass.getClassID());
@@ -213,6 +213,8 @@ public class StudentClassDAO {
         return -1;
     }
 
+    //Thêm vào bảng Grade
+    private static final String SQL_CREATE_GRADE = "INSERT INTO Grades (StudentClassID, MidtermScore, AttendanceScore, FinalExamScore) VALUES (?, 0, 0, 0)";
     private static boolean createGradeRecord(Connection conn, int studentClassID) throws SQLException {
         try (PreparedStatement pstmt = conn.prepareStatement(SQL_CREATE_GRADE)) {
             pstmt.setInt(1, studentClassID);
@@ -220,6 +222,8 @@ public class StudentClassDAO {
         }
     }
 
+    //Xoá ở bảng Grade
+    private static final String SQL_DELETE_GRADE = "DELETE FROM Grades WHERE StudentClassID = ?";
     private static boolean deleteGradeRecord(Connection conn, int studentClassID) throws SQLException {
         try (PreparedStatement pstmt = conn.prepareStatement(SQL_DELETE_GRADE)) {
             pstmt.setInt(1, studentClassID);
@@ -227,6 +231,8 @@ public class StudentClassDAO {
         }
     }
 
+    //Xoá
+    private static final String SQL_DELETE_STUDENTCLASS = "DELETE FROM StudentClasses WHERE StudentClassID = ?";
     private static boolean deleteStudentClassRecord(Connection conn, int studentClassID) throws SQLException {
         try (PreparedStatement pstmt = conn.prepareStatement(SQL_DELETE_STUDENTCLASS)) {
             pstmt.setInt(1, studentClassID);
@@ -234,6 +240,8 @@ public class StudentClassDAO {
         }
     }
 
+    //Thêm số lượng sinh viên đăng kí trong lớp ở bảng Class
+    private static final String SQL_UPDATE_REGISTERED_STUDENTS = "UPDATE Classes SET RegisteredStudents = RegisteredStudents + ? WHERE ClassID = ?";
     private static boolean updateRegisteredStudents(Connection conn, int classID, int change) throws SQLException {
         try (PreparedStatement pstmt = conn.prepareStatement(SQL_UPDATE_REGISTERED_STUDENTS)) {
             pstmt.setInt(1, change); // +1 cho thêm mới, -1 cho xóa
@@ -242,6 +250,7 @@ public class StudentClassDAO {
         }
     }
 
+    //kiểm tra lỗi và quay lại sự kiện
     private static void handleTransactionError(Connection conn, SQLException e, String errorMessage) {
         logger.severe(errorMessage + ": " + e.getMessage());
         try {
@@ -253,6 +262,7 @@ public class StudentClassDAO {
         }
     }
 
+    //đóng kết nối phi
     private static void closeConnection(Connection conn) {
         try {
             if (conn != null) {
@@ -275,4 +285,21 @@ public class StudentClassDAO {
         sc.setStudentName(rs.getString("StudentName"));
         return sc;
     }
+
+    public static String getStudentClassID(int studentID, int classID) {
+        String sql = "SELECT StudentClassID FROM StudentClasses WHERE StudentID = ? AND ClassID = ?";
+        try (Connection conn = ConnectDatabase.checkConnect();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, studentID);
+            stmt.setInt(2, classID);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getString("StudentClassID");
+            }
+        } catch (SQLException e) {
+            logger.severe("Lỗi khi lấy StudentClassID: " + e.getMessage());
+        }
+        return null;
+    }
+
 }

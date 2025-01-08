@@ -14,33 +14,10 @@ import common.ConnectDatabase;
 public class ClassDAO {
 	private static final Logger logger = Logger.getLogger(ClassDAO.class.getName());
 
+	// Thêm lớp học mới
 	private static final String SQL_CREATE_CLASS = "INSERT INTO Classes (CourseID, TeacherID, ClassTime, Room, Semester, ClassName, Status, "
 			+ "MaxStudents, TotalLessions, StartDate, EndDate, ClassType, ParentClassID, RegisteredStudents) "
 			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)";
-
-	private static final String SQL_UPDATE_CLASS = "UPDATE Classes SET TeacherID = ?, ClassTime = ?, Room = ?,  "
-			+ "Status = ?, MaxStudents = ?, TotalLessions = ? WHERE ClassID = ?";
-
-	private static final String SQL_DELETE_CLASS = "DELETE FROM Classes WHERE ClassID = ?";
-
-	private static final String SQL_GETCLASS_BYCLASSID = "SELECT c.*, cr.CourseName, cr.CourseID, t.TeacherID, t.FirstName, t.LastName "
-			+ "FROM Classes c " + "LEFT JOIN Courses cr ON c.CourseID = cr.CourseID "
-			+ "LEFT JOIN Teachers t ON c.TeacherID = t.TeacherID WHERE ClassID = ?";
-
-	private static final String SQL_GET_ALL_CLASS = "SELECT c.*, cr.CourseName, cr.CourseID, t.TeacherID, t.FirstName, t.LastName "
-			+ "FROM Classes c " + "LEFT JOIN Courses cr ON c.CourseID = cr.CourseID "
-			+ "LEFT JOIN Teachers t ON c.TeacherID = t.TeacherID";
-
-	private static final String SQL_SEARCH = "SELECT c.ClassID, c.CourseID, co.CourseName, c.TeacherID, t.FirstName, t.LastName"
-			+ "c.ClassTime, c.Room, c.Semester, c.ClassName, c.Status,"
-			+ "c.MaxStudents, c.TotalLessions, c.StartDate, c.EndDate, c.ClassType, c.ParentClassID"
-			+ "FROM Classes c" + "JOIN Courses co ON c.CourseID = co.CourseID"
-			+ "JOIN Teachers t ON c.TeacherID = t.TeacherID"
-			+ "WHERE c.ClassName LIKE ? OR CONCAT(t.FirstName, ' ', t.LastName) LIKE ?";
-
-	private static final String SQL_COUNT_CLASS = "SELECT COUNT(*) FROM Classes WHERE CourseID = ? AND ClassType = ?";
-
-	// Thêm lớp học mới
 	public static boolean createClass(Class cls) {
 		try (Connection conn = ConnectDatabase.checkConnect();
 				PreparedStatement pstmt = conn.prepareStatement(SQL_CREATE_CLASS)) {
@@ -63,6 +40,8 @@ public class ClassDAO {
 	}
 
 	// Cập nhật lớp học
+	private static final String SQL_UPDATE_CLASS = "UPDATE Classes SET TeacherID = ?, ClassTime = ?, Room = ?,  "
+			+ "Status = ?, MaxStudents = ?, TotalLessions = ? WHERE ClassID = ?";
 	public static boolean updateClass(Class cls) {
 		try (Connection conn = ConnectDatabase.checkConnect();
 				PreparedStatement pstmt = conn.prepareStatement(SQL_UPDATE_CLASS)) {
@@ -82,16 +61,17 @@ public class ClassDAO {
 		return false;
 	}
 
+	// Kiểm tra trùng lớp học
+	private static final String SQL_CHECK_DUPLICATE = "SELECT COUNT(*) FROM Classes " + "WHERE ClassName = ? AND Semester = ?";
 	public static boolean isDuplicateClassCode(String className, String semester) {
-		String query = "SELECT COUNT(*) FROM Classes " + "WHERE ClassName = ? AND Semester = ?";
-		try (Connection conn = ConnectDatabase.checkConnect(); PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+		try (Connection conn = ConnectDatabase.checkConnect(); PreparedStatement pstmt = conn.prepareStatement(SQL_CHECK_DUPLICATE)) {
 			pstmt.setString(1, className);
 			pstmt.setString(2, semester);
 
 			try (ResultSet rs = pstmt.executeQuery()) {
 				if (rs.next()) {
 					int count = rs.getInt(1);
-					logger.info("Số lượng lớp trùng: " + count);
 					return count > 0;
 				}
 			}
@@ -102,6 +82,7 @@ public class ClassDAO {
 	}
 
 	// Xóa lớp học
+	private static final String SQL_DELETE_CLASS = "DELETE FROM Classes WHERE ClassID = ?";
 	public static boolean deleteClass(int classID) {
 
 		try (Connection conn = ConnectDatabase.checkConnect();
@@ -115,6 +96,9 @@ public class ClassDAO {
 	}
 
 	// Lấy lớp học theo ID
+	private static final String SQL_GETCLASS_BYCLASSID = "SELECT c.*, cr.CourseName, cr.CourseID, t.TeacherID, t.FirstName, t.LastName "
+			+ "FROM Classes c " + "LEFT JOIN Courses cr ON c.CourseID = cr.CourseID "
+			+ "LEFT JOIN Teachers t ON c.TeacherID = t.TeacherID WHERE ClassID = ?";
 	public static Class getClassById(int classID) {
 
 		try (Connection conn = ConnectDatabase.checkConnect();
@@ -132,6 +116,9 @@ public class ClassDAO {
 	}
 
 	// Lấy tất cả lớp học (kèm thông tin khóa học và giáo viên)
+	private static final String SQL_GET_ALL_CLASS = "SELECT c.*, cr.CourseName, cr.CourseID, t.TeacherID, t.FirstName, t.LastName "
+			+ "FROM Classes c " + "LEFT JOIN Courses cr ON c.CourseID = cr.CourseID "
+			+ "LEFT JOIN Teachers t ON c.TeacherID = t.TeacherID";
 	public static List<Class> getAllClasses() {
 		List<Class> classes = new ArrayList<>();
 		try (Connection conn = ConnectDatabase.checkConnect();
@@ -146,6 +133,12 @@ public class ClassDAO {
 		return classes;
 	}
 
+	private static final String SQL_SEARCH = "SELECT c.ClassID, c.CourseID, co.CourseName, c.TeacherID, t.FirstName, t.LastName"
+			+ "c.ClassTime, c.Room, c.Semester, c.ClassName, c.Status,"
+			+ "c.MaxStudents, c.TotalLessions, c.StartDate, c.EndDate, c.ClassType, c.ParentClassID"
+			+ "FROM Classes c" + "JOIN Courses co ON c.CourseID = co.CourseID"
+			+ "JOIN Teachers t ON c.TeacherID = t.TeacherID"
+			+ "WHERE c.ClassName LIKE ? OR CONCAT(t.FirstName, ' ', t.LastName) LIKE ?";
 	public static List<Class> searchByClassName(String className, String teacherName) {
 		List<Class> classes = new ArrayList<>();
 		try (Connection conn = ConnectDatabase.checkConnect();
@@ -163,6 +156,8 @@ public class ClassDAO {
 		return classes;
 	}
 
+	//Đếm số lượng lớp theo CourseID
+	private static final String SQL_COUNT_CLASS = "SELECT COUNT(*) FROM Classes WHERE CourseID = ? AND ClassType = ?";
 	public static int countClassesByCourseID(int courseID, String classType) {
 
 		try (Connection conn = ConnectDatabase.checkConnect();
@@ -178,6 +173,25 @@ public class ClassDAO {
 		}
 		return 0;
 	}
+
+	//Lấy CourseID theo ClassID
+	private static final String SQL_GET_COURSE_ID = "SELECT CourseID FROM Classes WHERE ClassID = ?";
+    public static Integer getCourseIDByClassID(Integer classID) {
+        try (Connection conn = ConnectDatabase.checkConnect();
+             PreparedStatement ps = conn.prepareStatement(SQL_GET_COURSE_ID)) {
+
+            ps.setInt(1, classID);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("CourseID");
+                }
+            }
+        } catch (SQLException e) {
+            logger.severe("Lỗi lấy CourseID: " + e.getMessage());
+        }
+        return null;
+    }
 
 	private static Class mapClass(ResultSet rs) throws SQLException {
 

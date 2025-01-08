@@ -3,6 +3,7 @@ package valid;
 import common.AlertManager;
 import input.StudentClassInput;
 import jakarta.servlet.http.HttpServletRequest;
+import models.dao.ClassDAO;
 import models.dao.StudentClassDAO;
 
 public class StudentClassValidator {
@@ -27,8 +28,12 @@ public class StudentClassValidator {
                 hasErrors = true;
             }
 
-            if (StudentClassDAO.isDuplicate(input.getClassID(), input.getStudentID())) {
-                AlertManager.addMessage(request, "Học sinh này đã được thêm vào lớp học trước đó.", false);
+            Integer courseID = ClassDAO.getCourseIDByClassID(input.getClassID());
+            if (courseID == null) {
+                AlertManager.addMessage(request, "Khóa học không hợp lệ.", false);
+                hasErrors = true;
+            } else if (StudentClassDAO.isDuplicate(input.getClassID(), input.getStudentID(), courseID)) {
+                AlertManager.addMessage(request, "Sinh viên này đã được thêm vào lớp học hoặc khóa học trước đó.", false);
                 hasErrors = true;
             }
         }

@@ -86,4 +86,25 @@ public class GradeDAO {
         }
         return false;
     }
+
+ // Thêm phương thức cập nhật danh sách điểm
+    public static boolean updateGrades(List<Grade> grades) {
+        String sql = "UPDATE Grades SET AttendanceScore = ?, MidtermScore = ?, FinalExamScore = ? WHERE GradeID = ?";
+
+        try (Connection conn = ConnectDatabase.checkConnect(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            for (Grade grade : grades) {
+                ps.setDouble(1, grade.getAttendanceScore());
+                ps.setDouble(2, grade.getMidtermScore());
+                ps.setDouble(3, grade.getFinalExamScore());
+                ps.setString(4, grade.getGradeID());
+                ps.addBatch(); // Thêm câu lệnh vào batch
+            }
+            int[] result = ps.executeBatch(); // Thực thi batch cập nhật
+            return result.length == grades.size(); // Kiểm tra nếu tất cả đều thành công
+        } catch (SQLException e) {
+            logger.severe("Lỗi cập nhật danh sách điểm: " + e.getMessage());
+        }
+        return false;
+    }
+
 }

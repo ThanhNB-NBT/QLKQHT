@@ -11,6 +11,7 @@
 <script src="assets/js/dataTables.bootstrap4.min.js"></script>
 <script src="assets/js/select2.min.js"></script>
 <script src="assets/js/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script
 	src="assets/plugins/datetimepicker/js/tempusdominus-bootstrap-4.min.js"></script>
 <script

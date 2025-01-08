@@ -11,11 +11,11 @@ response.setDateHeader("Expires", 0);
 <head>
     <meta charset="UTF-8">
     <title>Quản lý sinh viên - Lớp học</title>
-    <jsp:include page="../../includes/resources.jsp"></jsp:include>
+    <jsp:include page="../../../includes/resources.jsp"></jsp:include>
 </head>
 <body>
     <div class="main-wrapper">
-        <jsp:include page="../../includes/header.jsp"></jsp:include>
+        <jsp:include page="../../../includes/header.jsp"></jsp:include>
         <div class="page-wrapper">
             <div class="content container-fluid">
                 <div class="page-header">
@@ -126,7 +126,7 @@ response.setDateHeader("Expires", 0);
         </div>
     </div>
 
-    <jsp:include page="../../includes/footer.jsp"></jsp:include>
+    <jsp:include page="../../../includes/footer.jsp"></jsp:include>
     <script src="${pageContext.request.contextPath}/Views/TeacherStudentClassView/TeacherStudentClassJS.js?v=<%= System.currentTimeMillis() %>"></script>
 </body>
 </html>

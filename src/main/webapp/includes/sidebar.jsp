@@ -5,7 +5,7 @@
   <div class="sidebar-inner slimscroll">
     <div id="sidebar-menu" class="sidebar-menu">
       <div class="header-left">
-        <a href="index.html" class="logo">
+        <a href="index.jsp" class="logo">
           <img src="assets/img/logo1.png" width="40" height="40" alt="Logo trường">
           <span class="text-uppercase">Đại học Vinh</span>
         </a>

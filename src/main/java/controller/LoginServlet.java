@@ -62,7 +62,7 @@ public class LoginServlet extends HttpServlet {
             session.setAttribute("isStudent", RoleUtils.isStudent(session));
 
             AlertManager.addMessage(request, roleMessage, true);
-            response.sendRedirect(request.getContextPath() + "/index.jsp");
+            response.sendRedirect(request.getContextPath() + "/GradeDashboardServlet");
         } else {
             // Đăng nhập thất bại
             AlertManager.addMessage(request, "Tài khoản hoặc mật khẩu không chính xác!", false);

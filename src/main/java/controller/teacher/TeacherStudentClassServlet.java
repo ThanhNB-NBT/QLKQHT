@@ -1,4 +1,4 @@
-package controller;
+package controller.teacher;
 
 import java.io.IOException;
 import java.util.List;
@@ -42,7 +42,7 @@ public class TeacherStudentClassServlet extends HttpServlet {
         request.setAttribute("classList", TeacherClassDAO.getClassesByTeacher(teacherID));
         request.setAttribute("students", StudentDAO.getAllStudents());
         request.setAttribute("studentClasses", studentClasses);
-        request.getRequestDispatcher("/Views/TeacherStudentClassView/teacherStudentClassViews.jsp").forward(request, response);
+        request.getRequestDispatcher("/Views/Teacher/TeacherStudentClassView/teacherStudentClassViews.jsp").forward(request, response);
     }
 
     @Override

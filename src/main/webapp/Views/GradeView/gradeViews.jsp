@@ -31,9 +31,31 @@ response.setDateHeader("Expires", 0);
 							<ul class="breadcrumb mb-0 p-0 float-right">
 								<li class="breadcrumb-item"><a href="index.jsp"><i
 										class="fas fa-home"></i> Trang chủ</a></li>
-								<li class="breadcrumb-item active"><span>Điểm sinh viên</span></li>
+								<li class="breadcrumb-item active"><span>Điểm sinh
+										viên</span></li>
 							</ul>
 						</div>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-sm-4"></div>
+					<div class="col-sm-4 text-right">
+						<form id="uploadExcelForm" action="GradeServlet" method="POST"
+							enctype="multipart/form-data">
+							<input type="hidden" name="action" value="uploadExcel">
+							<!-- Thêm trường hidden để gửi classID -->
+							<input type="hidden" name="classID" id="hiddenClassID" value="${selectedClassID}">
+							<input type="file" name="excelFile" accept=".xlsx, .xls"
+								id="gradeFileInput" style="display: none;" required>
+							<button type="submit" class="btn btn-primary"
+								onclick="uploadGradeFile()">Nhập điểm từ Excel</button>
+						</form>
+					</div>
+
+					<div class="col-sm-4 text-right">
+						<button class="btn btn-success" id="downloadExcel"
+							onclick="downloadExcelTemplate()">Tải danh sách SV</button>
 					</div>
 				</div>
 
@@ -90,15 +112,15 @@ response.setDateHeader("Expires", 0);
 													<td class="text-center">${grade.gradeLetter}</td>
 													<c:if test="${isTeacher}">
 														<td class="align-items-center"><a
-														class="btn btn-primary edit-grade"
-														data-id="${grade.gradeID}"
-														data-student-code="${grade.studentCode}"
-														data-student-name="${grade.studentName}"
-														data-attendance="${grade.attendanceScore}"
-														data-midterm="${grade.midtermScore}"
-														data-final="${grade.finalExamScore}"
-														data-class-id="${selectedClassID}"> <i
-															class="far fa-edit"></i>
+															class="btn btn-primary edit-grade"
+															data-id="${grade.gradeID}"
+															data-student-code="${grade.studentCode}"
+															data-student-name="${grade.studentName}"
+															data-attendance="${grade.attendanceScore}"
+															data-midterm="${grade.midtermScore}"
+															data-final="${grade.finalExamScore}"
+															data-class-id="${selectedClassID}"> <i
+																class="far fa-edit"></i>
 														</a></td>
 													</c:if>
 												</tr>
@@ -106,7 +128,11 @@ response.setDateHeader("Expires", 0);
 										</c:when>
 										<c:otherwise>
 											<tr>
-												<td colspan="9" class="text-center">${empty selectedClassID ? 'Vui lòng chọn lớp học' : 'Không có dữ liệu điểm cho lớp này'}</td>
+												<td colspan="9" class="text-center">
+													<div class="alert alert-warning" role="alert">
+														${empty selectedClassID ? 'Vui lòng chọn lớp học' : 'Không có dữ liệu điểm cho lớp này'}
+													</div>
+												</td>
 											</tr>
 										</c:otherwise>
 									</c:choose>
@@ -126,6 +152,7 @@ response.setDateHeader("Expires", 0);
 
 	<script
 		src="${pageContext.request.contextPath}/Views/GradeView/GradeJS.js?v=<%= System.currentTimeMillis() %>">
+
 	</script>
 </body>
 </html>

@@ -3,10 +3,10 @@ package models.bean;
 public class Grade {
     private String gradeID;
     private String studentClassID;
-    private double attendanceScore;
-    private double midtermScore;
-    private double finalExamScore;
-    private double componentScore;
+    private Double attendanceScore;
+    private Double midtermScore;
+    private Double finalExamScore;
+    private Double componentScore;
     private String gradeLetter;
     private String studentCode;
     private String studentName;
@@ -15,7 +15,7 @@ public class Grade {
     }
 
     // Constructor cho việc cập nhật điểm
-    public Grade(String gradeID, double attendanceScore, double midtermScore, double finalExamScore) {
+    public Grade(String gradeID, Double attendanceScore, Double midtermScore, Double finalExamScore) {
         this.gradeID = gradeID;
         this.attendanceScore = attendanceScore;
         this.midtermScore = midtermScore;
@@ -41,34 +41,34 @@ public class Grade {
         this.studentClassID = studentClassID;
     }
 
-    public double getAttendanceScore() {
+    public Double getAttendanceScore() {
         return attendanceScore;
     }
 
-    public void setAttendanceScore(double attendanceScore) {
-        this.attendanceScore = attendanceScore;
+    public void setAttendanceScore(Double attendanceScore) {
+        this.attendanceScore = attendanceScore != null ? attendanceScore : 0.0;
         updateComponentScoreAndGradeLetter();
     }
 
-    public double getMidtermScore() {
+    public Double getMidtermScore() {
         return midtermScore;
     }
 
-    public void setMidtermScore(double midtermScore) {
-        this.midtermScore = midtermScore;
+    public void setMidtermScore(Double midtermScore) {
+        this.midtermScore = midtermScore != null ? midtermScore : 0.0;
         updateComponentScoreAndGradeLetter();
     }
 
-    public double getFinalExamScore() {
+    public Double getFinalExamScore() {
         return finalExamScore;
     }
 
-    public void setFinalExamScore(double finalExamScore) {
-        this.finalExamScore = finalExamScore;
+    public void setFinalExamScore(Double finalExamScore) {
+        this.finalExamScore = finalExamScore != null ? finalExamScore : 0.0;
         updateComponentScoreAndGradeLetter();
     }
 
-    public double getComponentScore() {
+    public Double getComponentScore() {
         return componentScore;
     }
 
@@ -93,9 +93,13 @@ public class Grade {
 	}
 
 	// Phương thức tính toán điểm thành phần
-    private double calculateComponentScore() {
-        return roundToOneDecimal(this.attendanceScore * 0.2 + this.midtermScore * 0.3 + this.finalExamScore * 0.5);
-    }
+	private Double calculateComponentScore() {
+	    double attendance = this.attendanceScore != null ? this.attendanceScore : 0.0;
+	    double midterm = this.midtermScore != null ? this.midtermScore : 0.0;
+	    double finalExam = this.finalExamScore != null ? this.finalExamScore : 0.0;
+	    return roundToOneDecimal(attendance * 0.2 + midterm * 0.3 + finalExam * 0.5);
+	}
+
 
     // Phương thức xác định hạng điểm
     private String calculateGradeLetter() {
@@ -113,7 +117,7 @@ public class Grade {
     }
 
     // Làm tròn giá trị đến 1 chữ số thập phân
-    private double roundToOneDecimal(double value) {
+    private double roundToOneDecimal(Double value) {
         return Math.round(value * 10.0) / 10.0;
     }
 

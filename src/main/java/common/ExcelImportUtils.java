@@ -71,7 +71,7 @@ public class ExcelImportUtils {
 
 	    for (Cell cell : headerRow) {
 	        String columnNameInExcel = cell.getStringCellValue().trim();
-	        String columnNameInDB = ColumnMapping.EXCEL_TO_DB_MAPPING.get(columnNameInExcel);
+	        String columnNameInDB = ColumnMapping.STUDENT_EXCEL_TO_DB_MAPPING.get(columnNameInExcel);
 	        if (columnNameInDB != null) {
 	            columnMapping.put(columnNameInDB, cell.getColumnIndex());
 	        }
