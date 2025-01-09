@@ -16,36 +16,6 @@ import models.bean.Teacher;
 public class TeacherDAO {
     private static final Logger logger = Logger.getLogger(TeacherDAO.class.getName());
 
-    public static final String SQL_SELECT_ALL_TEACHERS =
-        "SELECT t.*, d.DepartmentName, a.Avatar FROM Teachers t " +
-        "LEFT JOIN Departments d ON t.DepartmentID = d.DepartmentID " +
-        "LEFT JOIN Accounts a ON t.AccountID = a.AccountID";
-
-    public static final String SQL_SELECT_TEACHER_BY_ID =
-        "SELECT t.*, d.DepartmentName, a.Avatar FROM Teachers t " +
-        "LEFT JOIN Departments d ON t.DepartmentID = d.DepartmentID " +
-        "LEFT JOIN Accounts a ON t.AccountID = a.AccountID " +
-        "WHERE t.TeacherID = ?";
-
-    public static final String SQL_SEARCH_TEACHERS_BY_NAME_EMAIL =
-        "SELECT t.*, d.DepartmentName, a.Avatar FROM Teachers t " +
-        "LEFT JOIN Departments d ON t.DepartmentID = d.DepartmentID " +
-        "LEFT JOIN Accounts a ON t.AccountID = a.AccountID WHERE 1=1";
-
-    public static final String SQL_INSERT_TEACHER =
-        "INSERT INTO Teachers (FirstName, LastName, Email, Phone, DepartmentID, Office, HireDate, AccountID) " +
-        "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-
-    public static final String SQL_UPDATE_TEACHER =
-        "UPDATE Teachers SET FirstName = ?, LastName = ?, Email = ?, Phone = ?, DepartmentID = ?, " +
-        "Office = ?, HireDate = ? WHERE TeacherID = ?";
-
-    public static final String SQL_DELETE_ACCOUNT =
-        "DELETE FROM Accounts WHERE AccountID = (SELECT AccountID FROM Teachers WHERE TeacherID = ?)";
-
-    public static final String SQL_DELETE_TEACHER =
-        "DELETE FROM Teachers WHERE TeacherID = ?";
-
     private static Teacher mapTeacher(ResultSet rs) throws SQLException {
         Teacher teacher = new Teacher();
         teacher.setTeacherID(rs.getInt("TeacherID"));
@@ -71,6 +41,11 @@ public class TeacherDAO {
         return teacher;
     }
 
+    //Lấy danh sách giảng viên
+    public static final String SQL_SELECT_ALL_TEACHERS =
+            "SELECT t.*, d.DepartmentName, a.Avatar FROM Teachers t " +
+            "LEFT JOIN Departments d ON t.DepartmentID = d.DepartmentID " +
+            "LEFT JOIN Accounts a ON t.AccountID = a.AccountID";
     public static List<Teacher> getAllTeachers() {
         List<Teacher> teachers = new ArrayList<>();
         try (Connection conn = ConnectDatabase.checkConnect();
@@ -85,6 +60,11 @@ public class TeacherDAO {
         return teachers;
     }
 
+    //Tìm kiếm theo tên hoặc email
+    public static final String SQL_SEARCH_TEACHERS_BY_NAME_EMAIL =
+            "SELECT t.*, d.DepartmentName, a.Avatar FROM Teachers t " +
+            "LEFT JOIN Departments d ON t.DepartmentID = d.DepartmentID " +
+            "LEFT JOIN Accounts a ON t.AccountID = a.AccountID WHERE 1=1";
     public static List<Teacher> searchTeachers(String name, String email) {
         List<Teacher> teachers = new ArrayList<>();
         StringBuilder query = new StringBuilder(SQL_SEARCH_TEACHERS_BY_NAME_EMAIL);
@@ -119,6 +99,12 @@ public class TeacherDAO {
         return teachers;
     }
 
+    //Lấy thông tin giảng viên theo ID
+    public static final String SQL_SELECT_TEACHER_BY_ID =
+            "SELECT t.*, d.DepartmentName, a.Avatar FROM Teachers t " +
+            "LEFT JOIN Departments d ON t.DepartmentID = d.DepartmentID " +
+            "LEFT JOIN Accounts a ON t.AccountID = a.AccountID " +
+            "WHERE t.TeacherID = ?";
     public static Teacher getTeacherById(int teacherID) {
         try (Connection conn = ConnectDatabase.checkConnect();
              PreparedStatement stmt = conn.prepareStatement(SQL_SELECT_TEACHER_BY_ID)) {
@@ -134,6 +120,10 @@ public class TeacherDAO {
         return null;
     }
 
+    //Thêm mới
+    public static final String SQL_INSERT_TEACHER =
+            "INSERT INTO Teachers (FirstName, LastName, Email, Phone, DepartmentID, Office, HireDate, AccountID) " +
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
     public static boolean createTeacher(Teacher teacher) {
         try (Connection conn = ConnectDatabase.checkConnect();
              PreparedStatement stmt = conn.prepareStatement(SQL_INSERT_TEACHER)) {
@@ -156,6 +146,10 @@ public class TeacherDAO {
         return false;
     }
 
+    //Cập nhật
+    public static final String SQL_UPDATE_TEACHER =
+            "UPDATE Teachers SET FirstName = ?, LastName = ?, Email = ?, Phone = ?, DepartmentID = ?, " +
+            "Office = ?, HireDate = ? WHERE TeacherID = ?";
     public static boolean updateTeacher(Teacher teacher) {
         try (Connection conn = ConnectDatabase.checkConnect();
              PreparedStatement stmt = conn.prepareStatement(SQL_UPDATE_TEACHER)) {
@@ -178,6 +172,12 @@ public class TeacherDAO {
         }
     }
 
+    //Xoá
+    public static final String SQL_DELETE_ACCOUNT =
+            "DELETE FROM Accounts WHERE AccountID = (SELECT AccountID FROM Teachers WHERE TeacherID = ?)";
+
+        public static final String SQL_DELETE_TEACHER =
+            "DELETE FROM Teachers WHERE TeacherID = ?";
     public static boolean deleteTeacher(int teacherID) {
         try (Connection conn = ConnectDatabase.checkConnect()) {
             // Xóa tài khoản liên kết

@@ -70,7 +70,6 @@ public class GradeDAO {
         return gradeList;
     }
 
-
     // Cập nhật điểm
     public static boolean updateGrade(Grade grade) {
         String sql = "UPDATE Grades SET AttendanceScore = ?, MidtermScore = ?, FinalExamScore = ?" +
@@ -107,4 +106,37 @@ public class GradeDAO {
         return false;
     }
 
+    // Lấy danh sách điểm theo StudentID
+    public static List<Grade> getGradesByStudentID(String studentID) {
+        List<Grade> gradeList = new ArrayList<>();
+        String sql = "SELECT g.GradeID, g.StudentClassID, g.AttendanceScore, g.MidtermScore, g.FinalExamScore, " +
+                     "c.Semester, co.CourseName, co.CourseCode, co.Credits " +
+                     "FROM Grades g " +
+                     "JOIN StudentClasses sc ON g.StudentClassID = sc.StudentClassID " +
+                     "JOIN Classes c ON sc.ClassID = c.ClassID " +
+                     "JOIN Courses co ON c.CourseID = co.CourseID " +
+                     "WHERE sc.StudentID = ?";
+
+        try (Connection conn = ConnectDatabase.checkConnect(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, studentID);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Grade grade = new Grade();
+                grade.setGradeID(rs.getString("GradeID"));
+                grade.setStudentClassID(rs.getString("StudentClassID"));
+                grade.setAttendanceScore(rs.getDouble("AttendanceScore"));
+                grade.setMidtermScore(rs.getDouble("MidtermScore"));
+                grade.setFinalExamScore(rs.getDouble("FinalExamScore"));
+                grade.setSemester(rs.getString("Semester"));
+                grade.setCourseName(rs.getString("CourseName"));
+                grade.setCourseCode(rs.getString("CourseCode"));
+                grade.setCredits(rs.getString("Credits"));
+                gradeList.add(grade);
+            }
+        } catch (SQLException e) {
+            logger.severe("Lỗi lấy danh sách điểm theo StudentID: " + e.getMessage());
+        }
+        return gradeList;
+    }
 }

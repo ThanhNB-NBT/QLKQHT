@@ -11,7 +11,7 @@ import java.util.logging.Logger;
 public class StudentClassDAO {
     private static final Logger logger = Logger.getLogger(StudentClassDAO.class.getName());
 
-    // Lấy danh sách tất cả StudentClass
+    // Lấy danh sách tất cả sinh viên của Lớp học phần (StudentClass)
     private static final String SQL_GET_ALL_STUDENTCLASS = "SELECT sc.StudentClassID, sc.ClassID, sc.StudentID, sc.Status, "
             + "c.ClassName, s.StudentCode, CONCAT(s.FirstName, ' ', s.LastName) AS StudentName "
             + "FROM StudentClasses sc "
@@ -34,7 +34,7 @@ public class StudentClassDAO {
         return studentClasses;
     }
 
-    // Lấy thông tin StudentClass theo ID
+    // Lấy thông tin sinh viên của Lớp học phần (StudentClass) theo ID
     private static final String SQL_GET_BY_ID = "SELECT sc.StudentClassID, sc.ClassID, sc.StudentID, sc.Status, "
             + "c.ClassName, s.StudentCode, CONCAT(s.FirstName, ' ', s.LastName) AS StudentName "
             + "FROM StudentClasses sc "
@@ -58,7 +58,7 @@ public class StudentClassDAO {
         return null;
     }
 
-    // Thêm mới StudentClass
+    // Thêm mới sinh viên của Lớp học phần (StudentClass)
     public static boolean createStudentClass(StudentClass studentClass) {
         Connection conn = null;
         try {
@@ -83,7 +83,7 @@ public class StudentClassDAO {
         }
     }
 
-    // Cập nhật StudentClass
+    // Cập nhật sinh viên của Lớp học phần StudentClass
     private static final String SQL_UPDATE_STUDENTCLASS = "UPDATE StudentClasses SET Status = ? WHERE StudentClassID = ?";
     public static boolean updateStudentClass(StudentClass studentClass) {
         try (Connection conn = ConnectDatabase.checkConnect();
@@ -99,7 +99,7 @@ public class StudentClassDAO {
         }
     }
 
-    // Xóa StudentClass
+    // Xóa sinh viên của Lớp học phầnStudentClass
     public static boolean deleteStudentClass(int studentClassID, int classID) {
         Connection conn = null;
         try {
@@ -123,7 +123,7 @@ public class StudentClassDAO {
         }
     }
 
-    // Tìm kiếm StudentClass
+    // Tìm kiếm theo tên sinh viên hoặc tên lớp học phần của Lớp học phần StudentClass
     private static final String SQL_SEARCH = "SELECT sc.StudentClassID, sc.ClassID, sc.StudentID, sc.Status, "
             + "c.ClassName, s.StudentCode, CONCAT(s.FirstName, ' ', s.LastName) AS StudentName "
             + "FROM StudentClasses sc "
@@ -150,7 +150,7 @@ public class StudentClassDAO {
         return studentClasses;
     }
 
-    // Kiểm tra trùng lớp và khóa học
+    // Kiểm tra trùng lớp và học phần
     private static final String SQL_CHECK_DUPLICATE =
             "SELECT COUNT(*) AS count " +
             "FROM StudentClasses sc " +

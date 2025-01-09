@@ -40,7 +40,6 @@
                 </a>
                 <div class="dropdown-menu">
                     <a class="dropdown-item" href="ProfileServlet">Thông tin cá nhân</a>
-                    <a class="dropdown-item" href="settings.html">Cài đặt</a>
                     <a class="dropdown-item" href="#" data-toggle="modal" data-target="#changePasswordModal">Đổi mật khẩu</a>
                     <a class="dropdown-item" href="LogoutServlet">Đăng xuất</a>
                 </div>
@@ -52,7 +51,6 @@
             </a>
             <div class="dropdown-menu dropdown-menu-right">
                 <a class="dropdown-item" href="ProfileServlet">Thông tin cá nhân</a>
-                <a class="dropdown-item" href="settings.html">Cài đặt</a>
                 <a class="dropdown-item" href="#" data-toggle="modal" data-target="#changePasswordModal">Đổi mật khẩu</a>
                 <a class="dropdown-item" href="LogoutServlet">Đăng xuất</a>
             </div>

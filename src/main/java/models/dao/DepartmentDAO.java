@@ -11,14 +11,6 @@ import java.util.logging.Logger;
 public class DepartmentDAO {
 	private static final Logger logger = Logger.getLogger(DepartmentDAO.class.getName());
 
-	private static final String SQL_SELECT_ALL_DEPARTMENT = "SELECT DepartmentID, DepartmentName, Email, Phone FROM Departments";
-	private static final String SQL_SELECT_DEPARTMENT = "SELECT DepartmentID, DepartmentName, Email, Phone FROM Departments WHERE DepartmentID = ?";
-	private static final String SQL_SEARCH_DEPARTMENT = "SELECT DepartmentID, DepartmentName, Email, Phone FROM Departments WHERE DepartmentName LIKE ?";
-	private static final String SQL_DELETE_DEPARTMENT = "DELETE FROM Departments WHERE DepartmentID = ?";
-	private static final String SQL_UPDATE_DEPARTMENT = "UPDATE Departments SET DepartmentName = ?, Email = ?, Phone = ? WHERE DepartmentID = ?";
-	private static final String SQL_INSERT_DEPARTMENT = "INSERT INTO Departments(DepartmentName, Email, Phone) VALUES (?, ?, ?)";
-	private static final String SQL_CHECHK_DEPARTMENTNAME = "SELECT COUNT(*) FROM Departments WHERE DepartmentName = ?";
-	private static final String SQL_DEPARTMENTID_BYNAME = "SELECT DepartmentID FROM Departments WHERE DepartmentName = ?";
 	private	static final String SQL_INSERT_DEPARTMENT_NAME = "INSERT INTO Departments (DepartmentName) VALUES (?)";
 
 	private static Department mapDepartment(ResultSet rs) throws SQLException{
@@ -30,6 +22,8 @@ public class DepartmentDAO {
 		return department;
 	}
 
+	//Lấy danh sách khoa/viện
+	private static final String SQL_SELECT_ALL_DEPARTMENT = "SELECT DepartmentID, DepartmentName, Email, Phone FROM Departments";
 	public static List<Department> getAllDepartment(){
 		List<Department> departments = new ArrayList<>();
 		try(Connection conn = ConnectDatabase.checkConnect();
@@ -45,6 +39,8 @@ public class DepartmentDAO {
 		return departments;
 	}
 
+	//Thêm mới
+	private static final String SQL_INSERT_DEPARTMENT = "INSERT INTO Departments(DepartmentName, Email, Phone) VALUES (?, ?, ?)";
 	public static boolean createDepartment(Department department) {
 		try(Connection conn = ConnectDatabase.checkConnect();
 			PreparedStatement stmt = conn.prepareStatement(SQL_INSERT_DEPARTMENT)){
@@ -59,6 +55,8 @@ public class DepartmentDAO {
 		return false;
 	}
 
+	//Xoá
+	private static final String SQL_DELETE_DEPARTMENT = "DELETE FROM Departments WHERE DepartmentID = ?";
 	public static boolean deleteDepartment(int departmentId) {
 		try(Connection conn = ConnectDatabase.checkConnect();
 			PreparedStatement stmt = conn.prepareStatement(SQL_DELETE_DEPARTMENT)){
@@ -70,6 +68,8 @@ public class DepartmentDAO {
 		return false;
 	}
 
+	//Cập nhật
+	private static final String SQL_UPDATE_DEPARTMENT = "UPDATE Departments SET DepartmentName = ?, Email = ?, Phone = ? WHERE DepartmentID = ?";
 	public static boolean updateDepartment(Department department) {
 		try(Connection conn = ConnectDatabase.checkConnect();
 			PreparedStatement stmt = conn.prepareStatement(SQL_UPDATE_DEPARTMENT)){
@@ -85,9 +85,11 @@ public class DepartmentDAO {
 		return false;
 	}
 
+	//Lấy thông tin theo ID
+	private static final String SQL_SELECT_DEPARTMENT_BYID = "SELECT DepartmentID, DepartmentName, Email, Phone FROM Departments WHERE DepartmentID = ?";
 	public static Department getDepartmentById(int departmentId) {
 		try(Connection conn = ConnectDatabase.checkConnect();
-			PreparedStatement stmt = conn.prepareStatement(SQL_SELECT_DEPARTMENT)){
+			PreparedStatement stmt = conn.prepareStatement(SQL_SELECT_DEPARTMENT_BYID)){
 				stmt.setInt(1, departmentId);
 				try(ResultSet rs = stmt.executeQuery()){
 					if(rs.next()) {
@@ -100,6 +102,9 @@ public class DepartmentDAO {
 		return null;
 	}
 
+
+	//Tìm kiếm
+	private static final String SQL_SEARCH_DEPARTMENT = "SELECT DepartmentID, DepartmentName, Email, Phone FROM Departments WHERE DepartmentName LIKE ?";
 	public static List<Department> searchByDepartmentName(String departmentName){
 		List<Department> departments = new ArrayList<>();
 
@@ -117,6 +122,8 @@ public class DepartmentDAO {
 		return departments;
 	}
 
+	//Kiểm tra trùng tên khoa
+	private static final String SQL_CHECHK_DEPARTMENTNAME = "SELECT COUNT(*) FROM Departments WHERE DepartmentName = ?";
 	public static boolean checkDepartmentName(String departmentName) {
 		try(Connection conn = ConnectDatabase.checkConnect();
 			PreparedStatement stmt = conn.prepareStatement(SQL_CHECHK_DEPARTMENTNAME)){
@@ -132,6 +139,8 @@ public class DepartmentDAO {
 		return false;
 	}
 
+	//Lấy ID theo tên khoa (cho chức năng nhập file excel ở quản lý sinh viên
+	private static final String SQL_DEPARTMENTID_BYNAME = "SELECT DepartmentID FROM Departments WHERE DepartmentName = ?";
 	public static Integer getDepartmentIDByName(String departmentName) {
 	    Integer departmentID = null;
 

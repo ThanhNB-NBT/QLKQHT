@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 public class TeacherStudentClassDAO {
     private static final Logger logger = Logger.getLogger(TeacherStudentClassDAO.class.getName());
 
+    // Lấy danh sách sinh viên theo TeacherID
     private static final String SQL_GET_BY_TEACHER_ID = "SELECT sc.StudentClassID, sc.ClassID, sc.StudentID, sc.Status, "
             + "c.ClassName, s.StudentCode, CONCAT(s.FirstName, ' ', s.LastName) AS StudentName "
             + "FROM StudentClasses sc "
@@ -19,19 +20,6 @@ public class TeacherStudentClassDAO {
             + "JOIN Teachers t ON c.TeacherID = t.TeacherID "
             + "WHERE t.TeacherID = ? "
             + "ORDER BY sc.ClassID";
-
-    private static final String SQL_SEARCH_BY_STUDENT_NAME = "SELECT sc.StudentClassID, sc.ClassID, sc.StudentID, sc.Status, "
-            + "c.ClassName, s.StudentCode, CONCAT(s.FirstName, ' ', s.LastName) AS StudentName "
-            + "FROM StudentClasses sc "
-            + "JOIN Classes c ON sc.ClassID = c.ClassID "
-            + "JOIN Students s ON sc.StudentID = s.StudentID "
-            + "JOIN Teachers t ON c.TeacherID = t.TeacherID "
-            + "WHERE t.TeacherID = ? AND CONCAT(s.FirstName, ' ', s.LastName) LIKE ? "
-            + "ORDER BY sc.ClassID";
-
-    private static final String SQL_UPDATE_STATUS = "UPDATE StudentClasses SET Status = ? WHERE StudentClassID = ?";
-
-    // Lấy danh sách sinh viên theo TeacherID
     public static List<StudentClass> getStudentsByTeacherId(String teacherID) {
         List<StudentClass> studentClasses = new ArrayList<>();
         try (Connection conn = ConnectDatabase.checkConnect();
@@ -51,6 +39,14 @@ public class TeacherStudentClassDAO {
     }
 
     // Tìm kiếm danh sách sinh viên theo TeacherID và tên sinh viên
+    private static final String SQL_SEARCH_BY_STUDENT_NAME = "SELECT sc.StudentClassID, sc.ClassID, sc.StudentID, sc.Status, "
+            + "c.ClassName, s.StudentCode, CONCAT(s.FirstName, ' ', s.LastName) AS StudentName "
+            + "FROM StudentClasses sc "
+            + "JOIN Classes c ON sc.ClassID = c.ClassID "
+            + "JOIN Students s ON sc.StudentID = s.StudentID "
+            + "JOIN Teachers t ON c.TeacherID = t.TeacherID "
+            + "WHERE t.TeacherID = ? AND CONCAT(s.FirstName, ' ', s.LastName) LIKE ? "
+            + "ORDER BY sc.ClassID";
     public static List<StudentClass> searchStudentsByTeacherId(String teacherID, String studentName) {
         List<StudentClass> studentClasses = new ArrayList<>();
         try (Connection conn = ConnectDatabase.checkConnect();
@@ -71,6 +67,7 @@ public class TeacherStudentClassDAO {
     }
 
     // Cập nhật trạng thái (Status) của StudentClass
+    private static final String SQL_UPDATE_STATUS = "UPDATE StudentClasses SET Status = ? WHERE StudentClassID = ?";
     public static boolean updateStudentClassStatus(Integer studentClassID, String status) {
         try (Connection conn = ConnectDatabase.checkConnect();
              PreparedStatement pstmt = conn.prepareStatement(SQL_UPDATE_STATUS)) {

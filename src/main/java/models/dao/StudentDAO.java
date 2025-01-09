@@ -16,41 +16,21 @@ import models.bean.Student;
 public class StudentDAO {
     private static final Logger logger = Logger.getLogger(StudentDAO.class.getName());
 
-    public static final String SQL_SELECT_ALL_STUDENTS =
-	    "SELECT s.*, d.DepartmentName, a.Avatar FROM Students s " +
-	    "LEFT JOIN Departments d ON s.DepartmentID = d.DepartmentID " +
-	    "LEFT JOIN Accounts a ON s.AccountID = a.AccountID";
 
-	public static final String SQL_SELECT_STUDENT_BY_ID =
-	    "SELECT s.*, d.DepartmentName, a.Avatar FROM Students s " +
-	    "LEFT JOIN Departments d ON s.DepartmentID = d.DepartmentID " +
-	    "LEFT JOIN Accounts a ON s.AccountID = a.AccountID " +
-	    "WHERE s.StudentID = ?";
 
-	public static final String SQL_SEARCH_STUDENTS_BY_NAME_MAJOR_ADDRESS =
-	    "SELECT s.*, d.DepartmentName, a.Avatar FROM Students s " +
-	    "LEFT JOIN Departments d ON s.DepartmentID = d.DepartmentID " +
-	    "LEFT JOIN Accounts a ON s.AccountID = a.AccountID WHERE 1=1";
 
-    public static final String SQL_INSERT_STUDENT =
-        "INSERT INTO Students (StudentCode, FirstName, LastName, DateOfBirth, Email, Phone, Address, EnrollmentYear, MajorName, DepartmentID, AccountID) " +
-        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-    public static final String SQL_UPDATE_STUDENT =
-        "UPDATE Students SET FirstName = ?, LastName = ?, DateOfBirth = ?, Email = ?, Phone = ?, Address = ?, " +
-        "EnrollmentYear = ?, MajorName = ?, DepartmentID = ? WHERE StudentID = ?";
 
-    public static final String SQL_DELETE_ACCOUNT =
-	    "DELETE FROM Accounts WHERE AccountID = (SELECT AccountID FROM Students WHERE StudentID = ?)";
 
-	public static final String SQL_DELETE_STUDENT =
-	    "DELETE FROM Students WHERE StudentID = ?";
 
-    public static final String SQL_CHECK_STUDENTCODE =
-        "SELECT COUNT(*) FROM Students WHERE StudentCode = ?";
 
-    public static final String SQL_CHECK_STUDENTCODE_UPDATE =
-        "SELECT COUNT(*) FROM Students WHERE StudentCode = ? AND StudentID = ?";
+
+
+
+
+
+
+
 
     private static Student mapStudent(ResultSet rs) throws SQLException {
 
@@ -82,6 +62,11 @@ public class StudentDAO {
         return student;
     }
 
+    //Lấy danh sách sinh viên
+    public static final String SQL_SELECT_ALL_STUDENTS =
+    	    "SELECT s.*, d.DepartmentName, a.Avatar FROM Students s " +
+    	    "LEFT JOIN Departments d ON s.DepartmentID = d.DepartmentID " +
+    	    "LEFT JOIN Accounts a ON s.AccountID = a.AccountID";
 
     public static List<Student> getAllStudents() {
         List<Student> students = new ArrayList<>();
@@ -97,6 +82,11 @@ public class StudentDAO {
         return students;
     }
 
+    //Tìm kiếm sinh viên theo ngành học
+    public static final String SQL_SEARCH_STUDENTS_BY_NAME_MAJOR_ADDRESS =
+    	    "SELECT s.*, d.DepartmentName, a.Avatar FROM Students s " +
+    	    "LEFT JOIN Departments d ON s.DepartmentID = d.DepartmentID " +
+    	    "LEFT JOIN Accounts a ON s.AccountID = a.AccountID WHERE 1=1";
     public static List<Student> searchStudents(String name, String major, String address) {
         List<Student> students = new ArrayList<>();
         StringBuilder query = new StringBuilder(SQL_SEARCH_STUDENTS_BY_NAME_MAJOR_ADDRESS);
@@ -137,6 +127,13 @@ public class StudentDAO {
         return students;
     }
 
+    //Lấy thông tin sinh viên theo ID
+	public static final String SQL_SELECT_STUDENT_BY_ID =
+		    "SELECT s.*, d.DepartmentName, a.Avatar FROM Students s " +
+		    "LEFT JOIN Departments d ON s.DepartmentID = d.DepartmentID " +
+		    "LEFT JOIN Accounts a ON s.AccountID = a.AccountID " +
+		    "WHERE s.StudentID = ?";
+
     public static Student getStudentById(int studentID) {
         try (Connection conn = ConnectDatabase.checkConnect();
              PreparedStatement stmt = conn.prepareStatement(SQL_SELECT_STUDENT_BY_ID)) {
@@ -152,6 +149,9 @@ public class StudentDAO {
         return null;
     }
 
+    //Kiểm tra trùng mã sinh viên
+    public static final String SQL_CHECK_STUDENTCODE =
+            "SELECT COUNT(*) FROM Students WHERE StudentCode = ?";
     public static boolean checkStudentCode(String studentCode) {
         try (Connection conn = ConnectDatabase.checkConnect();
              PreparedStatement stmt = conn.prepareStatement(SQL_CHECK_STUDENTCODE)) {
@@ -167,6 +167,9 @@ public class StudentDAO {
         return false;
     }
 
+    //Kiểm tra trùng mã sinh viên cho cập nhật
+    public static final String SQL_CHECK_STUDENTCODE_UPDATE =
+            "SELECT COUNT(*) FROM Students WHERE StudentCode = ? AND StudentID = ?";
     public static boolean checkStudentCode(String studentCode, int excludeStudentID) {
         try (Connection conn = ConnectDatabase.checkConnect();
              PreparedStatement stmt = conn.prepareStatement(SQL_CHECK_STUDENTCODE_UPDATE)) {
@@ -183,6 +186,10 @@ public class StudentDAO {
         return false;
     }
 
+    //Thêm mới
+    public static final String SQL_INSERT_STUDENT =
+            "INSERT INTO Students (StudentCode, FirstName, LastName, DateOfBirth, Email, Phone, Address, EnrollmentYear, MajorName, DepartmentID, AccountID) " +
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     public static boolean createStudent(Student student) {
         Connection conn = null;
         PreparedStatement insertStudentStmt = null;
@@ -212,6 +219,11 @@ public class StudentDAO {
         return false;
     }
 
+    //Xoá
+    public static final String SQL_DELETE_ACCOUNT =
+    	    "DELETE FROM Accounts WHERE AccountID = (SELECT AccountID FROM Students WHERE StudentID = ?)";
+	public static final String SQL_DELETE_STUDENT =
+		    "DELETE FROM Students WHERE StudentID = ?";
     public static boolean deleteStudent(int studentID) {
         try (Connection conn = ConnectDatabase.checkConnect()) {
             // Xóa tài khoản liên kết
@@ -233,6 +245,10 @@ public class StudentDAO {
     }
 
 
+    //Cập nhật
+    public static final String SQL_UPDATE_STUDENT =
+            "UPDATE Students SET FirstName = ?, LastName = ?, DateOfBirth = ?, Email = ?, Phone = ?, Address = ?, " +
+            "EnrollmentYear = ?, MajorName = ?, DepartmentID = ? WHERE StudentID = ?";
     public static boolean updateStudent(Student student) {
         try (Connection conn = ConnectDatabase.checkConnect();
              PreparedStatement stmt = conn.prepareStatement(SQL_UPDATE_STUDENT)) {
@@ -275,6 +291,7 @@ public class StudentDAO {
         }
     }
 
+    //Lấy StudentID theo mã sinh viên
     public static Integer getStudentIDByCode(String studentCode) {
         String sql = "SELECT StudentID FROM Students WHERE StudentCode = ?";
         try (Connection conn = ConnectDatabase.checkConnect();

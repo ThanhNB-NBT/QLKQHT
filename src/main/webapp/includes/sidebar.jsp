@@ -16,7 +16,7 @@
         <!-- Dành cho Sinh viên -->
         <c:if test="${isStudent}">
           <li>
-            <a href="GradeServlet">
+            <a href="StudentGradeServlet">
               <img src="assets/img/sidebar/icon-1.png" alt="icon"><span>Xem điểm</span>
             </a>
           </li>

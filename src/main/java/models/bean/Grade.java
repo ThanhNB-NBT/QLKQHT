@@ -10,6 +10,10 @@ public class Grade {
     private String gradeLetter;
     private String studentCode;
     private String studentName;
+    private String courseName;
+    private String courseCode;
+    private String semester;
+    private String credits;
 
     public Grade() {
     }
@@ -90,6 +94,39 @@ public class Grade {
 
 	public void setStudentName(String studentName) {
 		this.studentName = studentName;
+	}
+
+
+	public String getCourseName() {
+		return courseName;
+	}
+
+	public String getCourseCode() {
+		return courseCode;
+	}
+
+	public String getSemester() {
+		return semester;
+	}
+
+	public String getCredits() {
+		return credits;
+	}
+
+	public void setCourseName(String courseName) {
+		this.courseName = courseName;
+	}
+
+	public void setCourseCode(String courseCode) {
+		this.courseCode = courseCode;
+	}
+
+	public void setSemester(String semester) {
+		this.semester = semester;
+	}
+
+	public void setCredits(String credits) {
+		this.credits = credits;
 	}
 
 	// Phương thức tính toán điểm thành phần

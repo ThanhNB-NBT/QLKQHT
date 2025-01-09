@@ -1,15 +1,16 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
 <title>Thông tin cá nhân</title>
-<jsp:include page="../../../includes/resources.jsp"></jsp:include>
+<jsp:include page="../../includes/resources.jsp"></jsp:include>
 </head>
 <body>
 	<div class="main-wrapper">
-		<jsp:include page="../../../includes/header.jsp"></jsp:include>
+		<jsp:include page="../../includes/header.jsp"></jsp:include>
 		<div class="page-wrapper">
 			<div class="content container-fluid">
 
@@ -34,8 +35,19 @@
 													<div class="row">
 														<div class="col-lg-12 col-md-12 col-sm-12 col-12">
 															<div class="aboutprofile-pic">
-																<img class="card-img-top" src="${sessionScope.loggedInUser.avatar}"
-																	alt="Card image">
+																<!-- Kiểm tra avatar nếu null thì thay thế bằng ảnh mặc định -->
+																<c:choose>
+																	<c:when
+																		test="${empty sessionScope.loggedInUser.avatar}">
+																		<img class="card-img-top"
+																			src="${pageContext.request.contextPath}/assets/img/user.jpg"
+																			width="30" alt="Ảnh đại diện">
+																	</c:when>
+																	<c:otherwise>
+																		<img class="card-img-top"
+																			src="${sessionScope.loggedInUser.avatar}" width="30" alt="Ảnh đại diện">
+																	</c:otherwise>
+																</c:choose>
 															</div>
 															<div class="aboutprofile-name">
 																<h5 class="text-center mt-2">${student.firstName}
@@ -66,7 +78,8 @@
 																<div class="row">
 																	<div class="col-md-4 col-6">
 																		<strong>Họ và tên</strong>
-																		<p class="text-muted">${student.firstName} ${student.lastName}</p>
+																		<p class="text-muted">${student.firstName}
+																			${student.lastName}</p>
 																	</div>
 																	<div class="col-md-4 col-6">
 																		<strong>Số điện thoại</strong>
@@ -84,12 +97,12 @@
 																</div>
 																<hr>
 																<ul class="list-group list-group-flush">
-																	<li class="list-group-item"><b>Địa chỉ</b><a href="#"
-																		class="float-right">${student.address}</a></li>
+																	<li class="list-group-item"><b>Địa chỉ</b><a
+																		href="#" class="float-right">${student.address}</a></li>
 																	<li class="list-group-item"><b>Ngày sinh</b><a
 																		href="#" class="float-right">${student.dateOfBirth}</a></li>
-																	<li class="list-group-item"><b>Khoa/Viện</b><a href="#"
-																		class="float-right">${student.department.departmentName}</a></li>
+																	<li class="list-group-item"><b>Khoa/Viện</b><a
+																		href="#" class="float-right">${student.department.departmentName}</a></li>
 																	<li class="list-group-item"><b>Ngành học</b><a
 																		href="#" class="float-right">${student.majorName}</a></li>
 																	<li class="list-group-item"><b>Ngày nhập học</b><a
@@ -110,6 +123,6 @@
 			</div>
 		</div>
 	</div>
-	<jsp:include page="../../../includes/footer.jsp"></jsp:include>
+	<jsp:include page="../../includes/footer.jsp"></jsp:include>
 </body>
 </html>

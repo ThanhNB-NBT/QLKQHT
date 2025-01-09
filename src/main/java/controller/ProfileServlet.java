@@ -39,17 +39,23 @@ public class ProfileServlet extends HttpServlet {
         request.setAttribute("user", loggedInUser);
 
         if (RoleUtils.isTeacher(session)) {
+
         	String teacherIDStr = SessionUtils.getLoggedInAccount(session).getTeacherID();
         	int teacherID = Integer.parseInt(teacherIDStr);
+
             Teacher teacher = TeacherDAO.getTeacherById(teacherID);
+
             request.setAttribute("teacher", teacher);
             request.getRequestDispatcher("/Views/Teacher/TeacherProfile/TeacherProfile.jsp").forward(request, response);
         } else if (RoleUtils.isStudent(session)) {
+
             String studentIDStr = SessionUtils.getLoggedInAccount(session).getStudentID();
             int studentID = Integer.parseInt(studentIDStr);
+
             Student student = StudentDAO.getStudentById(studentID);
+
             request.setAttribute("student", student);
-            request.getRequestDispatcher("/Views/Student/StudentProfile/StudentProfile.jsp").forward(request, response);
+            request.getRequestDispatcher("/Views/Student/StudentProfile.jsp").forward(request, response);
         } else {
             response.sendRedirect(request.getContextPath() + "/errorPage/error404.jsp");
         }
