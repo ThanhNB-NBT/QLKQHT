@@ -63,6 +63,9 @@ public class AccountServlet extends HttpServlet {
 		case "update":
 			updateAccount(request, response);
 			break;
+		case "changePassword":
+            changePassword(request, response);
+            break;
 		default:
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Hành động không hợp lệ.");
 			break;
@@ -143,5 +146,57 @@ public class AccountServlet extends HttpServlet {
 		AlertManager.addMessage(request, message, success);
 
 		response.sendRedirect(ACCOUNT_SERVLET);
+	}
+
+	private void changePassword(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	    HttpSession session = request.getSession(false);
+	    if (!SessionUtils.isLoggedIn(session)) {
+	        response.sendRedirect("login.jsp");
+	        return;
+	    }
+
+	    Account loggedInUser = SessionUtils.getLoggedInAccount(session);
+	    int accountID = loggedInUser.getAccountID();
+
+	    String currentPassword = request.getParameter("currentPassword");
+	    String newPassword = request.getParameter("newPassword");
+	    String confirmPassword = request.getParameter("confirmNewPassword");
+
+	    // Lấy URL của trang hiện tại (Referer)
+	    String referer = request.getHeader("Referer");
+	    if (referer == null || referer.trim().isEmpty()) {
+	        referer = "GradeDashboardServlet"; // URL mặc định nếu không có Referer
+	    }
+
+	    // Kiểm tra mật khẩu hiện tại
+	    Account account = AccountDAO.getAccountById(accountID);
+	    if (account == null) {
+	        response.sendError(HttpServletResponse.SC_NOT_FOUND, "Không tìm thấy tài khoản.");
+	        return;
+	    }
+
+	    String hashedCurrentPassword = Account.hashPassword(currentPassword);
+	    String hashedCurrentPassword1 = Account.hashPassword(hashedCurrentPassword);// Băm mật khẩu người dùng nhập
+
+	    if (!account.getPassword().equals(hashedCurrentPassword1)) {
+	        AlertManager.addMessage(request, "Mật khẩu hiện tại không chính xác.", false);
+	        response.sendRedirect(referer);
+	        return;
+	    }
+
+	    // Kiểm tra mật khẩu mới và xác nhận mật khẩu
+	    if (newPassword == null || newPassword.trim().isEmpty() || !newPassword.equals(confirmPassword)) {
+	        AlertManager.addMessage(request, "Mật khẩu mới không hợp lệ hoặc không khớp.", false);
+	        response.sendRedirect(referer);
+	        return;
+	    }
+
+	    String hashedNewPassword = Account.hashPassword(newPassword);
+	    // Cập nhật mật khẩu mới
+	    boolean success = AccountDAO.changePassword(accountID, hashedNewPassword);
+	    String message = success ? "Đổi mật khẩu thành công!" : "Có lỗi xảy ra khi đổi mật khẩu.";
+	    AlertManager.addMessage(request, message, success);
+
+	    response.sendRedirect(referer);
 	}
 }

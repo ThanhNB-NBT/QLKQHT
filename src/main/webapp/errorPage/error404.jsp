@@ -4,9 +4,20 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title>Lỗi</title>
+<jsp:include page="../includes/resources.jsp"></jsp:include>
 </head>
 <body>
 
+	<div class="main-wrapper">
+		<jsp:include page="../includes/header.jsp"></jsp:include>
+		<div class="page-wrapper">
+			<div class="content container-fluid">
+				<h2 class="text-align-center">Có lỗi xảy ra, vui lòng quay lại!</h2>
+			</div>
+
+		</div>
+	</div>
+	<jsp:include page="../includes/footer.jsp"></jsp:include>
 </body>
 </html>

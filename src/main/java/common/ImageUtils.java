@@ -63,4 +63,13 @@ public class ImageUtils {
         }
         return "assets/img/profile/" + fileName;
     }
+
+    public static boolean deleteFile(String filePath) {
+        File file = new File(filePath);
+        if (file.exists() && file.isFile()) {
+            return file.delete();
+        }
+        return false;
+    }
+
 }

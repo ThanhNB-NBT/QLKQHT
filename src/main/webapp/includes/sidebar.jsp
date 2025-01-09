@@ -21,7 +21,7 @@
             </a>
           </li>
           <li>
-            <a href="UserProfileServlet">
+            <a href="ProfileServlet">
               <img src="assets/img/sidebar/icon-4.png" alt="icon"><span>Thông tin cá nhân</span>
             </a>
           </li>
@@ -44,7 +44,7 @@
             </ul>
           </li>
           <li>
-            <a href="UserProfileServlet">
+            <a href="ProfileServlet">
               <img src="assets/img/sidebar/icon-4.png" alt="icon"><span>Thông tin cá nhân</span>
             </a>
           </li>
