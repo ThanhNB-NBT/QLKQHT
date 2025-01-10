@@ -1,4 +1,4 @@
-package controller;
+package controller.student;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -27,7 +27,7 @@ public class StudentGradeServlet extends HttpServlet {
 
 		// Lấy studentID từ session
         HttpSession session = request.getSession();
-        String studentID = (String) SessionUtils.getLoggedInAccount(session).getStudentID();
+        String studentID = SessionUtils.getLoggedInAccount(session).getStudentID();
 
         if (studentID == null) {
             // Nếu không có studentID trong session, chuyển hướng về trang đăng nhập

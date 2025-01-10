@@ -5,7 +5,9 @@ import common.ConnectDatabase;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 public class StudentClassDAO {
@@ -300,6 +302,89 @@ public class StudentClassDAO {
             logger.severe("Lỗi khi lấy StudentClassID: " + e.getMessage());
         }
         return null;
+    }
+
+ // Lấy danh sách lớp học phần có thể đăng ký
+    private static final String SQL_GET_AVAILABLE_CLASSES =
+        "SELECT c.ClassID, c.ClassName, c.CourseID, c.MaxStudents, c.RegisteredStudents, "
+        + "c.ClassTime, c.Room, c.Semester, co.CourseName, co.Credits, t.FirstName, t.LastName "
+        + "FROM Classes c "
+        + "JOIN Courses co ON c.CourseID = co.CourseID "
+        + "JOIN Teachers t ON c.TeacherID = t.TeacherID "
+        + "WHERE c.RegisteredStudents < c.MaxStudents "
+        + "ORDER BY c.Semester DESC, c.ClassName";
+
+    public static List<Map<String, Object>> getAvailableClasses(int studentID) {
+        List<Map<String, Object>> availableClasses = new ArrayList<>();
+        try (Connection conn = ConnectDatabase.checkConnect();
+             PreparedStatement pstmt = conn.prepareStatement(SQL_GET_AVAILABLE_CLASSES);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                int classID = rs.getInt("ClassID");
+                int courseID = rs.getInt("CourseID");
+
+                // Sử dụng phương thức isDuplicate có sẵn để kiểm tra
+                if (!isDuplicate(classID, studentID, courseID)) {
+                    Map<String, Object> classInfo = new HashMap<>();
+                    classInfo.put("classID", classID);
+                    classInfo.put("className", rs.getString("ClassName"));
+                    classInfo.put("courseName", rs.getString("CourseName"));
+                    classInfo.put("credits", rs.getInt("Credits"));
+                    classInfo.put("classTime", rs.getString("ClassTime"));
+                    classInfo.put("room", rs.getString("Room"));
+                    classInfo.put("semester", rs.getString("Semester"));
+                    classInfo.put("teacherName", rs.getString("FirstName") + " " + rs.getString("LastName"));
+                    classInfo.put("maxStudents", rs.getInt("MaxStudents"));
+                    classInfo.put("registeredStudents", rs.getInt("RegisteredStudents"));
+
+                    availableClasses.add(classInfo);
+                }
+            }
+        } catch (SQLException e) {
+            logger.severe("Lỗi khi lấy danh sách lớp học phần có thể đăng ký: " + e.getMessage());
+        }
+        return availableClasses;
+    }
+
+    // Lấy danh sách lớp học phần đã đăng ký của sinh viên
+    private static final String SQL_GET_REGISTERED_CLASSES =
+        "SELECT sc.StudentClassID, sc.Status, c.ClassID, c.ClassName, c.ClassTime, "
+        + "c.Room, c.Semester, co.CourseName, co.Credits, t.FirstName, t.LastName "
+        + "FROM StudentClasses sc "
+        + "JOIN Classes c ON sc.ClassID = c.ClassID "
+        + "JOIN Courses co ON c.CourseID = co.CourseID "
+        + "JOIN Teachers t ON c.TeacherID = t.TeacherID "
+        + "WHERE sc.StudentID = ? "
+        + "ORDER BY c.Semester DESC, c.ClassName";
+
+    public static List<Map<String, Object>> getRegisteredClasses(int studentID) {
+        List<Map<String, Object>> registeredClasses = new ArrayList<>();
+        try (Connection conn = ConnectDatabase.checkConnect();
+             PreparedStatement pstmt = conn.prepareStatement(SQL_GET_REGISTERED_CLASSES)) {
+
+            pstmt.setInt(1, studentID);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    Map<String, Object> classInfo = new HashMap<>();
+                    classInfo.put("studentClassID", rs.getInt("StudentClassID"));
+                    classInfo.put("classID", rs.getInt("ClassID"));
+                    classInfo.put("className", rs.getString("ClassName"));
+                    classInfo.put("courseName", rs.getString("CourseName"));
+                    classInfo.put("credits", rs.getInt("Credits"));
+                    classInfo.put("classTime", rs.getString("ClassTime"));
+                    classInfo.put("room", rs.getString("Room"));
+                    classInfo.put("semester", rs.getString("Semester"));
+                    classInfo.put("teacherName", rs.getString("FirstName") + " " + rs.getString("LastName"));
+                    classInfo.put("status", rs.getString("Status"));
+
+                    registeredClasses.add(classInfo);
+                }
+            }
+        } catch (SQLException e) {
+            logger.severe("Lỗi khi lấy danh sách lớp học phần đã đăng ký: " + e.getMessage());
+        }
+        return registeredClasses;
     }
 
 }

@@ -5,7 +5,7 @@
   <div class="sidebar-inner slimscroll">
     <div id="sidebar-menu" class="sidebar-menu">
       <div class="header-left">
-        <a href="index.jsp" class="logo">
+        <a href="GradeDashboardServlet" class="logo">
           <img src="assets/img/logo1.png" width="40" height="40" alt="Logo trường">
           <span class="text-uppercase">Đại học Vinh</span>
         </a>
@@ -18,6 +18,11 @@
           <li>
             <a href="StudentGradeServlet">
               <img src="assets/img/sidebar/icon-1.png" alt="icon"><span>Xem điểm</span>
+            </a>
+          </li>
+          <li>
+            <a href="ClassRegisterServlet">
+              <img src="assets/img/sidebar/icon-1.png" alt="icon"><span>Đăng ký học</span>
             </a>
           </li>
           <li>

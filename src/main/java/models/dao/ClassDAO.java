@@ -193,6 +193,32 @@ public class ClassDAO {
         return null;
     }
 
+    // Kiểm tra sức chứa của lớp
+    private static final String SQL_CHECK_CAPACITY =
+        "SELECT RegisteredStudents, MaxStudents FROM Classes WHERE ClassID = ?";
+
+    public static boolean checkClassCapacity(int classID) {
+        try (Connection conn = ConnectDatabase.checkConnect();
+             PreparedStatement pstmt = conn.prepareStatement(SQL_CHECK_CAPACITY)) {
+
+            pstmt.setInt(1, classID);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    int registeredStudents = rs.getInt("RegisteredStudents");
+                    int maxStudents = rs.getInt("MaxStudents");
+
+                    // Kiểm tra nếu số lượng học sinh đã đăng ký <= sức chứa tối đa
+                    return registeredStudents <= maxStudents;
+                }
+            }
+        } catch (SQLException e) {
+            logger.severe("Lỗi khi kiểm tra sức chứa của lớp: " + e.getMessage());
+        }
+        return false; // Trả về false trong trường hợp xảy ra lỗi
+    }
+
+
 	private static Class mapClass(ResultSet rs) throws SQLException {
 
 		Class cls = new Class();

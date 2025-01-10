@@ -77,7 +77,8 @@ public class AccountDAO {
 		+ "CONCAT(t.FirstName, ' ' , t.LastName) AS TeacherName, CONCAT(s.FirstName, ' ' , s.LastName) AS StudentName "
 		+ "FROM Accounts a " + "JOIN Roles r ON a.roleID = r.roleID "
 		+ "LEFT JOIN Teachers t ON a.accountID = t.accountID "
-		+ "LEFT JOIN Students s ON a.accountID = s.accountID ";
+		+ "LEFT JOIN Students s ON a.accountID = s.accountID "
+		+ "ORDER BY a.RoleID";
 
 	public static List<Account> getAllAccounts() {
 		List<Account> accounts = new ArrayList<>();
