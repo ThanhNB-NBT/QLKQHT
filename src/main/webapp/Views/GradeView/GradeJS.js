@@ -19,13 +19,17 @@ $(document).on('click', '.edit-grade', function () {
 
     // Hiển thị modal
     $('#edit_grade').modal('show');
-	console.log('Sự kiện submit được kích hoạt');
+    console.log('Modal edit grade được mở');
 });
 
 $(document).ready(function () {
+    // Xử lý sự kiện thay đổi lớp học
     $('#classSelect').on('change', function () {
         $('#classSelectForm').submit();
     });
+
+    // Khởi tạo form upload
+    initializeUploadForm();
 });
 
 function downloadExcelTemplate() {
@@ -37,44 +41,40 @@ function downloadExcelTemplate() {
     window.location.href = `GradeServlet?action=downloadTemplate&classID=${classID}`;
 }
 
-function uploadGradeFile() {
+function initializeUploadForm() {
     const fileInput = document.getElementById("gradeFileInput");
-    const classSelect = document.getElementById("classSelect"); // Dropdown để lấy classID
-    const hiddenClassID = document.getElementById("hiddenClassID");
-
-    // Lấy classID từ dropdown
-    const classID = classSelect ? classSelect.value : null;
-
-    if (!classID) {
-        alert("Vui lòng chọn lớp học trước khi nhập điểm từ Excel.");
-        return;
-    }
-
-    // Gán giá trị classID vào input hidden
-    hiddenClassID.value = classID;
-
-    // Kiểm tra giá trị đã được cập nhật
-    console.log("ClassID được gửi:", hiddenClassID.value);
-
-    // Mở cửa sổ chọn file
-    fileInput.click();
-}
-
-// Sự kiện khi file được chọn
-document.getElementById("gradeFileInput").addEventListener("change", function () {
     const uploadForm = document.getElementById("uploadExcelForm");
     const hiddenClassID = document.getElementById("hiddenClassID");
 
-    // Kiểm tra hiddenClassID trước khi submit
-    if (!hiddenClassID.value) {
-        alert("Vui lòng chọn lớp học trước khi nhập điểm từ Excel.");
-        return;
-    }
+    // Xử lý sự kiện khi click nút upload
+    document.querySelector('button[onclick="uploadGradeFile()"]').addEventListener('click', function(e) {
+        e.preventDefault();
+        const classID = document.getElementById("classSelect").value;
 
-    console.log("Form đang được submit với classID:", hiddenClassID.value);
-    uploadForm.submit(); // Gửi form
-});
+        hiddenClassID.value = classID;
+        console.log("Mở dialog chọn file với classID:", classID);
+        fileInput.click();
+    });
 
+    // Xử lý sự kiện khi file được chọn
+    fileInput.addEventListener("change", function() {
+        if (this.files.length > 0) {
+            console.log("File được chọn:", this.files[0].name);
+            console.log("ClassID khi submit:", hiddenClassID.value);
 
+            // Tạo FormData để log
+            const formData = new FormData(uploadForm);
+            for (let pair of formData.entries()) {
+                console.log(pair[0] + ': ' + pair[1]);
+            }
 
+            uploadForm.submit();
+        }
+    });
+}
 
+function uploadGradeFile() {
+    // Function này chỉ được gọi thông qua onClick của button
+    // Việc xử lý đã được chuyển vào trong initializeUploadForm
+    console.log("Upload function called");
+}

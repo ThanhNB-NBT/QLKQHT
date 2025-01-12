@@ -86,22 +86,40 @@ public class GradeDAO {
         return false;
     }
 
- // Thêm phương thức cập nhật danh sách điểm
-    public static boolean updateGrades(List<Grade> grades) {
-        String sql = "UPDATE Grades SET AttendanceScore = ?, MidtermScore = ?, FinalExamScore = ? WHERE GradeID = ?";
 
-        try (Connection conn = ConnectDatabase.checkConnect(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            for (Grade grade : grades) {
+ // Thêm phương thức này vào class GradeDAO
+    public static boolean updateGradeByStudentClassID(Grade grade) {
+        String sql = "UPDATE Grades SET AttendanceScore = ?, MidtermScore = ?, FinalExamScore = ? " +
+                     "WHERE StudentClassID = ?";
+
+        try (Connection conn = ConnectDatabase.checkConnect();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            if (grade.getAttendanceScore() != null) {
                 ps.setDouble(1, grade.getAttendanceScore());
-                ps.setDouble(2, grade.getMidtermScore());
-                ps.setDouble(3, grade.getFinalExamScore());
-                ps.setString(4, grade.getGradeID());
-                ps.addBatch(); // Thêm câu lệnh vào batch
+            } else {
+                ps.setNull(1, Types.DOUBLE);
             }
-            int[] result = ps.executeBatch(); // Thực thi batch cập nhật
-            return result.length == grades.size(); // Kiểm tra nếu tất cả đều thành công
+
+            if (grade.getMidtermScore() != null) {
+                ps.setDouble(2, grade.getMidtermScore());
+            } else {
+                ps.setNull(2, Types.DOUBLE);
+            }
+
+            if (grade.getFinalExamScore() != null) {
+                ps.setDouble(3, grade.getFinalExamScore());
+            } else {
+                ps.setNull(3, Types.DOUBLE);
+            }
+
+            ps.setString(4, grade.getStudentClassID());
+
+            logger.info("Cập nhật điểm cho StudentClassID: " + grade.getStudentClassID());
+            return ps.executeUpdate() > 0;
+
         } catch (SQLException e) {
-            logger.severe("Lỗi cập nhật danh sách điểm: " + e.getMessage());
+            logger.severe("Lỗi cập nhật điểm theo StudentClassID: " + e.getMessage());
         }
         return false;
     }

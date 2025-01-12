@@ -102,8 +102,6 @@ public class CourseServlet extends HttpServlet {
 	    response.sendRedirect(COURSE_SERVLET);
 	}
 
-
-
     private void deleteCourse(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
         String courseIdStr = request.getParameter(COURSEID);
