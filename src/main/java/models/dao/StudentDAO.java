@@ -16,22 +16,6 @@ import models.bean.Student;
 public class StudentDAO {
     private static final Logger logger = Logger.getLogger(StudentDAO.class.getName());
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     private static Student mapStudent(ResultSet rs) throws SQLException {
 
         // Tạo đối tượng Student
@@ -306,5 +290,25 @@ public class StudentDAO {
         }
         return null;
     }
+
+    public static List<String> getClassIDByStudentID(String studentID) {
+        List<String> classIDs = new ArrayList<>();
+        String sql = "SELECT c.ClassID FROM Classes c "
+                + "JOIN StudentClasses sc ON c.ClassID = sc.ClassID "
+                + "JOIN Students s ON s.StudentID = sc.StudentID "
+                + "WHERE s.StudentID = ?";
+        try (Connection conn = ConnectDatabase.checkConnect();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, studentID);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                classIDs.add(rs.getString("ClassID"));
+            }
+        } catch (SQLException e) {
+            logger.severe("Lỗi khi lấy classID theo studentID: " + e.getMessage());
+        }
+        return classIDs; // Trả về danh sách
+    }
+
 
 }

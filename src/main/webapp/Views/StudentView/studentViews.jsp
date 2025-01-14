@@ -100,7 +100,7 @@ response.setDateHeader("Expires", 0);
 															alt="Avatar" class="img-thumbnail" width="40" height="40">
 
 														</td>
-														<td>${student.firstName}${student.lastName}</td>
+														<td>${student.firstName} ${student.lastName}</td>
 														<td><fmt:formatDate value="${student.dateOfBirth}"
 																pattern="dd/MM/yyyy" /></td>
 														<td>${student.majorName}</td>

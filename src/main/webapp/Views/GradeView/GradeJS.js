@@ -22,6 +22,34 @@ $(document).on('click', '.edit-grade', function () {
     console.log('Modal edit grade được mở');
 });
 
+// Hiển thị modal chỉnh sửa điểm
+$(document).on('click', '.edit-gradereview', function () {
+    const gradeID = $(this).data('id');
+    const attendance = $(this).data('attendance');
+    const midterm = $(this).data('midterm');
+    const final = $(this).data('final');
+    const studentCode = $(this).data('student-code');
+    const studentName = $(this).data('student-name');
+    const classID = $(this).data('class-id');
+	const status = $(this).data('status');
+	const comment = $(this).data('comment');
+
+    // Gán dữ liệu vào modal
+    $('#editGradeID').val(gradeID);
+    $('#editAttendanceScore').text(attendance);
+    $('#editMidtermScore').text(midterm);
+    $('#editFinalScore').text(final);
+    $('#editStudentCode').text(studentCode);
+    $('#editStudentName').text(studentName);
+    $('#editClassID').val(classID);
+	$('#editGradeStatus').val(status);
+	$('#editGradeComment').val(comment);
+
+    // Hiển thị modal
+    $('#edit_grade_review').modal('show');
+    console.log('Modal edit gradereview được mở');
+});
+
 $(document).ready(function () {
     // Xử lý sự kiện thay đổi lớp học
     $('#classSelect').on('change', function () {

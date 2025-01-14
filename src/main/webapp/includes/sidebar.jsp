@@ -40,7 +40,7 @@
             </a>
           </li>
           <li class="submenu">
-            <a>
+            <a >
               <img src="assets/img/sidebar/icon-4.png" alt="icon"> <span> Lớp </span> <span class="menu-arrow"></span>
             </a>
             <ul class="list-unstyled" style="display: none;">

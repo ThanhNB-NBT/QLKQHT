@@ -31,8 +31,8 @@ response.setDateHeader("Expires", 0);
 							<ul class="breadcrumb mb-0 p-0 float-right">
 								<li class="breadcrumb-item"><a href="index.jsp"><i
 										class="fas fa-home"></i> Trang chủ</a></li>
-								<li class="breadcrumb-item active"><span>Điểm sinh
-										viên</span></li>
+								<li class="breadcrumb-item active">Điểm sinh
+										viên</li>
 							</ul>
 						</div>
 					</div>
@@ -111,14 +111,16 @@ response.setDateHeader("Expires", 0);
 													<td class="text-center">${grade.gradeLetter}</td>
 													<td>${grade.gradeStatusLabel}</td>
 													<td class="align-items-center"><a
-														class="btn btn-primary edit-grade"
+														class="btn btn-primary edit-gradereview"
 														data-id="${grade.gradeID}"
 														data-student-code="${grade.studentCode}"
 														data-student-name="${grade.studentName}"
 														data-attendance="${grade.attendanceScore}"
 														data-midterm="${grade.midtermScore}"
 														data-final="${grade.finalExamScore}"
-														data-class-id="${selectedClassID}"> <i
+														data-class-id="${selectedClassID}"
+														data-status="${grade.gradeStatus}"
+														data-comment="${grade.gradeComment}"> <i
 															class="far fa-edit"></i>
 													</a></td>
 												</tr>
@@ -140,7 +142,7 @@ response.setDateHeader("Expires", 0);
 					</div>
 				</div>
 
-				<jsp:include page="editGradeModal.jsp"></jsp:include>
+				<jsp:include page="editGradeReviewModal.jsp"></jsp:include>
 
 			</div>
 		</div>
