@@ -1,5 +1,9 @@
 package models.bean;
 
+import java.util.Map;
+
+import common.XMLConfigManager;
+
 public class Grade {
     private String gradeID;
     private String studentClassID;
@@ -8,12 +12,16 @@ public class Grade {
     private Double finalExamScore;
     private Double componentScore;
     private String gradeLetter;
+    private GradeStatus gradeStatus = GradeStatus.PENDING;
+    private String gradeComment;
     private String studentCode;
     private String studentName;
     private String courseName;
     private String courseCode;
     private String semester;
     private String credits;
+    private static String classID;
+    private static String xmlContent;
 
     public Grade() {
     }
@@ -81,73 +89,115 @@ public class Grade {
     }
 
     public String getStudentCode() {
-		return studentCode;
+        return studentCode;
+    }
+
+    public String getStudentName() {
+        return studentName;
+    }
+
+    public void setStudentCode(String studentCode) {
+        this.studentCode = studentCode;
+    }
+
+    public void setStudentName(String studentName) {
+        this.studentName = studentName;
+    }
+
+    public String getCourseName() {
+        return courseName;
+    }
+
+    public String getCourseCode() {
+        return courseCode;
+    }
+
+    public String getSemester() {
+        return semester;
+    }
+
+    public String getCredits() {
+        return credits;
+    }
+
+    public void setCourseName(String courseName) {
+        this.courseName = courseName;
+    }
+
+    public void setCourseCode(String courseCode) {
+        this.courseCode = courseCode;
+    }
+
+    public void setSemester(String semester) {
+        this.semester = semester;
+    }
+
+    public void setCredits(String credits) {
+        this.credits = credits;
+    }
+
+    public static void setClassID(String ID) {
+        classID = ID;
+    }
+
+    public String getGradeStatus() {
+        return gradeStatus.getCode();
+    }
+
+    public String getGradeStatusLabel() {
+        return gradeStatus.getLabel();
+    }
+
+    public void setGradeStatus(String statusCode) {
+        this.gradeStatus = GradeStatus.fromCode(statusCode);
+    }
+
+	public String getGradeComment() {
+		return gradeComment;
 	}
 
-	public String getStudentName() {
-		return studentName;
+	public void setGradeComment(String gradeComment) {
+		this.gradeComment = gradeComment;
 	}
 
-	public void setStudentCode(String studentCode) {
-		this.studentCode = studentCode;
-	}
+	// Thêm method để set nội dung XML
+    public static void setXMLContent(String content) {
+        xmlContent = content;
+        System.out.println("XML Content đã được set trong Grade: " + (content != null ? "Có nội dung" : "Null"));
+    }
 
-	public void setStudentName(String studentName) {
-		this.studentName = studentName;
-	}
+    // Sửa lại phương thức calculateComponentScore
+    private Double calculateComponentScore() {
+    	System.out.println("Bắt đầu tính điểm thành phần...");
+        System.out.println("ClassID: " + classID);
+        System.out.println("XML Content null?: " + (xmlContent == null));
+        if (classID == null || classID.isEmpty() || xmlContent == null) {
+            return 0.0;
+        }
+        double[] weights = XMLConfigManager.getWeights(xmlContent, classID);
+        double attendance = this.attendanceScore != null ? this.attendanceScore : 0.0;
+        double midterm = this.midtermScore != null ? this.midtermScore : 0.0;
+        double finalExam = this.finalExamScore != null ? this.finalExamScore : 0.0;
+        return roundToOneDecimal(attendance * weights[0] + midterm * weights[1] + finalExam * weights[2]);
+    }
 
-
-	public String getCourseName() {
-		return courseName;
-	}
-
-	public String getCourseCode() {
-		return courseCode;
-	}
-
-	public String getSemester() {
-		return semester;
-	}
-
-	public String getCredits() {
-		return credits;
-	}
-
-	public void setCourseName(String courseName) {
-		this.courseName = courseName;
-	}
-
-	public void setCourseCode(String courseCode) {
-		this.courseCode = courseCode;
-	}
-
-	public void setSemester(String semester) {
-		this.semester = semester;
-	}
-
-	public void setCredits(String credits) {
-		this.credits = credits;
-	}
-
-	// Phương thức tính toán điểm thành phần
-	private Double calculateComponentScore() {
-	    double attendance = this.attendanceScore != null ? this.attendanceScore : 0.0;
-	    double midterm = this.midtermScore != null ? this.midtermScore : 0.0;
-	    double finalExam = this.finalExamScore != null ? this.finalExamScore : 0.0;
-	    return roundToOneDecimal(attendance * 0.2 + midterm * 0.3 + finalExam * 0.5);
-	}
-
-
-    // Phương thức xác định hạng điểm
+    // Sửa lại phương thức calculateGradeLetter
     private String calculateGradeLetter() {
-        if (componentScore >= 8.5) return "A";
-        if (componentScore >= 7.0) return "B";
-        if (componentScore >= 5.5) return "C";
-        if (componentScore >= 4.0) return "D";
+        if (classID == null || classID.isEmpty() || xmlContent == null) {
+            return "F";
+        }
+        Map<String, double[]> gradeLetters = XMLConfigManager.getGradeLetters(xmlContent, classID);
+        for (Map.Entry<String, double[]> entry : gradeLetters.entrySet()) {
+            double min = entry.getValue()[0];
+            double max = entry.getValue()[1];
+            if (componentScore >= min && componentScore <= max) {
+                return entry.getKey();
+            }
+        }
         return "F";
     }
 
-    // Cập nhật điểm thành phần và hạng điểm khi có thay đổi
+    // Cập nhật điểm thành phần và điểm chữ khi có thay đổi
     private void updateComponentScoreAndGradeLetter() {
         this.componentScore = calculateComponentScore();
         this.gradeLetter = calculateGradeLetter();
@@ -156,6 +206,39 @@ public class Grade {
     // Làm tròn giá trị đến 1 chữ số thập phân
     private double roundToOneDecimal(Double value) {
         return Math.round(value * 10.0) / 10.0;
+    }
+
+ // Định nghĩa Enum cho trạng thái duyệt điểm
+    public enum GradeStatus {
+        PENDING("0", "Chờ duyệt"),
+        APPROVED("1", "Đã duyệt"),
+        REJECTED("2", "Từ chối"),
+        REVISED("3", "Đã sửa");
+
+        private final String code;
+        private final String label;
+
+        GradeStatus(String code, String label) {
+            this.code = code;
+            this.label = label;
+        }
+
+        public String getCode() {
+            return code;
+        }
+
+        public String getLabel() {
+            return label;
+        }
+
+        public static GradeStatus fromCode(String code) {
+            for (GradeStatus status : values()) {
+                if (status.getCode().equals(code)) {
+                    return status;
+                }
+            }
+            return PENDING; // Mặc định là chờ duyệt
+        }
     }
 
     @Override

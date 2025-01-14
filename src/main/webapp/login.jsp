@@ -20,12 +20,12 @@
 						<form action="LoginServlet" method="post">
 							<div class="form-group">
 								<label>Tài khoản / Email</label>
-								<input type="text" class="form-control" name="identifier" required pattern=".{3,}"
+								<input type="text" class="form-control" name="identifier" pattern=".{3,}"
 													title="Tài khoản phải có ít nhất 3 ký tự">
 							</div>
 							<div class="form-group">
 								<label>Mật khẩu</label>
-								<input type="password" class="form-control" name="password" required pattern=".{3,}"
+								<input type="password" class="form-control" name="password" pattern=".{3,}"
 													title="Mật khẩu phải có ít nhất 6 ký tự">
 							</div>
 							<div class="form-group text-center custom-mt-form-group">

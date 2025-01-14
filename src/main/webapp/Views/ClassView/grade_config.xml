@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Classes>
+    <Class>
+        <ClassID>19</ClassID>
+        <ClassName>Cơ sở dữ liệu_LT01</ClassName>
+        <AttendanceWeight>0.2</AttendanceWeight>
+        <MidtermWeight>0.3</MidtermWeight>
+        <FinalWeight>0.5</FinalWeight>
+        <GradeLetters>
+            <GradeLetter min="8.5" max="10">A</GradeLetter>
+            <GradeLetter min="7.0" max="8.4">B</GradeLetter>
+            <GradeLetter min="5.5" max="6.9">C</GradeLetter>
+            <GradeLetter min="4.0" max="5.4">D</GradeLetter>
+            <GradeLetter min="0.0" max="3.9">S</GradeLetter>
+        </GradeLetters>
+    </Class>
+    <Class>
+        <ClassID>21</ClassID>
+        <ClassName>Tiếng Anh 1_LT01</ClassName>
+        <AttendanceWeight>0.25</AttendanceWeight>
+        <MidtermWeight>0.25</MidtermWeight>
+        <FinalWeight>0.5</FinalWeight>
+        <GradeLetters>
+            <GradeLetter min="9.0" max="10">A</GradeLetter>
+            <GradeLetter min="8.0" max="8.9">B</GradeLetter>
+            <GradeLetter min="6.5" max="7.9">C</GradeLetter>
+            <GradeLetter min="5.0" max="6.4">E</GradeLetter>
+            <GradeLetter min="0.0" max="4.9">F</GradeLetter>
+        </GradeLetters>
+    </Class>
+    <Class>
+        <ClassID>20</ClassID>
+        <ClassName>Tư tưởng HCM_LT02</ClassName>
+        <AttendanceWeight>0.15</AttendanceWeight>
+        <MidtermWeight>0.15</MidtermWeight>
+        <FinalWeight>0.7</FinalWeight>
+        <GradeLetters>
+            <GradeLetter min="9.0" max="10">A</GradeLetter>
+            <GradeLetter min="8.0" max="8.9">B</GradeLetter>
+            <GradeLetter min="6.5" max="7.9">C</GradeLetter>
+            <GradeLetter min="5.0" max="6.4">D</GradeLetter>
+            <GradeLetter min="0.0" max="4.9">F</GradeLetter>
+        </GradeLetters>
+    </Class>
+</Classes>

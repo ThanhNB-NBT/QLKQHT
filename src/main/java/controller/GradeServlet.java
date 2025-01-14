@@ -19,9 +19,13 @@ import models.dao.ClassDAO;
 import models.dao.GradeDAO;
 import valid.GradeValidator;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
+import java.util.logging.Logger;
 
 @WebServlet("/GradeServlet")
 @MultipartConfig
@@ -29,10 +33,43 @@ public class GradeServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final String URL = "GradeServlet?classID=";
 	private static final String CLASSID = "classID";
+	private static final Logger logger = Logger.getLogger(GradeServlet.class.getName());
 
 	public GradeServlet() {
 		super();
 	}
+
+	@Override
+    public void init() throws ServletException {
+        super.init();
+        try {
+            System.out.println("Đang khởi tạo GradeServlet...");
+
+            // Lấy đường dẫn file
+            String xmlPath = getServletContext().getRealPath("/Views/ClassView/grade_config.xml");
+            System.out.println("Đường dẫn file XML: " + xmlPath);
+
+            // Kiểm tra file có tồn tại không
+            File xmlFile = new File(xmlPath);
+            if (!xmlFile.exists()) {
+                System.err.println("ERROR: File không tồn tại tại đường dẫn: " + xmlPath);
+                throw new ServletException("File cấu hình điểm không tồn tại");
+            }
+
+            // Đọc nội dung file
+            String xmlContent = Files.readString(Path.of(xmlPath));
+            System.out.println("Đã đọc được nội dung XML: " + xmlContent.substring(0, 100) + "...");
+
+            // Set nội dung vào Grade
+            Grade.setXMLContent(xmlContent);
+            System.out.println("Đã set XML content thành công");
+
+        } catch (IOException e) {
+            System.err.println("ERROR khi đọc file config: " + e.getMessage());
+            e.printStackTrace();
+            throw new ServletException("Không thể đọc file cấu hình điểm", e);
+        }
+    }
 
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -60,26 +97,31 @@ public class GradeServlet extends HttpServlet {
 	}
 
 	@Override
-	protected void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		String action = request.getParameter("action");
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String action = request.getParameter("action");
 
-		if (action != null) {
-			switch (action) {
-			case "uploadExcel":
-				uploadExcel(request, response);
-				return;
-			case "update":
-				updateGrade(request, response);
-				return;
-			default:
-				response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Hành động không hợp lệ.");
-				return;
-			}
-		}
-
-		response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Hành động không hợp lệ.");
-	}
+        if (action != null) {
+            switch (action) {
+                case "uploadExcel":
+                    uploadExcel(request, response);
+                    return;
+                case "update":
+                    updateGrade(request, response);
+                    return;
+                case "review":
+                    if (RoleUtils.isAdmin(request.getSession())) {
+                        reviewGrade(request, response);
+                    } else {
+                        response.sendError(HttpServletResponse.SC_FORBIDDEN, "Không có quyền duyệt điểm");
+                    }
+                    return;
+                default:
+                    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Hành động không hợp lệ.");
+                    return;
+            }
+        }
+    }
 
 	private void handleViewGrades(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -88,19 +130,70 @@ public class GradeServlet extends HttpServlet {
 		String teacherID = RoleUtils.isAdmin(session) ? null
 						   : SessionUtils.getLoggedInAccount(session).getTeacherID();
 
-		// Lấy danh sách lớp học
-		List<Class> classes = GradeDAO.getClassesByTeacher(teacherID);
-		request.setAttribute("classes", classes);
+		Grade.setClassID(classID);
 
-		// Lấy danh sách điểm
-		if (classID != null && !classID.isEmpty()) {
-			List<Grade> grades = GradeDAO.getGradesByClassID(classID);
-			request.setAttribute("grades", grades);
-			request.setAttribute("selectedClassID", classID);
-		}
+		if (RoleUtils.isAdmin(session)) {
+			List<Class> classes = GradeDAO.getClassesByTeacher(teacherID);
+			request.setAttribute("classes", classes);
 
-		request.getRequestDispatcher("/Views/GradeView/gradeViews.jsp").forward(request, response);
+			if (classID != null && !classID.isEmpty()) {
+				List<Grade> grades = GradeDAO.getGradesByClassID(classID);
+				request.setAttribute("grades", grades);
+				request.setAttribute("selectedClassID", classID);
+			}
+
+			request.getRequestDispatcher("/Views/GradeView/gradeReviews.jsp").forward(request, response);
+	    } else if (RoleUtils.isTeacher(session)) {
+			List<Class> classes = GradeDAO.getClassesByTeacher(teacherID);
+			request.setAttribute("classes", classes);
+
+			if (classID != null && !classID.isEmpty()) {
+				List<Grade> grades = GradeDAO.getGradesByClassID(classID);
+				request.setAttribute("grades", grades);
+				request.setAttribute("selectedClassID", classID);
+			}
+
+			request.getRequestDispatcher("/Views/GradeView/gradeViews.jsp").forward(request, response);
+	    } else {
+	        response.sendRedirect("login.jsp"); // Điều hướng đến trang đăng nhập nếu không hợp lệ
+	    }
+
 	}
+
+	// Thêm phương thức xử lý duyệt điểm
+	private void reviewGrade(HttpServletRequest request, HttpServletResponse response)
+	        throws IOException {
+	    String gradeID = request.getParameter("gradeID");
+	    String status = request.getParameter("status");
+	    String comment = request.getParameter("comment");
+	    String classID = request.getParameter(CLASSID);
+
+	    // Log các thông tin đầu vào
+	    logger.info("Bắt đầu xử lý duyệt điểm.");
+	    logger.info("Thông tin đầu vào - GradeID: " + gradeID + ", Status: " + status +
+	                ", Comment: " + comment + ", ClassID: " + classID);
+
+	    if (gradeID == null || status == null) {
+	        logger.warning("Thiếu thông tin cần thiết để duyệt điểm. GradeID hoặc Status là null.");
+	        AlertManager.addMessage(request, "Thiếu thông tin duyệt điểm", false);
+	        response.sendRedirect(URL + classID);
+	        return;
+	    }
+
+	    boolean success = GradeDAO.reviewGrade(gradeID, status, comment);
+	    String message = success ? "Duyệt điểm thành công!" : "Có lỗi khi duyệt điểm.";
+
+	    // Log kết quả xử lý
+	    if (success) {
+	        logger.info("Duyệt điểm thành công cho GradeID: " + gradeID);
+	    } else {
+	        logger.severe("Có lỗi khi duyệt điểm cho GradeID: " + gradeID);
+	    }
+
+	    AlertManager.addMessage(request, message, success);
+	    response.sendRedirect(URL + classID);
+	}
+
 
 	private void downloadExcelTemplate(HttpServletRequest request, HttpServletResponse response) {
 		String classIDParam = request.getParameter(CLASSID);
@@ -222,28 +315,49 @@ public class GradeServlet extends HttpServlet {
 	}
 
 	private void updateGrade(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		String gradeIDStr = request.getParameter("gradeID");
-		String attendanceScoreStr = request.getParameter("attendanceScore");
-		String midtermScoreStr = request.getParameter("midtermScore");
-		String finalExamScoreStr = request.getParameter("finalExamScore");
-		String classID = request.getParameter(CLASSID);
+	    // Kiểm tra quyền - chỉ giảng viên mới được cập nhật điểm
+	    HttpSession session = request.getSession();
+	    if (RoleUtils.isAdmin(session)) {
+	        AlertManager.addMessage(request, "Admin không có quyền cập nhật điểm", false);
+	        response.sendRedirect(URL + request.getParameter(CLASSID));
+	        return;
+	    }
 
-		// Chuyển đổi và kiểm tra giá trị input
-		Integer gradeID = parseInteger(gradeIDStr);
-		Double attendanceScore = parseDouble(attendanceScoreStr);
-		Double midtermScore = parseDouble(midtermScoreStr);
-		Double finalExamScore = parseDouble(finalExamScoreStr);
+	    String gradeIDStr = request.getParameter("gradeID");
+	    String attendanceScoreStr = request.getParameter("attendanceScore");
+	    String midtermScoreStr = request.getParameter("midtermScore");
+	    String finalExamScoreStr = request.getParameter("finalExamScore");
+	    String classID = request.getParameter(CLASSID);
 
-		if (GradeValidator.validateUpdateInput(gradeID, attendanceScore, midtermScore, finalExamScore, request)) {
-			response.sendRedirect(URL + classID);
-			return;
-		}
+	    // Chuyển đổi và kiểm tra giá trị input
+	    Integer gradeID = parseInteger(gradeIDStr);
+	    Double attendanceScore = parseDouble(attendanceScoreStr);
+	    Double midtermScore = parseDouble(midtermScoreStr);
+	    Double finalExamScore = parseDouble(finalExamScoreStr);
 
-		Grade grade = new Grade(String.valueOf(gradeID), attendanceScore, midtermScore, finalExamScore);
-		boolean success = GradeDAO.updateGrade(grade);
-		AlertManager.addMessage(request, success ? "Cập nhật điểm thành công!" : "Có lỗi khi cập nhật điểm.", success);
+	    if (GradeValidator.validateUpdateInput(gradeID, attendanceScore, midtermScore, finalExamScore, request)) {
+	        response.sendRedirect(URL + classID);
+	        return;
+	    }
 
-		response.sendRedirect(URL + classID);
+	    // Kiểm tra trạng thái điểm trước khi cho phép cập nhật
+	    String currentStatus = GradeDAO.getGradeStatus(String.valueOf(gradeID));
+	    if (currentStatus != null && currentStatus.equals(Grade.GradeStatus.APPROVED.getCode())) {
+	        AlertManager.addMessage(request, "Không thể cập nhật điểm đã được duyệt!", false);
+	        response.sendRedirect(URL + classID);
+	        return;
+	    }
+
+	    Grade grade = new Grade(String.valueOf(gradeID), attendanceScore, midtermScore, finalExamScore);
+	    // Tự động set trạng thái về chờ duyệt khi cập nhật điểm
+	    grade.setGradeStatus(Grade.GradeStatus.PENDING.getCode());
+
+	    boolean success = GradeDAO.updateGrade(grade);
+	    String message = success ? "Cập nhật điểm thành công! Điểm đã chuyển sang trạng thái chờ duyệt."
+	                           : "Có lỗi khi cập nhật điểm.";
+	    AlertManager.addMessage(request, message, success);
+
+	    response.sendRedirect(URL + classID);
 	}
 
 	private static Double parseDouble(String value) {

@@ -42,14 +42,16 @@ public class GradeDAO {
     // Lấy danh sách sinh viên và điểm theo ClassID
     public static List<Grade> getGradesByClassID(String classID) {
         List<Grade> gradeList = new ArrayList<>();
-        String sql = "SELECT g.GradeID, g.StudentClassID, g.AttendanceScore, g.MidtermScore, g.FinalExamScore, " +
-                     "s.StudentCode, CONCAT(s.FirstName, ' ', s.LastName) AS StudentName " +
-                     "FROM Grades g " +
-                     "JOIN StudentClasses sc ON g.StudentClassID = sc.StudentClassID " +
-                     "JOIN Students s ON sc.StudentID = s.StudentID " +
-                     "WHERE sc.ClassID = ?";
+        String sql = "SELECT g.GradeID, g.StudentClassID, g.AttendanceScore, " +
+                    "g.MidtermScore, g.FinalExamScore, g.GradeStatus, g.GradeComment, " +
+                    "s.StudentCode, CONCAT(s.FirstName, ' ', s.LastName) AS StudentName " +
+                    "FROM Grades g " +
+                    "JOIN StudentClasses sc ON g.StudentClassID = sc.StudentClassID " +
+                    "JOIN Students s ON sc.StudentID = s.StudentID " +
+                    "WHERE sc.ClassID = ?";
 
-        try (Connection conn = ConnectDatabase.checkConnect(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = ConnectDatabase.checkConnect();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, classID);
             ResultSet rs = ps.executeQuery();
 
@@ -62,32 +64,50 @@ public class GradeDAO {
                 grade.setFinalExamScore(rs.getDouble("FinalExamScore"));
                 grade.setStudentCode(rs.getString("StudentCode"));
                 grade.setStudentName(rs.getString("StudentName"));
+                grade.setGradeStatus(rs.getString("GradeStatus"));
+                grade.setGradeComment(rs.getString("GradeComment"));
                 gradeList.add(grade);
             }
         } catch (SQLException e) {
-        	logger.severe("Lỗi Lấy danh sách sinh viên và điểm theo ClassID: " + e.getMessage());
+            logger.severe("Lỗi lấy danh sách điểm: " + e.getMessage());
         }
         return gradeList;
     }
 
     // Cập nhật điểm
     public static boolean updateGrade(Grade grade) {
-        String sql = "UPDATE Grades SET AttendanceScore = ?, MidtermScore = ?, FinalExamScore = ?" +
-                     "WHERE GradeID = ?";
-        try (Connection conn = ConnectDatabase.checkConnect(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setDouble(1, grade.getAttendanceScore());
-            ps.setDouble(2, grade.getMidtermScore());
-            ps.setDouble(3, grade.getFinalExamScore());
-            ps.setString(4, grade.getGradeID());
-            return ps.executeUpdate() > 0;
+        // Kiểm tra trạng thái duyệt trước khi cho phép cập nhật
+        String checkStatus = "SELECT GradeStatus FROM Grades WHERE GradeID = ?";
+        String updateSql = "UPDATE Grades SET AttendanceScore = ?, MidtermScore = ?, " +
+                          "FinalExamScore = ?, GradeStatus = ? WHERE GradeID = ?";
+
+        try (Connection conn = ConnectDatabase.checkConnect()) {
+            // Kiểm tra trạng thái
+            try (PreparedStatement checkPs = conn.prepareStatement(checkStatus)) {
+                checkPs.setString(1, grade.getGradeID());
+                ResultSet rs = checkPs.executeQuery();
+                if (rs.next() && rs.getString("GradeStatus").equals(Grade.GradeStatus.APPROVED.getCode())) {
+                    logger.warning("Không thể cập nhật điểm đã được duyệt!");
+                    return false;
+                }
+            }
+
+            // Thực hiện cập nhật
+            try (PreparedStatement updatePs = conn.prepareStatement(updateSql)) {
+                updatePs.setDouble(1, grade.getAttendanceScore());
+                updatePs.setDouble(2, grade.getMidtermScore());
+                updatePs.setDouble(3, grade.getFinalExamScore());
+                updatePs.setString(4, Grade.GradeStatus.PENDING.getCode());
+                updatePs.setString(5, grade.getGradeID());
+                return updatePs.executeUpdate() > 0;
+            }
         } catch (SQLException e) {
-        	logger.severe("Lỗi cập nhật điểm: " + e.getMessage());
+            logger.severe("Lỗi cập nhật điểm: " + e.getMessage());
+            return false;
         }
-        return false;
     }
 
-
- // Thêm phương thức này vào class GradeDAO
+    //Dành cho importExcel
     public static boolean updateGradeByStudentClassID(Grade grade) {
         String sql = "UPDATE Grades SET AttendanceScore = ?, MidtermScore = ?, FinalExamScore = ? " +
                      "WHERE StudentClassID = ?";
@@ -133,7 +153,7 @@ public class GradeDAO {
                      "JOIN StudentClasses sc ON g.StudentClassID = sc.StudentClassID " +
                      "JOIN Classes c ON sc.ClassID = c.ClassID " +
                      "JOIN Courses co ON c.CourseID = co.CourseID " +
-                     "WHERE sc.StudentID = ?";
+                     "WHERE sc.StudentID = ? AND g.GradeStatus = 1";
 
         try (Connection conn = ConnectDatabase.checkConnect(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, studentID);
@@ -157,4 +177,45 @@ public class GradeDAO {
         }
         return gradeList;
     }
+
+    //Kiểm tra trạng thái duyệt điểm
+    public static String getGradeStatus(String gradeID) {
+        String sql = "SELECT GradeStatus FROM Grades WHERE GradeID = ?";
+        try (Connection conn = ConnectDatabase.checkConnect();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, gradeID);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getString("GradeStatus");
+            }
+        } catch (SQLException e) {
+            logger.severe("Lỗi kiểm tra trạng thái điểm: " + e.getMessage());
+        }
+        return null;
+    }
+
+
+ // Thêm phương thức duyệt điểm (dành cho admin)
+    public static boolean reviewGrade(String gradeID, String status, String comment) {
+        String sql = "UPDATE Grades SET GradeStatus = ?, GradeComment = ? WHERE GradeID = ?";
+        logger.info("Chuẩn bị thực thi truy vấn cập nhật điểm.");
+        logger.info("SQL: " + sql);
+        logger.info("Thông tin đầu vào - GradeID: " + gradeID + ", Status: " + status + ", Comment: " + comment);
+
+        try (Connection conn = ConnectDatabase.checkConnect();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, status);
+            ps.setString(2, comment);
+            ps.setString(3, gradeID);
+
+            int rowsAffected = ps.executeUpdate();
+            logger.info("Số dòng bị ảnh hưởng: " + rowsAffected);
+
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            logger.severe("Lỗi duyệt điểm: " + e.getMessage());
+            return false;
+        }
+    }
+
 }
